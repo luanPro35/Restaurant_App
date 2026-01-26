@@ -1,20 +1,24 @@
 import React from "react";
 import { View, FlatList, Image, Text } from "react-native";
 
+import Banner1 from "../../../../assets/Banner1.png";
+import Banner2 from "../../../../assets/Banner2.png";
+import Banner3 from "../../../../assets/Banner3.png";
+
 const List_Banner = [
   {
     id: 1,
-    image: require("../../../../../assets/Banner1.png"),
+    image: Banner1,
     description: "Mua ngay",
   },
   {
     id: 2,
-    image: require("../../../../../assets/Banner2.png"),
+    image: Banner2,
     description: "Mua ngay",
   },
   {
     id: 3,
-    image: require("../../../../../assets/Banner3.png"),
+    image: Banner3,
     description: "Ưu đãi hot. Mua ngay",
   },
 ];

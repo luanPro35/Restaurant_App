@@ -8,14 +8,15 @@ import Best_Seller_Today from "./Best_Seller_Today";
 import New_Dish from "./New_Dish";
 import Quick_Combo from "./Quick_Combo";
 import MealOption from "./MealOption";
-interface HomeScreenProps {
-  onLogout: () => void;
-}
+import Shopping_Cart from "../../../app/providers/Shopping_Cart";
+import Navbar from "./Navbar";
+import { useAuth } from "../../../app/context/AuthContext";
 
-export default function HomeScreen({ onLogout }: HomeScreenProps) {
+export default function HomeScreen() {
+  const { logout } = useAuth();
   return (
     <View className="flex-1 bg-[#F9F6E7]">
-      <Header onLogout={onLogout} />
+      <Header onLogout={logout} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-6 pt-8">
@@ -39,7 +40,15 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
         <View className="px-3">
           <MealOption />
         </View>
+        <View className="h-32" />
       </ScrollView>
+
+      <View className="absolute bottom-8 left-4 right-4 flex-row items-center">
+        <View className="flex-1 mr-3">
+          <Navbar />
+        </View>
+        <Shopping_Cart />
+      </View>
     </View>
   );
 }

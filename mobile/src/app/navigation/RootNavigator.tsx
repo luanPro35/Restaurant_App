@@ -1,12 +1,26 @@
 import React from "react";
-import { View, Text } from "react-native";
-// import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AuthNavigator from "./AuthNavigator";
+import MainNavigator from "./MainNavigator";
+import { useAuth } from "../context/AuthContext";
 
-// Logic to switch between Auth and Main flows usually goes here
+export type RootStackParamList = {
+  Auth: undefined;
+  Main: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
 export default function RootNavigator() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <View>
-      <Text>Root Navigator Placeholder</Text>
-    </View>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <Stack.Screen name="Main" component={MainNavigator} />
+      ) : (
+        <Stack.Screen name="Auth" component={AuthNavigator} />
+      )}
+    </Stack.Navigator>
   );
 }

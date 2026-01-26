@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export const List_Quick_Combo = [
+export const List_Today_Featured = [
   {
     id: 1,
     name: "Lẩu gà đen dân tộc",
@@ -165,12 +165,12 @@ export const List_Quick_Combo = [
   },
 ];
 
-export default function Quick_Combo() {
+export default function Today_Featured() {
   return (
     <View className="py-4">
       <View className="flex-row items-center justify-between">
         <Text className="text-2xl font-bold text-[#2D2D2D] mb-4">
-          Combo / Ưu đãi nhanh <Text className="text-[#E07B39]">🎁</Text>
+          Món Nổi Bật Hôm Nay
         </Text>
         <TouchableOpacity className="bg-[#E07B39] p-2 rounded-full mb-5">
           <MaterialCommunityIcons name="arrow-right" size={24} color="black" />
@@ -178,7 +178,7 @@ export default function Quick_Combo() {
       </View>
       <View>
         <FlatList
-          data={List_Quick_Combo.slice(0, 6)}
+          data={List_Today_Featured.slice(0, 6)}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
@@ -200,9 +200,18 @@ export default function Quick_Combo() {
                   <Text className="text-xs text-[#6B4423] mb-2">
                     {item.category}
                   </Text>
-                  <Text className="text-base font-bold text-[#E07B39]">
-                    {item.price}
-                  </Text>
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-base font-bold text-[#E07B39]">
+                      {item.price}
+                    </Text>
+                    <TouchableOpacity className="bg-[#E07B39] p-1 rounded-full">
+                      <MaterialCommunityIcons
+                        name="plus"
+                        size={20}
+                        color="white"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </TouchableOpacity>

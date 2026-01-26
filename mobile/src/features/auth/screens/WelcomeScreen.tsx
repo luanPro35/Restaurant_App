@@ -1,63 +1,58 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, Image, Animated, Dimensions, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Image, Animated, Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../../../app/navigation/AuthNavigator";
 
 const { height } = Dimensions.get("window");
 
-interface WelcomeProps {
-  children: React.ReactNode;
-}
-
-export default function WelcomeScreen({ children }: WelcomeProps) {
-  const logoTranslateY = useRef(new Animated.Value(0)).current;
-  const contentOpacity = useRef(new Animated.Value(0)).current;
-
-  // Note: Adjust the import path for the logo if necessary,
-  // since this file moved deeper into the directory structure.
-  // Previous: ../../assets/Logo.png (from src/screens)
-  // New: ../../../../assets/Logo.png (from src/features/auth/screens)
+export default function WelcomeScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const logoScale = useRef(new Animated.Value(1)).current;
+  const logoOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      // Animation sequence
+    // Start animation after 500ms
+    const animationTimer = setTimeout(() => {
       Animated.parallel([
-        Animated.timing(logoTranslateY, {
-          toValue: -height * 0.3, // Move up by 30% of screen height
+        Animated.timing(logoScale, {
+          toValue: 0.8,
           duration: 1000,
           useNativeDriver: true,
         }),
-        Animated.timing(contentOpacity, {
-          toValue: 1,
+        Animated.timing(logoOpacity, {
+          toValue: 0,
           duration: 1000,
           useNativeDriver: true,
         }),
       ]).start();
-    }, 2500); // Wait 2.5 seconds
+    }, 1500);
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Navigate to Login after animation completes
+    const navigationTimer = setTimeout(() => {
+      navigation.replace("Login");
+    }, 2000); // 500ms delay + 1500ms for animation to mostly complete
+
+    return () => {
+      clearTimeout(animationTimer);
+      clearTimeout(navigationTimer);
+    };
+  }, [navigation]);
 
   return (
     <View className="flex-1 bg-[#F9F6E7] items-center justify-center">
-      {/* Animated Logo */}
       <Animated.View
-        className="absolute items-center justify-center"
         style={{
-          transform: [{ translateY: logoTranslateY }, { translateX: 5 }],
+          transform: [{ scale: logoScale }],
+          opacity: logoOpacity,
         }}
       >
         <Image
           source={require("../../../../assets/Logo.png")}
-          className="w-[150px] h-[150px]"
+          className="w-[200px] h-[200px]"
           resizeMode="contain"
         />
-      </Animated.View>
-
-      {/* Content (Login/Register Forms) */}
-      <Animated.View
-        className="w-full items-center"
-        style={{ opacity: contentOpacity }}
-      >
-        {children}
       </Animated.View>
     </View>
   );

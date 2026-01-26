@@ -200,9 +200,18 @@ export default function Today_Featured() {
                   <Text className="text-xs text-[#6B4423] mb-2">
                     {item.category}
                   </Text>
-                  <Text className="text-base font-bold text-[#E07B39]">
-                    {item.price}
-                  </Text>
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-base font-bold text-[#E07B39]">
+                      {item.price}
+                    </Text>
+                    <TouchableOpacity className="bg-[#E07B39] p-1 rounded-full">
+                      <MaterialCommunityIcons
+                        name="plus"
+                        size={20}
+                        color="white"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </TouchableOpacity>

@@ -1,12 +1,18 @@
 import React from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-const List_Feature = [
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MainStackParamList } from "../../../../app/navigation/MainNavigator";
+
+const List_Feature = (
+  navigation: NativeStackNavigationProp<MainStackParamList>,
+) => [
   {
     name: "Tại quán",
     icon: "silverware-fork-knife",
     color: "#FF7A00",
-    onPress: () => console.log("Tại quán"),
+    onPress: () => navigation.navigate("AtRestaurant"),
   },
   {
     name: "Giao hàng",
@@ -53,9 +59,13 @@ const List_Feature = [
 ];
 
 export default function Choose_Feature() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const features = List_Feature(navigation);
+
   return (
     <View className="px-1 flex-row flex-wrap">
-      {List_Feature.map((item, index) => (
+      {features.map((item, index) => (
         <TouchableOpacity
           key={index}
           onPress={item.onPress}
