@@ -16,7 +16,7 @@ import Category_Food from "./Category_Food";
 import List_Food from "./List_Food";
 import Shopping_Cart from "../../../app/providers/Shopping_Cart";
 
-export default function AtRestaurantScreen() {
+export default function DeliveryScreen() {
   const navigation = useNavigation();
   const listRef = useRef<SectionList>(null);
   const scrollY = useRef(new Animated.Value(0)).current;

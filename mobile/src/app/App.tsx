@@ -1,16 +1,36 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View, ActivityIndicator } from "react-native";
 import RootNavigator from "./navigation/RootNavigator";
 import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
+  const [isReady, setIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    // Small delay to ensure everything is mounted
+    const timer = setTimeout(() => setIsReady(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#E07B39" />
+      </View>
+    );
+  }
+
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <StatusBar style="auto" />
-        <RootNavigator />
-      </NavigationContainer>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <NavigationContainer onReady={() => console.log("Navigation ready")}>
+          <StatusBar style="auto" />
+          <RootNavigator />
+        </NavigationContainer>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

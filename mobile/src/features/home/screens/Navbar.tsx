@@ -20,8 +20,8 @@ const List_Navbar = [
   },
   {
     id: 4,
-    name: "Tin nhắn",
-    icon: "message",
+    name: "Thông báo",
+    icon: "bell",
   },
 ];
 
@@ -29,14 +29,27 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function Navbar() {
   const [activeTab, setActiveTab] = useState(1);
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
+  const handlePress = (id: number) => {
+    setActiveTab(id);
+    if (id === 1) {
+      navigation.navigate("Home");
+    } else if (id === 2) {
+      navigation.navigate("Payment");
+    } else if (id === 3) {
+      navigation.navigate("History");
+    } else if (id === 4) {
+      navigation.navigate("Messages");
+    }
+  };
 
   return (
     <View className="flex-row justify-around items-center bg-white py-3 px-2 rounded-3xl shadow-2xl border border-gray-100">
       {List_Navbar.map((item) => (
         <TouchableOpacity
           key={item.id}
-          onPress={() => setActiveTab(item.id)}
+          onPress={() => handlePress(item.id)}
           className="items-center justify-center flex-1"
         >
           <MaterialCommunityIcons

@@ -13,7 +13,6 @@ export default function WelcomeScreen() {
   const logoOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Start animation after 500ms
     const animationTimer = setTimeout(() => {
       Animated.parallel([
         Animated.timing(logoScale, {
@@ -29,10 +28,9 @@ export default function WelcomeScreen() {
       ]).start();
     }, 1500);
 
-    // Navigate to Login after animation completes
     const navigationTimer = setTimeout(() => {
       navigation.replace("Login");
-    }, 2000); // 500ms delay + 1500ms for animation to mostly complete
+    }, 2000);
 
     return () => {
       clearTimeout(animationTimer);

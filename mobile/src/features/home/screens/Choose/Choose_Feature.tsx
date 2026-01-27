@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../../../app/navigation/MainNavigator";
+import FeaturesModal from "../../../all_choose/components/FeaturesModal";
 
 const List_Feature = (
   navigation: NativeStackNavigationProp<MainStackParamList>,
+  onOpenModal: () => void,
 ) => [
   {
     name: "Tại quán",
@@ -18,50 +20,52 @@ const List_Feature = (
     name: "Giao hàng",
     icon: "truck-delivery",
     color: "#4CAF50",
-    onPress: () => console.log("Giao hàng"),
+    onPress: () => navigation.navigate("Delivery"),
   },
   {
     name: "Menu",
     icon: "book-open-variant",
     color: "#3F51B5",
-    onPress: () => console.log("Menu"),
+    onPress: () => navigation.navigate("Menu"),
   },
   {
     name: "Bán chạy",
     icon: "fire",
     color: "#F44336",
-    onPress: () => console.log("Bán chạy"),
+    onPress: () => navigation.navigate("BestSeller"),
   },
   {
     name: "Khuyến mãi",
     icon: "ticket-percent",
     color: "#E91E63",
-    onPress: () => console.log("Khuyến mãi"),
+    onPress: () => navigation.navigate("Promotion"),
   },
   {
     name: "Đơn hàng",
     icon: "receipt-text",
     color: "#795548",
-    onPress: () => console.log("Đơn hàng"),
+    onPress: () => navigation.navigate("Package"),
   },
   {
     name: "Lịch sử",
     icon: "history",
     color: "#607D8B",
-    onPress: () => console.log("Lịch sử"),
+    onPress: () => navigation.navigate("History"),
   },
   {
     name: "Tất cả",
     icon: "apps",
     color: "#9C27B0",
-    onPress: () => console.log("Tất cả"),
+    onPress: onOpenModal,
   },
 ];
 
 export default function Choose_Feature() {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
-  const features = List_Feature(navigation);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const features = List_Feature(navigation, () => setModalVisible(true));
 
   return (
     <View className="px-1 flex-row flex-wrap">
@@ -86,6 +90,11 @@ export default function Choose_Feature() {
           </View>
         </TouchableOpacity>
       ))}
+
+      <FeaturesModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
