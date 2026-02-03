@@ -1,0 +1,8 @@
+openapi: 3.0.0
+info:
+  title: Restaurant Booking API
+  version: 1.0.0
+  description: API documentation for Restaurant Booking application
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local server

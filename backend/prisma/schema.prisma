@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  orders    Order[]
+  payments  Payment[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+  STAFF
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String?
+  description String?   @db.Text
+  image       String?   @db.Text
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             String   @id @default(uuid())
+  name           String
+  slug           String?
+  description    String?  @db.Text
+  price          Float
+  originalPrice  Float?
+  images         String   @db.Text // Store as JSON string
+  unit           String   @default("đĩa")
+  isAvailable    Boolean  @default(true)
+  isBestSeller   Boolean  @default(false)
+  
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id])
+  
+  variants       ProductVariant[] 
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  name      String
+  price     Float
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_variants")
+}
+
+model Table {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  capacity  Int
+  status    TableStatus @default(AVAILABLE)
+  location  String      @default("Main Hall")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  orders    Order[]
+
+  @@map("tables")
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  
+  tableId         String?
+  table           Table?      @relation(fields: [tableId], references: [id])
+  
+  items           OrderItem[]
+  totalAmount     Float
+  
+  status          OrderStatus @default(PENDING)
+  type            OrderType   @default(DINE_IN)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  
+  note            String?       @db.Text
+  deliveryAddress String?       @db.Text
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  payment         Payment?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId String
+  // Defined as generic field, could be relation if strict integrity is needed
+  // product   Product @relation(fields: [productId], references: [id])
+
+  name      String
+  quantity  Int
+  price     Float
+  variant   String?
+  note      String?
+
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COOKING
+  SERVED
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id])
+  
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id])
+  
+  amount        Float
+  method        PaymentMethod @default(CASH)
+  status        TransactionStatus @default(PENDING)
+  transactionId String?
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  BANK_TRANSFER
+  E_WALLET
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
