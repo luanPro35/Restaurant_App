@@ -41,6 +41,11 @@ export class RegisterDto {
   @IsOptional()
   @ApiPropertyOptional({ example: "user" })
   role?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: "123456" })
+  otp!: string;
 }
 
 export class RefreshTokenDto {
@@ -124,4 +129,23 @@ export class UpdateProfileDto {
   @MinLength(6)
   @ApiPropertyOptional()
   password?: string;
+}
+
+export class SendOtpDto {
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty({ example: "user@example.com" })
+  email!: string;
+}
+
+export class VerifyOtpDto {
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty({ example: "user@example.com" })
+  email!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: "123456" })
+  otp!: string;
 }

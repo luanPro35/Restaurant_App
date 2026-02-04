@@ -50,6 +50,18 @@ export const authApi = {
     const response = await api.post("/auth/reset-password", data);
     return response.data;
   },
+
+  // POST: http://localhost:4000/api/v1/auth/send-otp
+  sendOtp: async (email: string) => {
+    const response = await api.post("/auth/send-otp", { email });
+    return response.data;
+  },
+
+  // POST: http://localhost:4000/api/v1/auth/verify-otp
+  verifyOtp: async (email: string, otp: string) => {
+    const response = await api.post("/auth/verify-otp", { email, otp });
+    return response.data;
+  },
 };
 
 export default authApi;

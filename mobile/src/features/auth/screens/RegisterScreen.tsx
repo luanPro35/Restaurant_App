@@ -56,6 +56,21 @@ export default function RegisterScreen() {
             />
           </View>
 
+          <View className="w-full flex-row items-center mb-6">
+            <View className="flex-1 bg-white rounded-2xl px-5 py-4 flex-row items-center border border-[#E5D5C3] shadow-sm mr-3">
+              <Ionicons name="keypad" size={20} color="#6B4423" />
+              <TextInput
+                placeholder="Confirm OTP"
+                className="flex-1 ml-3 text-base text-[#2D2D2D]"
+                placeholderTextColor="#999"
+                secureTextEntry
+              />
+            </View>
+            <TouchableOpacity className="bg-[#E07B39] rounded-2xl px-4 py-4 items-center justify-center shadow-lg active:bg-[#C96A2E]">
+              <Text className="text-white font-bold">Resend</Text>
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity className="w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg active:bg-[#C96A2E]">
             <Text className="text-white text-lg font-bold">Sign Up</Text>
           </TouchableOpacity>

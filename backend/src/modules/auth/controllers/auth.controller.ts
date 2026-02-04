@@ -7,13 +7,19 @@ import {
   Get,
 } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
-import { RegisterDto, LoginDto } from "../validations/auth.validation";
+import {
+  RegisterDto,
+  LoginDto,
+  SendOtpDto,
+  VerifyOtpDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from "../validations/auth.validation";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { RolesGuard } from "../guards/roles.guard";
 import { Public } from "../decorators/public.decorator";
 import { CurrentUser } from "../decorators/current-user.decorator";
-import { auth } from "../../../middlewares/auth.middleware";
 import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../enums/role.enum";
 import {
@@ -23,11 +29,16 @@ import {
   ApiBearerAuth,
 } from "@nestjs/swagger";
 import { JwtRefreshGuard } from "../guards/jwt-refresh.guard";
+import { OtpService } from "../otp/otp.service";
 
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly otpService: OtpService,
+  ) {}
+
   @ApiTags("Auth")
   @ApiOperation({ summary: "Login admin" })
   @ApiResponse({ status: 200, description: "Return admin user" })
@@ -66,7 +77,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Return new access token" })
   @Post("refresh-token")
   async refreshToken(@CurrentUser() user: any) {
-    // Strategy adds user/payload to request
     return this.authService.generateTokens(user);
   }
 
@@ -84,19 +94,33 @@ export class AuthController {
     return user;
   }
 
-  @Post("forgot-password")
-  async forgotPassword(@Body() body: { email: string }) {
-    return this.authService.forgotPassword(body.email);
+  @ApiOperation({ summary: "Send OTP" })
+  @ApiResponse({ status: 201, description: "OTP sent successfully" })
+  @Post("send-otp")
+  async sendOtp(@Body() sendOtpDto: SendOtpDto) {
+    return this.otpService.generateOtp(sendOtpDto.email);
   }
 
+  @ApiOperation({ summary: "Verify OTP" })
+  @ApiResponse({ status: 200, description: "OTP verified successfully" })
+  @Post("verify-otp")
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.otpService.verifyOtp(verifyOtpDto.email, verifyOtpDto.otp);
+  }
+
+  @ApiOperation({ summary: "Forgot password" })
+  @Post("forgot-password")
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
+  }
+
+  @ApiOperation({ summary: "Reset password" })
   @Post("reset-password")
-  async resetPassword(
-    @Body() body: { email: string; password: string; token: string },
-  ) {
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
-      body.email,
-      body.password,
-      body.token,
+      resetPasswordDto.email,
+      resetPasswordDto.password,
+      resetPasswordDto.token,
     );
   }
 }

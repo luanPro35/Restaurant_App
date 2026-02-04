@@ -2,20 +2,29 @@ import {
   Injectable,
   UnauthorizedException,
   BadGatewayException,
+  BadRequestException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { RegisterDto, LoginDto } from "../validations/auth.validation";
 import * as bcrypt from "bcrypt";
+import { OtpService } from "../otp/otp.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly otpService: OtpService,
   ) {}
 
   async register(registerDto: RegisterDto) {
+    if (registerDto.otp) {
+      await this.otpService.verifyOtp(registerDto.email, registerDto.otp);
+    } else {
+      throw new BadRequestException("OTP is required for registration");
+    }
+
     const existUser = await this.prisma.user.findUnique({
       where: {
         email: registerDto.email,
@@ -37,6 +46,9 @@ export class AuthService {
     if (!user) {
       throw new BadGatewayException("User not created");
     }
+
+    await this.prisma.otp.delete({ where: { email } });
+
     return user;
   }
 

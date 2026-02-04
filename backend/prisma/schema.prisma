@@ -42,24 +42,24 @@ model Category {
 }
 
 model Product {
-  id             String   @id @default(uuid())
-  name           String
-  slug           String?
-  description    String?  @db.Text
-  price          Float
-  originalPrice  Float?
-  images         String   @db.Text // Store as JSON string
-  unit           String   @default("đĩa")
-  isAvailable    Boolean  @default(true)
-  isBestSeller   Boolean  @default(false)
-  
-  categoryId     String
-  category       Category @relation(fields: [categoryId], references: [id])
-  
-  variants       ProductVariant[] 
+  id            String  @id @default(uuid())
+  name          String
+  slug          String?
+  description   String? @db.Text
+  price         Float
+  originalPrice Float?
+  images        String  @db.Text // Store as JSON string
+  unit          String  @default("đĩa")
+  isAvailable   Boolean @default(true)
+  isBestSeller  Boolean @default(false)
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  variants ProductVariant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("products")
 }
@@ -95,44 +95,44 @@ enum TableStatus {
 }
 
 model Order {
-  id              String      @id @default(uuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  
-  tableId         String?
-  table           Table?      @relation(fields: [tableId], references: [id])
-  
-  items           OrderItem[]
-  totalAmount     Float
-  
-  status          OrderStatus @default(PENDING)
-  type            OrderType   @default(DINE_IN)
-  paymentStatus   PaymentStatus @default(UNPAID)
-  
-  note            String?       @db.Text
-  deliveryAddress String?       @db.Text
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  payment         Payment?
+  tableId String?
+  table   Table?  @relation(fields: [tableId], references: [id])
+
+  items       OrderItem[]
+  totalAmount Float
+
+  status        OrderStatus   @default(PENDING)
+  type          OrderType     @default(DINE_IN)
+  paymentStatus PaymentStatus @default(UNPAID)
+
+  note            String? @db.Text
+  deliveryAddress String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  payment   Payment?
 
   @@map("orders")
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
   productId String
   // Defined as generic field, could be relation if strict integrity is needed
   // product   Product @relation(fields: [productId], references: [id])
 
-  name      String
-  quantity  Int
-  price     Float
-  variant   String?
-  note      String?
+  name     String
+  quantity Int
+  price    Float
+  variant  String?
+  note     String?
 
   @@map("order_items")
 }
@@ -159,20 +159,20 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id            String        @id @default(uuid())
-  orderId       String        @unique
-  order         Order         @relation(fields: [orderId], references: [id])
-  
-  userId        String?
-  user          User?         @relation(fields: [userId], references: [id])
-  
+  id      String @id @default(uuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
   amount        Float
-  method        PaymentMethod @default(CASH)
+  method        PaymentMethod     @default(CASH)
   status        TransactionStatus @default(PENDING)
   transactionId String?
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("payments")
 }
@@ -189,4 +189,15 @@ enum TransactionStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("otps")
 }
