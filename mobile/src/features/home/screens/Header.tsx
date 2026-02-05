@@ -2,12 +2,10 @@ import React from "react";
 import { View, TouchableOpacity, TextInput } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-interface HeaderProps {
-  onLogout: () => void;
-}
-
-export default function Header({ onLogout }: HeaderProps) {
+export default function Header() {
+  const navigation = useNavigation<any>();
   return (
     <View className="bg-[#E07B39] pt-12 pb-6 px-4 rounded-b-3xl shadow-lg">
       <View className="flex-row items-center justify-between gap-3">
@@ -34,7 +32,7 @@ export default function Header({ onLogout }: HeaderProps) {
 
         <TouchableOpacity
           className="p-2 bg-white rounded-full"
-          onPress={onLogout}
+          onPress={() => navigation.navigate("Profile")}
         >
           <MaterialCommunityIcons name="account" size={24} color="#E07B39" />
         </TouchableOpacity>

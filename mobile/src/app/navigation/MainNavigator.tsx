@@ -10,6 +10,7 @@ import HistoryScreen from "../../features/history/screens/HistoryScreen";
 import PackageScreen from "../../features/package/screens/PackageScreen";
 import PaymentScreen from "../../features/payment/screens/PaymentScreen";
 import MessagesScreen from "../../features/messages/screens/MessagesScreen";
+import ProfileScreen from "../../features/profile/screens/ProfileScreen";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -22,6 +23,7 @@ export type MainStackParamList = {
   Package: undefined;
   Payment: undefined;
   Messages: undefined;
+  Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -39,6 +41,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Package" component={PackageScreen} />
       <Stack.Screen name="Payment" component={PaymentScreen} />
       <Stack.Screen name="Messages" component={MessagesScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 }
