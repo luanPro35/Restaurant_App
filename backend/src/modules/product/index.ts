@@ -1,2 +1,3 @@
-// Product module export
-export default {};
+import { ProductModule } from "./product.module";
+
+export { ProductModule };

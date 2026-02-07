@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 interface MenuItem {
   id: string;
   name: string;
-  price: string;
+  price: number;
   image: string;
   description: string;
   category: string;
@@ -167,7 +167,7 @@ export default function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
               color: "#E07B39",
             }}
           >
-            {item.price}
+            {item.price.toLocaleString("vi-VN")}đ
           </Text>
         </View>
       </TouchableOpacity>

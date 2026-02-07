@@ -17,7 +17,7 @@ const { height } = Dimensions.get("window");
 interface CartItem {
   id: string;
   name: string;
-  price: string;
+  price: number;
   image: string;
   quantity: number;
 }
@@ -60,8 +60,7 @@ export default function CartModal({
 
   const calculateTotal = () => {
     return items.reduce((total, item) => {
-      const price = parseInt(item.price.replace(/[^\d]/g, ""));
-      return total + price * item.quantity;
+      return total + item.price * item.quantity;
     }, 0);
   };
 
@@ -76,15 +75,9 @@ export default function CartModal({
       animationType="none"
       onRequestClose={onClose}
     >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          justifyContent: "flex-end",
-        }}
-      >
+      <View className="flex-1 bg-black/50 justify-end">
         <TouchableOpacity
-          style={{ flex: 1 }}
+          className="flex-1"
           activeOpacity={1}
           onPress={onClose}
         />
@@ -92,89 +85,40 @@ export default function CartModal({
         <Animated.View
           style={{
             transform: [{ translateY: slideAnim }],
-            backgroundColor: "white",
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
             maxHeight: height * 0.8,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            elevation: 10,
           }}
+          className="bg-white rounded-t-[30px] shadow-2xl elevation-10"
         >
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 20,
-              borderBottomWidth: 1,
-              borderBottomColor: "#f0f0f0",
-            }}
-          >
+          <View className="flex-row justify-between items-center p-5 border-b border-gray-100">
             <View>
-              <Text
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: "#2D2D2D",
-                }}
-              >
+              <Text className="text-2xl font-bold text-[#2D2D2D]">
                 Giỏ hàng
               </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: "#666",
-                  marginTop: 4,
-                }}
-              >
+              <Text className="text-sm text-gray-500 mt-1">
                 {items.length} món
               </Text>
             </View>
             <TouchableOpacity
               onPress={onClose}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#f5f5f5",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+              className="w-10 h-10 rounded-full bg-gray-100 justify-center items-center"
             >
               <MaterialCommunityIcons name="close" size={24} color="#666" />
             </TouchableOpacity>
           </View>
 
-          {/* Cart Items */}
           <ScrollView
-            style={{ flex: 1 }}
+            className="flex-1"
             contentContainerStyle={{ padding: 20 }}
             showsVerticalScrollIndicator={false}
           >
             {items.length === 0 ? (
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingVertical: 60,
-                }}
-              >
+              <View className="items-center justify-center py-16">
                 <MaterialCommunityIcons
                   name="cart-outline"
                   size={80}
                   color="#ddd"
                 />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: "#999",
-                    marginTop: 16,
-                  }}
-                >
+                <Text className="text-base text-gray-400 mt-4">
                   Giỏ hàng trống
                 </Text>
               </View>
@@ -182,66 +126,29 @@ export default function CartModal({
               items.map((item) => (
                 <View
                   key={item.id}
-                  style={{
-                    flexDirection: "row",
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: 16,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
+                  className="flex-row bg-gray-50 rounded-2xl p-3 mb-3"
                 >
                   <Image
                     source={{ uri: item.image }}
-                    style={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: 12,
-                      backgroundColor: "#e0e0e0",
-                    }}
+                    className="w-20 h-20 rounded-xl bg-gray-200"
                   />
-                  <View style={{ flex: 1, marginLeft: 12 }}>
+                  <View className="flex-1 ml-3">
                     <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        color: "#2D2D2D",
-                        marginBottom: 4,
-                      }}
+                      className="text-base font-bold text-[#2D2D2D] mb-1"
                       numberOfLines={2}
                     >
                       {item.name}
                     </Text>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: "#E07B39",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {item.price}
+                    <Text className="text-[15px] text-[#E07B39] font-semibold">
+                      {formatPrice(item.price)}
                     </Text>
 
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginTop: 8,
-                      }}
-                    >
+                    <View className="flex-row items-center mt-2">
                       <TouchableOpacity
                         onPress={() =>
                           onUpdateQuantity(item.id, item.quantity - 1)
                         }
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: "#fff",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          borderWidth: 1,
-                          borderColor: "#E07B39",
-                        }}
+                        className="w-8 h-8 rounded-full bg-white justify-center items-center border border-[#E07B39]"
                       >
                         <MaterialCommunityIcons
                           name="minus"
@@ -250,16 +157,7 @@ export default function CartModal({
                         />
                       </TouchableOpacity>
 
-                      <Text
-                        style={{
-                          marginHorizontal: 16,
-                          fontSize: 16,
-                          fontWeight: "bold",
-                          color: "#2D2D2D",
-                          minWidth: 24,
-                          textAlign: "center",
-                        }}
-                      >
+                      <Text className="mx-4 text-base font-bold text-[#2D2D2D] min-w-[24px] text-center">
                         {item.quantity}
                       </Text>
 
@@ -267,14 +165,7 @@ export default function CartModal({
                         onPress={() =>
                           onUpdateQuantity(item.id, item.quantity + 1)
                         }
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: "#E07B39",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
+                        className="w-8 h-8 rounded-full bg-[#E07B39] justify-center items-center"
                       >
                         <MaterialCommunityIcons
                           name="plus"
@@ -285,10 +176,7 @@ export default function CartModal({
 
                       <TouchableOpacity
                         onPress={() => onRemoveItem(item.id)}
-                        style={{
-                          marginLeft: "auto",
-                          padding: 8,
-                        }}
+                        className="ml-auto p-2"
                       >
                         <MaterialCommunityIcons
                           name="trash-can-outline"
@@ -303,37 +191,11 @@ export default function CartModal({
             )}
           </ScrollView>
 
-          {/* Footer */}
           {items.length > 0 && (
-            <View
-              style={{
-                padding: 20,
-                borderTopWidth: 1,
-                borderTopColor: "#f0f0f0",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginBottom: 16,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: "#666",
-                  }}
-                >
-                  Tổng cộng
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 24,
-                    fontWeight: "bold",
-                    color: "#E07B39",
-                  }}
-                >
+            <View className="p-5 border-t border-gray-100">
+              <View className="flex-row justify-between mb-4">
+                <Text className="text-base text-gray-500">Tổng cộng</Text>
+                <Text className="text-2xl font-bold text-[#E07B39]">
                   {formatPrice(calculateTotal())}
                 </Text>
               </View>
@@ -343,26 +205,9 @@ export default function CartModal({
                   colors={["#E07B39", "#D66A28"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={{
-                    borderRadius: 16,
-                    paddingVertical: 16,
-                    alignItems: "center",
-                    shadowColor: "#E07B39",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5,
-                  }}
+                  className="rounded-2xl py-4 items-center shadow-lg elevation-5"
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: 18,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Đặt món
-                  </Text>
+                  <Text className="text-white text-lg font-bold">Đặt món</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
