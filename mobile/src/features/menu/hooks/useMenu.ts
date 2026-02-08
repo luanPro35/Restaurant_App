@@ -7,12 +7,22 @@ export const useMenu = () => {
   const [error, setError] = useState(null);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<{
+    search: string;
+    category: string;
+    sortOrder: string;
+    minPrice?: number;
+    maxPrice?: number;
+    unit: string;
+    isAvailable: string;
+    isBestSeller: string;
+    limit: number;
+  }>({
     search: "",
     category: "",
     sortOrder: "asc",
-    minPrice: "",
-    maxPrice: "",
+    minPrice: undefined,
+    maxPrice: undefined,
     unit: "",
     isAvailable: "",
     isBestSeller: "",

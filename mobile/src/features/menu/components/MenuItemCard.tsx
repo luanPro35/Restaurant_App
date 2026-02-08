@@ -55,118 +55,52 @@ export default function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
 
   return (
     <Animated.View
-      style={{
-        transform: [{ scale: scaleAnim }],
-        width: "48%",
-        marginBottom: 16,
-      }}
+      style={{ transform: [{ scale: scaleAnim }] }}
+      className="w-[48%] mb-4"
     >
       <TouchableOpacity
         activeOpacity={0.9}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={{
-          backgroundColor: "white",
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3,
-        }}
+        className="bg-white rounded-2xl overflow-hidden shadow-md"
+        style={{ elevation: 3 }}
       >
-        {/* Image */}
-        <View style={{ position: "relative", height: 140 }}>
+        <View className="relative h-[140px]">
           <Image
             source={{ uri: item.image }}
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: "#f0f0f0",
-            }}
+            className="w-full h-full bg-gray-100"
             resizeMode="cover"
           />
           <LinearGradient
             colors={["transparent", "rgba(0,0,0,0.6)"]}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 60,
-            }}
+            className="absolute bottom-0 left-0 right-0 h-[60px]"
           />
 
-          {/* Category badge */}
-          <View
-            style={{
-              position: "absolute",
-              top: 8,
-              left: 8,
-              backgroundColor: "rgba(224, 123, 57, 0.95)",
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 12,
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: 9,
-                fontWeight: "bold",
-              }}
-            >
+          <View className="absolute top-2 left-2 bg-[#E07B39]/95 px-2 py-1 rounded-xl">
+            <Text className="text-white text-[9px] font-bold">
               {item.category}
             </Text>
           </View>
 
-          {/* Add button on image */}
           <TouchableOpacity
             onPress={handleAddToCart}
             activeOpacity={0.7}
-            style={{
-              position: "absolute",
-              bottom: 8,
-              right: 8,
-              backgroundColor: "#E07B39",
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              justifyContent: "center",
-              alignItems: "center",
-              shadowColor: "#E07B39",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.4,
-              shadowRadius: 4,
-              elevation: 4,
-            }}
+            className="absolute bottom-2 right-2 bg-[#E07B39] w-9 h-9 rounded-full justify-center items-center shadow-lg"
+            style={{ elevation: 4 }}
           >
             <MaterialCommunityIcons name="plus" size={20} color="white" />
           </TouchableOpacity>
         </View>
 
-        {/* Content */}
-        <View style={{ padding: 10 }}>
+        <View className="p-2.5">
           <Text
-            style={{
-              fontSize: 14,
-              fontWeight: "bold",
-              color: "#2D2D2D",
-              marginBottom: 4,
-            }}
+            className="text-sm font-bold text-[#2D2D2D] mb-1"
             numberOfLines={2}
           >
             {item.name}
           </Text>
 
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "bold",
-              color: "#E07B39",
-            }}
-          >
+          <Text className="text-[15px] font-bold text-[#E07B39]">
             {item.price.toLocaleString("vi-VN")}đ
           </Text>
         </View>

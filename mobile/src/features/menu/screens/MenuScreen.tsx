@@ -34,35 +34,30 @@ export default function MenuScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartVisible, setIsCartVisible] = useState(false);
 
-  // Initial fetch
   useEffect(() => {
     fetchMenu();
   }, []);
-
-  // Sync search query to filter
   const handleSearch = (query: string) => {
     setFilter((prev: any) => ({ ...prev, search: query }));
     fetchMenu({ ...filter, search: query });
   };
 
-  // Sync price filter to filter state
   const handlePriceFilter = (value: string) => {
-    let minPrice = "";
-    let maxPrice = "";
+    let minPrice: number | undefined = undefined;
+    let maxPrice: number | undefined = undefined;
 
-    if (value === "under50") maxPrice = "50000";
+    if (value === "under50") maxPrice = 50000;
     if (value === "50to150") {
-      minPrice = "50000";
-      maxPrice = "150000";
+      minPrice = 50000;
+      maxPrice = 150000;
     }
-    if (value === "over150") minPrice = "150000";
+    if (value === "over150") minPrice = 150000;
 
     const newFilter = { ...filter, minPrice, maxPrice };
     setFilter(newFilter);
     fetchMenu(newFilter);
   };
 
-  // Sync sort order
   const handleSort = () => {
     const newOrder = filter.sortOrder === "asc" ? "desc" : "asc";
     const newFilter = { ...filter, sortOrder: newOrder };
@@ -116,10 +111,11 @@ export default function MenuScreen() {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const getActivePriceFilter = () => {
-    if (filter.minPrice === "" && filter.maxPrice === "50000") return "under50";
-    if (filter.minPrice === "50000" && filter.maxPrice === "150000")
+    if (filter.minPrice === undefined && filter.maxPrice === 50000)
+      return "under50";
+    if (filter.minPrice === 50000 && filter.maxPrice === 150000)
       return "50to150";
-    if (filter.minPrice === "150000" && filter.maxPrice === "")
+    if (filter.minPrice === 150000 && filter.maxPrice === undefined)
       return "over150";
     return "all";
   };
@@ -233,13 +229,7 @@ export default function MenuScreen() {
                 </Text>
               </View>
             ) : (
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  justifyContent: "space-between",
-                }}
-              >
+              <View className="flex-row flex-wrap justify-between">
                 {menuItems.map((item) => (
                   <MenuItemCard
                     key={item.id}
@@ -253,14 +243,7 @@ export default function MenuScreen() {
         )}
       </ScrollView>
 
-      <View
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          zIndex: 1000,
-        }}
-      >
+      <View className="absolute bottom-5 right-5 z-[1000]">
         <Shopping_Cart
           itemCount={totalItems}
           onPress={() => setIsCartVisible(true)}

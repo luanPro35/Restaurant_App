@@ -12,6 +12,8 @@ import PaymentScreen from "../../features/payment/screens/PaymentScreen";
 import MessagesScreen from "../../features/messages/screens/MessagesScreen";
 import ProfileScreen from "../../features/profile/screens/ProfileScreen";
 import ChangeProfileScreen from "../../features/profile/components/ChangeProfile";
+import AdminDashboardScreen from "../../features/admin/screens/AdminDashboardScreen";
+import AdminSettingsScreen from "../../features/admin/screens/AdminSettingsScreen";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -26,13 +28,19 @@ export type MainStackParamList = {
   Messages: undefined;
   Profile: undefined;
   ChangeProfile: undefined;
+  AdminDashboard: undefined;
+  AdminSettings: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export default function MainNavigator() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="AdminDashboard"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="AtRestaurant" component={AtRestaurant} />
       <Stack.Screen name="Delivery" component={DeliveryScreen} />
@@ -45,6 +53,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ChangeProfile" component={ChangeProfileScreen} />
+      <Stack.Screen name="AdminSettings" component={AdminSettingsScreen} />
     </Stack.Navigator>
   );
 }
