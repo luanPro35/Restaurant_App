@@ -122,7 +122,7 @@ export default function AdminDashboardScreen() {
             title="Sản phẩm"
             icon="food"
             colors={["#3b82f6", "#1d4ed8"]}
-            onPress={() => console.log("Products")}
+            onPress={() => navigation.navigate("AdminProducts")}
           />
           <AdminCard
             title="Danh mục"

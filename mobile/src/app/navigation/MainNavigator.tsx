@@ -14,6 +14,7 @@ import ProfileScreen from "../../features/profile/screens/ProfileScreen";
 import ChangeProfileScreen from "../../features/profile/components/ChangeProfile";
 import AdminDashboardScreen from "../../features/admin/screens/AdminDashboardScreen";
 import AdminSettingsScreen from "../../features/admin/screens/AdminSettingsScreen";
+import AdminProductsScreen from "../../features/admin/screens/AdminProductsScreen";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -30,6 +31,7 @@ export type MainStackParamList = {
   ChangeProfile: undefined;
   AdminDashboard: undefined;
   AdminSettings: undefined;
+  AdminProducts: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -54,6 +56,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ChangeProfile" component={ChangeProfileScreen} />
       <Stack.Screen name="AdminSettings" component={AdminSettingsScreen} />
+      <Stack.Screen name="AdminProducts" component={AdminProductsScreen} />
     </Stack.Navigator>
   );
 }

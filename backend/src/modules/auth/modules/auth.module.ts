@@ -26,5 +26,6 @@ import { OtpModule } from "../otp/otp.module";
     RolesGuard,
   ],
   controllers: [AuthController],
+  exports: [AuthService, RolesGuard, PassportModule],
 })
 export class AuthModule {}
