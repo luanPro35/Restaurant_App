@@ -15,6 +15,11 @@ import ChangeProfileScreen from "../../features/profile/components/ChangeProfile
 import AdminDashboardScreen from "../../features/admin/screens/AdminDashboardScreen";
 import AdminSettingsScreen from "../../features/admin/screens/AdminSettingsScreen";
 import AdminProductsScreen from "../../features/admin/screens/AdminProductsScreen";
+import AdminCreateProduct from "../../features/admin/screens/AdminProductsScreen/AdminCreateProduct";
+import AdminCategoriesScreen from "../../features/admin/screens/AdminCategoriesScreen";
+import AdminTablesScreen from "../../features/admin/screens/AdminTablesScreen";
+import AdminEditTables from "../../features/admin/screens/AdminTablesScreen/AdminEditTables";
+import { AdminTable } from "../../features/admin/types/admin.types";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -32,6 +37,10 @@ export type MainStackParamList = {
   AdminDashboard: undefined;
   AdminSettings: undefined;
   AdminProducts: undefined;
+  AdminCreateProduct: undefined;
+  AdminCategories: undefined;
+  AdminTablesScreen: undefined;
+  AdminEditTables: { table: AdminTable };
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -57,6 +66,10 @@ export default function MainNavigator() {
       <Stack.Screen name="ChangeProfile" component={ChangeProfileScreen} />
       <Stack.Screen name="AdminSettings" component={AdminSettingsScreen} />
       <Stack.Screen name="AdminProducts" component={AdminProductsScreen} />
+      <Stack.Screen name="AdminCreateProduct" component={AdminCreateProduct} />
+      <Stack.Screen name="AdminCategories" component={AdminCategoriesScreen} />
+      <Stack.Screen name="AdminTablesScreen" component={AdminTablesScreen} />
+      <Stack.Screen name="AdminEditTables" component={AdminEditTables} />
     </Stack.Navigator>
   );
 }

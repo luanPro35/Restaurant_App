@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MainStackParamList } from "../../../app/navigation/MainNavigator";
+import { MainStackParamList } from "../../../../app/navigation/MainNavigator";
 
 export default function AdminDashboardScreen() {
   const navigation =
@@ -128,13 +128,13 @@ export default function AdminDashboardScreen() {
             title="Danh mục"
             icon="shape"
             colors={["#6366f1", "#4338ca"]}
-            onPress={() => console.log("Categories")}
+            onPress={() => navigation.navigate("AdminCategories")}
           />
           <AdminCard
             title="Bàn & Chỗ"
             icon="table-chair"
             colors={["#10b981", "#047857"]}
-            onPress={() => console.log("Tables")}
+            onPress={() => navigation.navigate("AdminTablesScreen")}
           />
           <AdminCard
             title="Đơn hàng"

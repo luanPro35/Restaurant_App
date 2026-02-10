@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { AdminProduct } from "../types/admin.types";
 import { formatCurrency } from "../utils/admin.utils";
 
-interface AdminProductCardProps {
+export interface AdminProductCardProps {
   product: AdminProduct;
   onEdit: (product: AdminProduct) => void;
   onDelete: (id: string) => void;

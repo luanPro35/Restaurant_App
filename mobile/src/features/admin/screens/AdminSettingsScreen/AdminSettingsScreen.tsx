@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAuth } from "../../../app/context/AuthContext";
+import { useAuth } from "../../../../app/context/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function AdminSettingsScreen() {

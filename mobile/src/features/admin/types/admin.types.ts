@@ -33,3 +33,18 @@ export interface AdminProductResponse {
   data: AdminProduct[];
   pagination: AdminPagination;
 }
+
+export interface AdminTable {
+  id: string;
+  name: string;
+  capacity: number;
+  status: string;
+  isAvailable: boolean;
+  listFoods?: string[];
+  price: number;
+  isActive: boolean;
+  qrCode?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
