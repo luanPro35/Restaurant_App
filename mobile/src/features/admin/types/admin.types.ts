@@ -48,3 +48,12 @@ export interface AdminTable {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface AdminOrder {
+  id: string;
+  name: string;
+  price: number;
+  isAvailable: boolean;
+  until: string;
+  address: string;
+}

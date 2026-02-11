@@ -4,7 +4,7 @@ import { AdminProduct } from "../types/admin.types";
 import { formatCurrency } from "../utils/admin.utils";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 64) / 2; // Accounting for screen padding and gap
+const CARD_WIDTH = (width - 64) / 2;
 
 export interface AdminProductCardCategoriesProps {
   product: AdminProduct;
@@ -18,7 +18,6 @@ export const AdminProductCardCategories = ({
       className="bg-white rounded-[28px] mb-4 overflow-hidden border border-gray-100 shadow-sm"
       style={{ width: CARD_WIDTH, elevation: 3 }}
     >
-      {/* Image Section */}
       <View className="relative w-full aspect-square bg-gray-50">
         <Image
           source={{
@@ -40,7 +39,6 @@ export const AdminProductCardCategories = ({
         )}
       </View>
 
-      {/* Content Section */}
       <View className="p-3">
         <Text
           className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-0.5"
@@ -51,7 +49,7 @@ export const AdminProductCardCategories = ({
         <Text
           className="text-gray-900 font-bold text-sm leading-tight mb-2"
           numberOfLines={2}
-          style={{ height: 34 }} // Fixed height for 2 lines to keep grid aligned
+          style={{ height: 34 }}
         >
           {product.name}
         </Text>

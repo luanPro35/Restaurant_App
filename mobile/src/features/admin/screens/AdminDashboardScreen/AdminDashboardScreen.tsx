@@ -140,25 +140,13 @@ export default function AdminDashboardScreen() {
             title="Đơn hàng"
             icon="clipboard-list-outline"
             colors={["#f59e0b", "#d97706"]}
-            onPress={() => console.log("Orders")}
-          />
-          <AdminCard
-            title="Vận chuyển"
-            icon="truck-fast-outline"
-            colors={["#14b8a6", "#0d9488"]}
-            onPress={() => console.log("Delivery")}
-          />
-          <AdminCard
-            title="Báo cáo"
-            icon="chart-areaspline"
-            colors={["#a855f7", "#7e22ce"]}
-            onPress={() => console.log("Stats")}
+            onPress={() => navigation.navigate("AdminOrdersScreen")}
           />
           <AdminCard
             title="Khách hàng"
             icon="account-group-outline"
             colors={["#ec4899", "#be185d"]}
-            onPress={() => console.log("Users")}
+            onPress={() => navigation.navigate("AdminUsersScreen")}
           />
           <AdminCard
             title="Khuyến mãi"
@@ -183,12 +171,6 @@ export default function AdminDashboardScreen() {
             icon="message-draw"
             colors={["#06b6d4", "#0891b2"]}
             onPress={() => console.log("Comments")}
-          />
-          <AdminCard
-            title="Lịch sử"
-            icon="book-open-variant"
-            colors={["#f43f5e", "#e11d48"]}
-            onPress={() => console.log("Logs")}
           />
           <AdminCard
             title="Cài đặt"

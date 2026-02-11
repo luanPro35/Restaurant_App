@@ -71,7 +71,10 @@ export default function AdminTablesScreen() {
           <Text className="text-xl font-black text-gray-800">
             Quản lý bàn & chỗ
           </Text>
-          <TouchableOpacity className="w-10 h-10 bg-white shadow-sm rounded-xl items-center justify-center border border-gray-100">
+          <TouchableOpacity
+            onPress={() => navigation.navigate("AdminAddTables")}
+            className="w-10 h-10 bg-white shadow-sm rounded-xl items-center justify-center border border-gray-100"
+          >
             <MaterialCommunityIcons name="plus" size={20} color="#1F2937" />
           </TouchableOpacity>
         </View>
