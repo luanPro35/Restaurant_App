@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@nestjs/config": "^4.0.2",
+    "@nestjs/config": "^4.0.3",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/typeorm": "^11.0.0",
