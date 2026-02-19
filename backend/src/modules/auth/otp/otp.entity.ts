@@ -1,23 +1,25 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 
 export class OtpEntity {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  email: string;
+  email!: string;
+
+  @Exclude()
+  @ApiProperty()
+  otp!: string;
 
   @ApiProperty()
-  otp: string;
+  expiresAt!: Date;
 
   @ApiProperty()
-  expiresAt: Date;
+  createdAt!: Date;
 
   @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   constructor(partial: Partial<OtpEntity>) {
     Object.assign(this, partial);
