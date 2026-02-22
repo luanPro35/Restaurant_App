@@ -4,6 +4,7 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma.service";
+import { sendEmail } from "../../../jobs/email.job";
 
 @Injectable()
 export class OtpService {
@@ -16,11 +17,27 @@ export class OtpService {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    return await this.prisma.otp.upsert({
+    const otpRecord = await this.prisma.otp.upsert({
       where: { email: email },
       update: { otp: otp, expiresAt: expiresAt },
       create: { email: email, otp: otp, expiresAt: expiresAt },
     });
+
+    try {
+      await sendEmail(
+        email,
+        "Mã xác thực (OTP) của bạn",
+        `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
+      );
+      console.log(`✅ OTP email sent successfully to: ${email}`);
+    } catch (error: any) {
+      console.error("❌ Failed to send OTP email:", error?.message || error);
+      throw new BadRequestException(
+        `Không thể gửi email OTP đến ${email}. Lỗi: ${error?.message || "Unknown error"}`,
+      );
+    }
+
+    return otpRecord;
   }
 
   async verifyOtp(email: string, otp: string) {

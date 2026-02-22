@@ -213,3 +213,18 @@ model Otp {
 
   @@map("otps")
 }
+
+model Notification {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  startAt     DateTime
+  endAt       DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notifications")
+}
+

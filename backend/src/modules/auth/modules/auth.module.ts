@@ -8,6 +8,7 @@ import { LocalStrategy } from "../strategies/local.strategy";
 import { JwtRefreshStrategy } from "../strategies/jwt-refresh.strategy";
 import { RolesGuard } from "../guards/roles.guard";
 import { OtpModule } from "../otp/otp.module";
+import { TokenService } from "../tokens/token.service";
 
 @Module({
   imports: [
@@ -20,12 +21,13 @@ import { OtpModule } from "../otp/otp.module";
   ],
   providers: [
     AuthService,
+    TokenService,
     JwtStrategy,
     LocalStrategy,
     JwtRefreshStrategy,
     RolesGuard,
   ],
   controllers: [AuthController],
-  exports: [AuthService, RolesGuard, PassportModule],
+  exports: [AuthService, TokenService, RolesGuard, PassportModule],
 })
 export class AuthModule {}

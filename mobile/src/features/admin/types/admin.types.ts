@@ -57,3 +57,14 @@ export interface AdminOrder {
   until: string;
   address: string;
 }
+
+export interface AdminPromotion {
+  id: string;
+  name: string;
+  discount: number;
+  until: string;
+  isActive: boolean;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

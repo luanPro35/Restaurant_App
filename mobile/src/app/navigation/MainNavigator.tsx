@@ -24,6 +24,7 @@ import AdminAddTables from "../../features/admin/screens/AdminTablesScreen/Admin
 import AdminOrdersScreen from "@/features/admin/screens/AdminOrdersScreen";
 import AdminDetailOrder from "../../features/admin/screens/AdminOrdersScreen/AdminDetailOrder";
 import AdminUsersScreen from "../../features/admin/screens/AdminUsersScreen";
+import AdminPromotionsScreen from "@/features/admin/screens/AdminPromotionsScreen";
 
 export type MainStackParamList = {
   Home: undefined;
@@ -49,6 +50,7 @@ export type MainStackParamList = {
   AdminOrdersScreen: undefined;
   AdminDetailOrder: { order: AdminOrder };
   AdminUsersScreen: undefined;
+  AdminPromotionsScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -82,6 +84,10 @@ export default function MainNavigator() {
       <Stack.Screen name="AdminOrdersScreen" component={AdminOrdersScreen} />
       <Stack.Screen name="AdminDetailOrder" component={AdminDetailOrder} />
       <Stack.Screen name="AdminUsersScreen" component={AdminUsersScreen} />
+      <Stack.Screen
+        name="AdminPromotionsScreen"
+        component={AdminPromotionsScreen}
+      />
     </Stack.Navigator>
   );
 }

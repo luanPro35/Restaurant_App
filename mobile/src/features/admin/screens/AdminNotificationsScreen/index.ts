@@ -1,2 +1,2 @@
-export * from "./AdminNotificationsScreen";
-export { default } from "./AdminNotificationsScreen";
+export * from "./AdminNotificationScreen";
+export { default } from "./AdminNotificationScreen";

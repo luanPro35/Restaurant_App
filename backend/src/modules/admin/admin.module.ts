@@ -2,13 +2,41 @@ import { Module } from "@nestjs/common";
 import { AdminProductController } from "./controllers/admin-products.controller";
 import { AdminProductService } from "./services/admin-products.service";
 import { AdminProductRepository } from "./repositories/admin-products.repository";
+import { AdminManageUserRepository } from "./repositories/admin-manage_user.repository";
 import { ProductModule } from "../product/product.module";
 import { AuthModule } from "../auth/modules/auth.module";
+import { AdminManageUserController } from "./controllers/admin-manage_user.controller";
+import { AdminManageUserService } from "./services/admin-manage_user.service";
+import { AdminPromotionController } from "./controllers/admin-promotion.controller";
+import { AdminPromotionService } from "./services/admin-promotion.service";
+import { AdminRepository } from "./repositories/admin-repository";
+import { AdminNotificationController } from "./controllers/admin-notification.controller";
+import { AdminNotificationService } from "./services/admin-notification.service";
+import { AdminNotificationRepository } from "./repositories/admin-notification.repository";
 
 @Module({
   imports: [ProductModule, AuthModule],
-  controllers: [AdminProductController],
-  providers: [AdminProductService, AdminProductRepository],
-  exports: [AdminProductService],
+  controllers: [
+    AdminProductController,
+    AdminManageUserController,
+    AdminPromotionController,
+    AdminNotificationController,
+  ],
+  providers: [
+    AdminProductService,
+    AdminProductRepository,
+    AdminManageUserRepository,
+    AdminManageUserService,
+    AdminPromotionService,
+    AdminRepository,
+    AdminNotificationService,
+    AdminNotificationRepository,
+  ],
+  exports: [
+    AdminProductService,
+    AdminManageUserService,
+    AdminPromotionService,
+    AdminNotificationService,
+  ],
 })
 export class AdminModule {}

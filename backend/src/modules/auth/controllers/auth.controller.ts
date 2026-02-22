@@ -76,8 +76,10 @@ export class AuthController {
   @ApiOperation({ summary: "Refresh access token" })
   @ApiResponse({ status: 200, description: "Return new access token" })
   @Post("refresh-token")
-  async refreshToken(@CurrentUser() user: any) {
-    return this.authService.generateTokens(user);
+  async refreshToken(@Request() req: any) {
+    const refreshToken =
+      req.user?.refreshToken || req.headers.authorization?.split(" ")[1];
+    return this.authService.refreshToken(refreshToken);
   }
 
   @ApiBearerAuth()

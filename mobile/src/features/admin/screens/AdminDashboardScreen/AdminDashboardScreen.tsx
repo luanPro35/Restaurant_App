@@ -152,7 +152,7 @@ export default function AdminDashboardScreen() {
             title="Khuyến mãi"
             icon="ticket-percent-outline"
             colors={["#ef4444", "#b91d1d"]}
-            onPress={() => console.log("Promotions")}
+            onPress={() => navigation.navigate("AdminPromotionsScreen" as any)}
           />
           <AdminCard
             title="Tài chính"
@@ -164,7 +164,9 @@ export default function AdminDashboardScreen() {
             title="Thông báo"
             icon="megaphone-outline"
             colors={["#facc15", "#eab308"]}
-            onPress={() => console.log("Notifications")}
+            onPress={() =>
+              navigation.navigate("AdminNotificationsScreen" as any)
+            }
           />
           <AdminCard
             title="Phản hồi"

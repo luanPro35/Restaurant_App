@@ -4,18 +4,18 @@ import {
   BadGatewayException,
   BadRequestException,
 } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { RegisterDto, LoginDto } from "../validations/auth.validation";
 import * as bcrypt from "bcrypt";
 import { OtpService } from "../otp/otp.service";
+import { TokenService } from "../tokens/token.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -58,8 +58,8 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
+    const accessToken = this.tokenService.generateAccessToken(payload);
+    const refreshToken = this.tokenService.generateRefreshToken(payload);
     return {
       accessToken,
       refreshToken,
@@ -68,10 +68,18 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
+
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+
+    if (!user) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
       throw new UnauthorizedException("Invalid credentials");
     }
 
@@ -102,7 +110,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.tokenService.generateAccessToken(payload);
     return {
       message: "Forgot password successful",
       accessToken,
@@ -129,7 +137,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.tokenService.generateAccessToken(payload);
     return {
       message: "Reset password successful",
       accessToken,
@@ -180,13 +188,13 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
-      const payload = this.jwtService.verify(refreshToken);
+      const payload = this.tokenService.verifyToken(refreshToken);
       const newPayload = {
         sub: payload.sub,
         email: payload.email,
         role: payload.role,
       };
-      const accessToken = this.jwtService.sign(newPayload);
+      const accessToken = this.tokenService.generateAccessToken(newPayload);
       return {
         message: "Refresh token successful",
         accessToken,

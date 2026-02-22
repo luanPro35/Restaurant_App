@@ -1,21 +1,57 @@
-import React from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../../app/navigation/AuthNavigator";
-
 import { useAuth } from "../../../app/context/AuthContext";
+import authApi from "../../../services/api/auth.api";
 
 export default function LoginScreen() {
   const { login } = useAuth();
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList, "Login">>();
 
-  const onLoginPress = () => {
-    login();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onLoginPress = async () => {
+    if (!email || !password) {
+      Alert.alert("Lỗi", "Vui lòng nhập đầy đủ email và mật khẩu");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password.trim();
+      const response = await authApi.login({
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
+      if (response.accessToken) {
+        login(response.accessToken, response.user);
+      } else {
+        Alert.alert("Lỗi", "Không nhận được token từ server");
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Đăng nhập thất bại";
+      Alert.alert("Lỗi", message);
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <SafeAreaView className="pt-10 flex-1 bg-[#F9F6E7]">
       <View className="flex-1 bg-[#F9F6E7] ">
@@ -40,6 +76,8 @@ export default function LoginScreen() {
               placeholderTextColor="#999"
               keyboardType="email-address"
               autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
 
@@ -50,6 +88,8 @@ export default function LoginScreen() {
               className="flex-1 ml-3 text-base text-[#2D2D2D]"
               placeholderTextColor="#999"
               secureTextEntry
+              value={password}
+              onChangeText={setPassword}
             />
           </View>
 
@@ -59,10 +99,15 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg active:bg-[#C96A2E]"
+            className={`w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg active:bg-[#C96A2E] ${loading ? "opacity-70" : ""}`}
             onPress={onLoginPress}
+            disabled={loading}
           >
-            <Text className="text-white text-lg font-bold">Login</Text>
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text className="text-white text-lg font-bold">Login</Text>
+            )}
           </TouchableOpacity>
 
           <View className="flex-row justify-center mt-6">
