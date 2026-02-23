@@ -150,6 +150,8 @@ export default function AdminEditNotificationScreen() {
                 placeholderTextColor="#9CA3AF"
                 value={title}
                 onChangeText={setTitle}
+                autoCorrect={false}
+                spellCheck={false}
               />
             </View>
           </View>
@@ -172,6 +174,8 @@ export default function AdminEditNotificationScreen() {
                 numberOfLines={4}
                 textAlignVertical="top"
                 style={{ minHeight: 100 }}
+                autoCorrect={false}
+                spellCheck={false}
               />
             </View>
           </View>
@@ -195,6 +199,8 @@ export default function AdminEditNotificationScreen() {
                 placeholderTextColor="#9CA3AF"
                 value={description}
                 onChangeText={setDescription}
+                autoCorrect={false}
+                spellCheck={false}
               />
             </View>
           </View>

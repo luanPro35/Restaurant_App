@@ -66,11 +66,6 @@ export class ResetPasswordDto {
   @MinLength(6)
   @ApiProperty()
   password!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  token!: string;
 }
 
 export class ForgotPasswordDto {

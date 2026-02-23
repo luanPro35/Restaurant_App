@@ -10,10 +10,47 @@ import {
   Alert,
   Switch,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import adminApi from "../../admin-api";
+
+const InputField = ({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType = "default",
+  multiline = false,
+  required = false,
+}: any) => (
+  <View className="mb-5">
+    <View className="flex-row">
+      <Text className="text-gray-700 font-bold mb-2 ml-1">{label}</Text>
+      {required && <Text className="text-red-500 ml-1">*</Text>}
+    </View>
+    <TextInput
+      className={`bg-white border border-gray-200 rounded-2xl p-4 text-gray-800 shadow-sm ${multiline ? "h-32 text-start" : ""}`}
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor="#9CA3AF"
+      keyboardType={keyboardType}
+      multiline={multiline}
+      textAlignVertical={multiline ? "top" : "center"}
+      autoCorrect={false}
+      spellCheck={false}
+    />
+  </View>
+);
+
+const categories = [
+  { id: "1e52c6ce-1d9e-4d0d-821b-604a2ba36359", name: "Món chính" },
+  { id: "14a95a8a-ed42-4ad8-ad3f-e0e16aef0959", name: "Món khai vị" },
+  { id: "5bc9e23d-2a41-4a2d-bd56-1bef3ac1a7c3", name: "Tráng miệng" },
+  { id: "7d0a2143-9c63-4b7e-9ff3-c30542c6e92e", name: "Đồ uống" },
+];
 
 export const AdminCreateProduct = () => {
   const navigation = useNavigation();
@@ -22,9 +59,9 @@ export const AdminCreateProduct = () => {
     name: "",
     description: "",
     price: "",
-    unit: "phần",
-    category: "",
-    images: "",
+    unit: "đĩa",
+    category: categories[0].id,
+    image: "",
     isAvailable: true,
     isBestSeller: false,
   });
@@ -44,40 +81,23 @@ export const AdminCreateProduct = () => {
       Alert.alert("Thành công", "Đã tạo sản phẩm mới", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create product error:", error);
-      Alert.alert("Lỗi", "Không thể tạo sản phẩm. Vui lòng thử lại.");
+      let errorMessage = "Không thể tạo sản phẩm. Vui lòng thử lại.";
+
+      if (error.response?.data?.message) {
+        const msg = error.response.data.message;
+        if (Array.isArray(msg)) {
+          errorMessage = msg.map((m: any) => m.message || m).join("\n");
+        } else {
+          errorMessage = msg;
+        }
+      }
+      Alert.alert("Lỗi", errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  const InputField = ({
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = "default",
-    multiline = false,
-    required = false,
-  }: any) => (
-    <View className="mb-5">
-      <View className="flex-row">
-        <Text className="text-gray-700 font-bold mb-2 ml-1">{label}</Text>
-        {required && <Text className="text-red-500 ml-1">*</Text>}
-      </View>
-      <TextInput
-        className={`bg-white border border-gray-200 rounded-2xl p-4 text-gray-800 shadow-sm ${multiline ? "h-32 text-start" : ""}`}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#9CA3AF"
-        keyboardType={keyboardType}
-        multiline={multiline}
-        textAlignVertical={multiline ? "top" : "center"}
-      />
-    </View>
-  );
 
   return (
     <View className="flex-1 bg-[#FDFCF7]">
@@ -115,13 +135,37 @@ export const AdminCreateProduct = () => {
           required
         />
 
-        <InputField
-          label="Danh mục"
-          value={form.category}
-          onChangeText={(text: string) => setForm({ ...form, category: text })}
-          placeholder="Nhập ID danh mục hoặc tên..."
-          required
-        />
+        <View className="mb-8">
+          <View className="flex-row">
+            <Text className="text-gray-700 font-bold mb-3 ml-1">Danh mục</Text>
+            <Text className="text-red-500 ml-1">*</Text>
+          </View>
+          <View className="flex-row flex-wrap">
+            {categories.map((category) => {
+              const isSelected = form.category === category.id;
+              return (
+                <TouchableOpacity
+                  key={category.id}
+                  onPress={() => setForm({ ...form, category: category.id })}
+                  activeOpacity={0.7}
+                  className={`mr-2 mb-2 px-4 py-2 rounded-xl border ${
+                    isSelected
+                      ? "bg-[#E07B39] border-[#E07B39]"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <Text
+                    className={`font-semibold ${
+                      isSelected ? "text-white" : "text-gray-600"
+                    }`}
+                  >
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
 
         <View className="flex-row justify-between">
           <View className="w-[48%]">
@@ -156,8 +200,8 @@ export const AdminCreateProduct = () => {
 
         <InputField
           label="Link hình ảnh"
-          value={form.images}
-          onChangeText={(text: string) => setForm({ ...form, images: text })}
+          value={form.image}
+          onChangeText={(text: string) => setForm({ ...form, image: text })}
           placeholder="https://example.com/image.jpg"
         />
 

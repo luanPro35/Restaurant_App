@@ -74,6 +74,46 @@ export const useAdminProducts = () => {
     ]);
   };
 
+  const getProductById = async (id: string) => {
+    try {
+      const response = await adminApi.products.getById(id);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin product:", error);
+      Alert.alert("Lỗi", "Không thể tải sản phẩm");
+    }
+  };
+
+  const getProductAll = async () => {
+    try {
+      const response = await adminApi.products.getAll();
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin products:", error);
+      Alert.alert("Lỗi", "Không thể tải danh sách sản phẩm");
+    }
+  };
+
+  const updateProduct = async (id: string, productData: any) => {
+    try {
+      const response = await adminApi.products.update(id, productData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating admin product:", error);
+      Alert.alert("Lỗi", "Không thể cập nhật sản phẩm");
+    }
+  };
+
+  const createProduct = async (productData: any) => {
+    try {
+      const response = await adminApi.products.create(productData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating admin product:", error);
+      Alert.alert("Lỗi", "Không thể tạo sản phẩm");
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -87,5 +127,9 @@ export const useAdminProducts = () => {
     handleRefresh,
     toggleAvailability,
     deleteProduct,
+    getProductById,
+    getProductAll,
+    updateProduct,
+    createProduct,
   };
 };

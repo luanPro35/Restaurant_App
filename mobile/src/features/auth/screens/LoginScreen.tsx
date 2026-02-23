@@ -46,7 +46,7 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       const message = error.response?.data?.message || "Đăng nhập thất bại";
-      Alert.alert("Lỗi", message);
+      Alert.alert("Lỗi", Array.isArray(message) ? message.join("\n") : message);
     } finally {
       setLoading(false);
     }
@@ -93,7 +93,10 @@ export default function LoginScreen() {
             />
           </View>
 
-          <TouchableOpacity className="self-end mb-6">
+          <TouchableOpacity
+            className="self-end mb-6"
+            onPress={() => navigation.navigate("Forgot")}
+          >
             <Text className="text-sm text-[#E07B39] font-medium">
               Forgot Password?
             </Text>

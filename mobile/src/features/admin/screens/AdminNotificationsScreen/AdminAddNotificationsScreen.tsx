@@ -121,6 +121,8 @@ export default function AdminNotificationsScreen() {
                 className="flex-1 py-3 ml-2.5 text-sm text-gray-800"
                 placeholder="Nhập tiêu đề thông báo..."
                 placeholderTextColor="#9ca3af"
+                autoCorrect={false}
+                spellCheck={false}
               />
             </View>
 
@@ -136,6 +138,8 @@ export default function AdminNotificationsScreen() {
                 placeholderTextColor="#9ca3af"
                 multiline
                 textAlignVertical="top"
+                autoCorrect={false}
+                spellCheck={false}
               />
             </View>
 
@@ -154,6 +158,8 @@ export default function AdminNotificationsScreen() {
                 className="flex-1 py-3 ml-2.5 text-sm text-gray-800"
                 placeholder="Nhập mô tả ngắn..."
                 placeholderTextColor="#9ca3af"
+                autoCorrect={false}
+                spellCheck={false}
               />
             </View>
 

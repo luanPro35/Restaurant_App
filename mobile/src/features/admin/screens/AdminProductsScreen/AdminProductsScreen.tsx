@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,13 +12,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAdminProducts } from "../../hooks/useAdminProducts";
 import { AdminProductCard } from "../../components/AdminProductCard";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MainStackParamList } from "../../../../app/navigation/MainNavigator";
+import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
+import { AdminProduct } from "../../types/admin.types";
 
 export default function AdminProductsScreen() {
   const navigation =
-    useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+    useNavigation<NativeStackNavigationProp<AdminStackParamList>>();
   const {
     products,
     loading,
@@ -29,6 +30,12 @@ export default function AdminProductsScreen() {
     fetchProducts,
   } = useAdminProducts();
   const [search, setSearch] = useState("");
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProducts();
+    }, [fetchProducts]),
+  );
 
   const handleSearch = () => {
     fetchProducts({ search });
@@ -118,7 +125,9 @@ export default function AdminProductsScreen() {
           renderItem={({ item }) => (
             <AdminProductCard
               product={item}
-              onEdit={(p) => console.log("Edit", p)}
+              onEdit={(p) =>
+                navigation.navigate("AdminEditProduct", { productId: p.id })
+              }
               onDelete={deleteProduct}
               onToggleAvailability={toggleAvailability}
             />

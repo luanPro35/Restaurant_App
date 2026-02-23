@@ -38,7 +38,7 @@ export default function RegisterScreen() {
       Alert.alert("Thành công", "Mã OTP đã được gửi đến email của bạn");
     } catch (error: any) {
       const message = error.response?.data?.message || "Không thể gửi OTP";
-      Alert.alert("Lỗi", message);
+      Alert.alert("Lỗi", Array.isArray(message) ? message.join("\n") : message);
     } finally {
       setSendingOtp(false);
     }
@@ -63,7 +63,7 @@ export default function RegisterScreen() {
       ]);
     } catch (error: any) {
       const message = error.response?.data?.message || "Đăng ký thất bại";
-      Alert.alert("Lỗi", message);
+      Alert.alert("Lỗi", Array.isArray(message) ? message.join("\n") : message);
     } finally {
       setLoading(false);
     }

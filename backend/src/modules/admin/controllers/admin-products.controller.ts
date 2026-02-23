@@ -27,8 +27,8 @@ export class AdminProductController {
   constructor(private readonly adminProductService: AdminProductService) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.adminProductService.createProduct(createProductDto);
+  create(@Body() data: any) {
+    return this.adminProductService.createProduct(data);
   }
 
   @Get()

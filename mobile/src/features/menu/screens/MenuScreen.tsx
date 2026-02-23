@@ -14,19 +14,7 @@ import Shopping_Cart from "../../../app/providers/Shopping_Cart";
 import CartModal from "../components/CartModal";
 import Search_Dish from "../../delivery/Header/Search_Dish";
 import { useMenu } from "../hooks/useMenu";
-
-interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  description: string;
-  category: string;
-}
-
-interface CartItem extends MenuItem {
-  quantity: number;
-}
+import { MenuItem, CartItem } from "../types";
 
 export default function MenuScreen() {
   const navigation = useNavigation();

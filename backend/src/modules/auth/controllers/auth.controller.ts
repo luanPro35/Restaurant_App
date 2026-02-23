@@ -122,7 +122,6 @@ export class AuthController {
     return this.authService.resetPassword(
       resetPasswordDto.email,
       resetPasswordDto.password,
-      resetPasswordDto.token,
     );
   }
 }

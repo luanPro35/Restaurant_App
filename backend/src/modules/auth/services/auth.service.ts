@@ -123,29 +123,29 @@ export class AuthService {
     };
   }
 
-  async resetPassword(email: string, password: string, token: string) {
+  async resetPassword(email: string, password: string) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
     if (!user) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException("User not found");
     }
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-    const accessToken = this.tokenService.generateAccessToken(payload);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updatedUser = await this.prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword },
+    });
+
+    const tokens = await this.generateTokens(updatedUser);
     return {
       message: "Reset password successful",
-      accessToken,
+      ...tokens,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        role: updatedUser.role,
       },
     };
   }
