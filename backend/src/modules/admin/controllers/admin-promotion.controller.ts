@@ -31,8 +31,6 @@ import {
 
 @ApiTags("Admin / Promotions")
 @Controller("admin/promotions")
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
 @UseInterceptors(ClassSerializerInterceptor)
 export class AdminPromotionController {
   constructor(private readonly adminPromotionService: AdminPromotionService) {}
@@ -59,6 +57,8 @@ export class AdminPromotionController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: "Tạo khuyến mãi mới" })
   @ApiBody({ type: CreatePromotionDto })
   @ApiResponse({
@@ -70,6 +70,8 @@ export class AdminPromotionController {
   }
 
   @Patch(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: "Cập nhật thông tin khuyến mãi" })
   @ApiParam({ name: "id", description: "ID của khuyến mãi cần cập nhật" })
   @ApiBody({ type: UpdatePromotionDto })
@@ -86,6 +88,8 @@ export class AdminPromotionController {
   }
 
   @Delete(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: "Xóa khuyến mãi" })
   @ApiParam({ name: "id", description: "ID của khuyến mãi cần xóa" })
   @ApiResponse({

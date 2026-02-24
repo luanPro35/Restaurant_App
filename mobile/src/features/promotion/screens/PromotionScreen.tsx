@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,64 +7,14 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import PromotionCard from "../components/PromotionCard";
 import VoucherItem from "../components/VoucherItem";
+import { usePromotion } from "../hooks/usePromotion";
 
 type TabType = "promotions" | "notifications";
-
-// Mock Data
-const PROMOTIONS = [
-  {
-    id: "1",
-    title: "Siêu Sale Cuối Tuần",
-    description:
-      "Giảm giá 50% cho tất cả các món lẩu vào tối thứ 7 và Chủ nhật hàng tuần.",
-    image:
-      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    discount: "-50%",
-    expiryDate: "30/06/2026",
-  },
-  {
-    id: "2",
-    title: "Combo Gia Đình",
-    description:
-      "Tặng ngay 1 bình nước ngọt 1.5L khi gọi Combo Gia Đình 4 người.",
-    image:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    discount: "TẶNG NƯỚC",
-    expiryDate: "15/07/2026",
-  },
-];
-
-const VOUCHERS = [
-  {
-    id: "v1",
-    code: "WELCOME50",
-    discount: "50K",
-    minOrder: "200K",
-    expiryDate: "31/12/2026",
-    title: "Giảm 50K cho bạn mới",
-  },
-  {
-    id: "v2",
-    code: "FREESHIP",
-    discount: "15K",
-    minOrder: "100K",
-    expiryDate: "30/06/2026",
-    title: "Mã Freeship đơn 100K",
-  },
-  {
-    id: "v3",
-    code: "SALE20",
-    discount: "20%",
-    minOrder: "500K",
-    expiryDate: "30/06/2026",
-    title: "Giảm 20% tối đa 100K",
-  },
-];
 
 const NOTIFICATIONS = [
   {
@@ -93,9 +43,9 @@ const NOTIFICATIONS = [
   },
 ];
 
-export default function PromotionScreen() {
-  const navigation = useNavigation();
+export default function PromotionScreen({ navigation }: any) {
   const [activeTab, setActiveTab] = useState<TabType>("promotions");
+  const { promotions, loading, error, fetchPromotions } = usePromotion();
 
   const renderNotification = ({
     item,
@@ -126,6 +76,21 @@ export default function PromotionScreen() {
       {!item.read && <View className="w-2 h-2 rounded-full bg-[#E07B39]" />}
     </View>
   );
+
+  const renderNotPromotion = () => {
+    return (
+      <View className="py-20 items-center justify-center bg-white rounded-2xl border border-dashed border-gray-200">
+        <MaterialCommunityIcons
+          name="ticket-percent-outline"
+          size={48}
+          color="#D1D5DB"
+        />
+        <Text className="text-gray-400 mt-2">
+          Không có chương trình khuyến mãi nào
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <View className="flex-1 bg-[#F9F6E7]">
@@ -187,22 +152,53 @@ export default function PromotionScreen() {
               <Text className="text-lg font-bold text-[#2D2D2D] mb-3">
                 Mã Giảm Giá Của Bạn
               </Text>
-              {VOUCHERS.map((item) => (
-                <VoucherItem key={item.id} item={item} />
-              ))}
+              {loading ? (
+                <View className="py-4 items-center">
+                  <Text className="text-gray-400">Đang tải mã giảm giá...</Text>
+                </View>
+              ) : promotions.length > 0 ? (
+                promotions
+                  .filter((p) => p.code)
+                  .map((item) => <VoucherItem key={item.id} item={item} />)
+              ) : (
+                <View className="py-10 items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                  <Text className="text-gray-400">
+                    Bạn chưa có mã giảm giá nào
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View>
               <Text className="text-lg font-bold text-[#2D2D2D] mb-3">
                 Chương Trình Nổi Bật
               </Text>
-              {PROMOTIONS.map((item) => (
-                <PromotionCard
-                  key={item.id}
-                  item={item}
-                  onPress={(item) => console.log("Press promo:", item.title)}
-                />
-              ))}
+              {loading ? (
+                <View className="py-20 items-center justify-center">
+                  <Text className="text-gray-400">Đang tải khuyến mãi...</Text>
+                </View>
+              ) : promotions.length > 0 ? (
+                promotions.map((item) => (
+                  <PromotionCard
+                    key={item.id}
+                    item={{
+                      id: item.id,
+                      title: item.name,
+                      description: item.description || "",
+                      image:
+                        item.image ||
+                        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                      discount: `-${item.discount}%`,
+                      expiryDate: item.until,
+                    }}
+                    onPress={(promo) =>
+                      console.log("Press promo:", promo.title)
+                    }
+                  />
+                ))
+              ) : (
+                renderNotPromotion()
+              )}
             </View>
           </ScrollView>
         ) : (

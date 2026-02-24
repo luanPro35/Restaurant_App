@@ -64,6 +64,9 @@ export interface AdminPromotion {
   discount: number;
   until: string;
   isActive: boolean;
+  code?: string;
+  minOrder?: number;
+  image?: string;
   description?: string;
   createdAt?: string;
   updatedAt?: string;

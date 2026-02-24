@@ -41,6 +41,19 @@ export class CreatePromotionDto {
 
   @IsString()
   @IsOptional()
+  code?: string;
+
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  minOrder?: number;
+
+  @IsString()
+  @IsOptional()
+  image?: string;
+
+  @IsString()
+  @IsOptional()
   description?: string;
 }
 
@@ -64,6 +77,19 @@ export class UpdatePromotionDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsString()
+  @IsOptional()
+  code?: string;
+
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  minOrder?: number;
+
+  @IsString()
+  @IsOptional()
+  image?: string;
 
   @IsString()
   @IsOptional()

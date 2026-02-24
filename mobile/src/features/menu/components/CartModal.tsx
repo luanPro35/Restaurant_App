@@ -9,11 +9,23 @@ import {
   Animated,
   Dimensions,
   TextInput,
+  Platform,
+  UIManager,
+  LayoutAnimation,
 } from "react-native";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { CartItem } from "../types";
 import { formatCurrency } from "../../../shared/utils";
+import { useNavigation } from "@react-navigation/native";
 
 const { height } = Dimensions.get("window");
 
@@ -101,13 +113,13 @@ export default function CartModal({
             transform: [{ translateY: slideAnim }],
             maxHeight: height * 0.85,
           }}
-          className="bg-[#FDFCF7] rounded-t-[32px] shadow-2xl"
+          className="bg-[#FDFCF7] rounded-t-[32px] shadow-2xl flex-shrink-1"
         >
-          <View className="items-center pt-3 pb-1">
+          <View className="items-center pt-3 pb-1 flex-shrink-0">
             <View className="w-10 h-1 rounded-full bg-gray-300" />
           </View>
 
-          <View className="flex-row justify-between items-center px-6 pb-4 pt-2 border-b border-gray-100">
+          <View className="flex-row justify-between items-center px-6 pb-4 pt-2 border-b border-gray-100 flex-shrink-0">
             <View className="flex-row items-center">
               <View className="w-11 h-11 rounded-2xl bg-[#FFF3E8] items-center justify-center mr-3">
                 <MaterialCommunityIcons
@@ -170,14 +182,16 @@ export default function CartModal({
                   style={{ elevation: 1 }}
                 >
                   <View className="relative">
-                    <Image
-                      source={{ uri: item.image }}
-                      className="w-[88px] h-[88px] rounded-2xl bg-gray-100"
-                    />
                     <View className="absolute -top-1 -right-1 bg-[#E07B39] rounded-full w-6 h-6 items-center justify-center shadow-sm">
-                      <Text className="text-white text-[10px] font-black">
-                        x{item.quantity}
-                      </Text>
+                      <TextInput
+                        className="text-sm text-gray-500 font-semibold border border-orange-400 rounded-lg px-2 py-1.5 min-w-[36px] text-center"
+                        value={quantityInput}
+                        keyboardType="numeric"
+                        onChangeText={setQuantityInput}
+                        onSubmitEditing={handleTotalQuantitySubmit}
+                        onBlur={handleTotalQuantitySubmit}
+                        selectTextOnFocus
+                      />
                     </View>
                   </View>
 
@@ -239,22 +253,28 @@ export default function CartModal({
                         </TouchableOpacity>
                       </View>
 
-                      <Text className="text-[17px] font-black text-[#E07B39] mr-1">
-                        {formatCurrency(item.price * item.quantity)}
-                      </Text>
+                      <View className="flex-row items-center">
+                        <Text className="text-[17px] font-black text-[#E07B39] mr-2">
+                          {formatCurrency(item.price * item.quantity)}
+                        </Text>
 
-                      {/* Nút Xóa (X) ở góc trên phải */}
-                      <TouchableOpacity
-                        onPress={() => onRemoveItem(item.id)}
-                        className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gray-100 justify-center items-center shadow-sm"
-                        activeOpacity={0.7}
-                      >
-                        <MaterialCommunityIcons
-                          name="close"
-                          size={14}
-                          color="#9CA3AF"
-                        />
-                      </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            LayoutAnimation.configureNext(
+                              LayoutAnimation.Presets.spring,
+                            );
+                            onRemoveItem(item.id);
+                          }}
+                          className="bg-red-50 p-2 rounded-lg -mr-2"
+                          activeOpacity={0.7}
+                        >
+                          <MaterialCommunityIcons
+                            name="trash-can-outline"
+                            size={22}
+                            color="#EF4444"
+                          />
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -263,25 +283,82 @@ export default function CartModal({
           </ScrollView>
 
           {items.length > 0 && (
-            <View className="px-6 pt-4 pb-8 bg-white border-t border-gray-100 rounded-t-3xl shadow-lg">
-              <View className="mb-4">
-                <Text className="text-sm text-gray-400 mb-2">
-                  Tên người đặt / Ghi chú
-                </Text>
-                <TextInput
-                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800"
-                  placeholder="Nhập tên của bạn hoặc ghi chú..."
-                  value={name}
-                  onChangeText={setName}
-                />
+            <View className="px-6 pt-4 pb-8 bg-white border-t border-gray-100 rounded-t-3xl shadow-lg flex-shrink-0">
+              <View className="mb-6">
+                <View className="flex-row items-center mb-3 ml-1">
+                  <View className="w-1.5 h-5 bg-[#E07B39] rounded-full mr-3" />
+                  <Text className="text-[14px] font-black text-slate-800 uppercase tracking-widest">
+                    Chi tiết hóa đơn
+                  </Text>
+                </View>
+
+                <View className="bg-slate-50/50 rounded-[32px] p-2 border border-slate-100">
+                  {items.map((i, idx) => (
+                    <View
+                      key={i.id}
+                      className={`flex-row items-center justify-between p-4 ${
+                        idx !== items.length - 1
+                          ? "border-b border-white/60"
+                          : ""
+                      }`}
+                    >
+                      <View className="flex-1 mr-4">
+                        <Text
+                          className="text-[14px] font-bold text-slate-800 mb-1"
+                          numberOfLines={1}
+                        >
+                          {i.name}
+                        </Text>
+                        <View className="flex-row items-center">
+                          <TextInput
+                            className="bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-[11px] font-black text-slate-600 min-w-[36px] text-center"
+                            defaultValue={String(i.quantity)}
+                            keyboardType="numeric"
+                            onEndEditing={(e) => {
+                              const val = parseInt(e.nativeEvent.text);
+                              if (!isNaN(val) && val > 0)
+                                onUpdateQuantity(i.id, val);
+                            }}
+                          />
+                          <Text className="text-[11px] text-slate-400 font-bold ml-2">
+                            × {formatCurrency(i.price)}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View className="flex-row items-center">
+                        <Text className="text-[15px] font-black text-slate-800 mr-4">
+                          {formatCurrency(i.price * i.quantity)}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => {
+                            LayoutAnimation.configureNext(
+                              LayoutAnimation.Presets.spring,
+                            );
+                            onRemoveItem(i.id);
+                          }}
+                          className="w-10 h-10 rounded-2xl bg-red-50 justify-center items-center active:bg-red-100"
+                        >
+                          <MaterialCommunityIcons
+                            name="trash-can-outline"
+                            size={20}
+                            color="#EF4444"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </View>
               </View>
 
-              <View className="flex-row justify-between items-start mb-2">
-                <View className="flex-1 mr-4">
-                  <View className="flex-row items-center gap-2 mb-1">
-                    <Text className="text-sm text-gray-400">Tạm tính</Text>
+              <View className="flex-row items-center justify-between mb-4 px-2">
+                <View className="flex-row items-center">
+                  <Text className="text-[14px] font-bold text-slate-400 mr-3">
+                    Tạm tính
+                  </Text>
+                  <View className="flex-row items-center bg-orange-50 px-3 py-1.5 rounded-2xl">
                     <TextInput
-                      className="text-sm text-gray-500 font-semibold border border-orange-400 rounded-lg px-2 py-1.5 min-w-[36px] text-center"
+                      className="text-sm font-black text-[#E07B39] min-w-[24px] text-center"
                       value={quantityInput}
                       keyboardType="numeric"
                       onChangeText={setQuantityInput}
@@ -289,15 +366,12 @@ export default function CartModal({
                       onBlur={handleTotalQuantitySubmit}
                       selectTextOnFocus
                     />
-                    <Text className="text-sm text-gray-500 font-semibold">
-                      món
+                    <Text className="text-[11px] font-black text-[#E07B39] ml-1 uppercase">
+                      Món
                     </Text>
                   </View>
-                  <Text className="text-[10px] text-gray-400" numberOfLines={1}>
-                    {items.map((i) => i.name).join(", ")}
-                  </Text>
                 </View>
-                <Text className="text-sm text-gray-500 font-semibold mt-1">
+                <Text className="text-xl font-black text-slate-800">
                   {formatCurrency(totalPrice)}
                 </Text>
               </View>

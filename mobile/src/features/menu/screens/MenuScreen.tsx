@@ -8,19 +8,21 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import MenuItemCard from "../components/MenuItemCard";
-import Shopping_Cart from "../../../app/providers/Shopping_Cart";
-import CartModal from "../components/CartModal";
 import Search_Dish from "../../delivery/Header/Search_Dish";
 import { useMenu } from "../hooks/useMenu";
 import { MenuItem, CartItem } from "../types";
+import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
+import { useCart } from "../../../app/context/CartContext";
 
 export default function MenuScreen() {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
   const { menu, loading, fetchMenu, filter, setFilter } = useMenu();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartVisible, setIsCartVisible] = useState(false);
+  const { addToCart, setIsCartVisible } = useCart();
+  const [isCartVisibleLocal, setIsCartVisibleLocal] = useState(false); // Just in case, but actually let's use the global one
 
   useEffect(() => {
     fetchMenu();
@@ -53,50 +55,43 @@ export default function MenuScreen() {
     fetchMenu(newFilter);
   };
 
-  const menuItems: MenuItem[] = menu.map((item: any) => ({
-    id: item.id,
-    name: item.name,
-    price: item.price,
-    image:
-      item.images ||
+  const menuItems: MenuItem[] = menu.map((item: any) => {
+    let imageUrl =
       "https://via.placeholder.com/400x300/E07B39/ffffff?text=" +
-        encodeURIComponent(item.name),
-    description: item.description || "",
-    category: item.category?.name || "Khác",
-  }));
+      encodeURIComponent(item.name);
+
+    if (item.image) {
+      imageUrl = item.image;
+    } else if (item.images) {
+      if (Array.isArray(item.images) && item.images.length > 0) {
+        imageUrl = item.images[0];
+      } else if (typeof item.images === "string") {
+        try {
+          const parsed = JSON.parse(item.images);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            imageUrl = parsed[0];
+          } else {
+            imageUrl = item.images;
+          }
+        } catch (e) {
+          imageUrl = item.images;
+        }
+      }
+    }
+
+    return {
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: imageUrl,
+      description: item.description || "",
+      category: item.category?.name || "Khác",
+    };
+  });
 
   const handleAddToCart = (item: MenuItem) => {
-    setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id);
-      if (existingItem) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
-    });
+    addToCart(item);
   };
-
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      handleRemoveItem(id);
-      return;
-    }
-    setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleCheckout = () => {
-    console.log("Checkout with items:", cartItems);
-    setIsCartVisible(false);
-  };
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const getActivePriceFilter = () => {
     if (filter.minPrice === undefined && filter.maxPrice === 50000)
@@ -128,6 +123,10 @@ export default function MenuScreen() {
       </Text>
     </TouchableOpacity>
   );
+
+  const handleProductPress = (item: MenuItem) => {
+    navigation.navigate("DetailProduct", { id: item.id });
+  };
 
   return (
     <View className="flex-1 bg-[#F9F6E7]">
@@ -223,6 +222,7 @@ export default function MenuScreen() {
                     key={item.id}
                     item={item as any}
                     onAddToCart={handleAddToCart as any}
+                    onPress={handleProductPress}
                   />
                 ))}
               </View>
@@ -231,21 +231,7 @@ export default function MenuScreen() {
         )}
       </ScrollView>
 
-      <View className="absolute bottom-5 right-5 z-[1000]">
-        <Shopping_Cart
-          itemCount={totalItems}
-          onPress={() => setIsCartVisible(true)}
-        />
-      </View>
-
-      <CartModal
-        visible={isCartVisible}
-        items={cartItems as any}
-        onClose={() => setIsCartVisible(false)}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={handleCheckout}
-      />
+      {/* Floating Cart Button and Modal are now handled globally in App.tsx */}
     </View>
   );
 }

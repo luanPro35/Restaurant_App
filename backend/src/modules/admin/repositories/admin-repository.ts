@@ -39,14 +39,11 @@ export class AdminRepository {
   }
 
   async createPromotion(data: CreatePromotionDto) {
-    const { name, discount, until, isActive, description } = data;
+    const { until, ...rest } = data;
     return this.prisma.promotion.create({
       data: {
-        name,
-        discount,
-        isActive,
-        description,
-        until: new Date(until),
+        ...rest,
+        until: until ? new Date(until) : new Date(),
       },
     });
   }

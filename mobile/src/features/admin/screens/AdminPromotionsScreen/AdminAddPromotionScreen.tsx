@@ -25,6 +25,9 @@ export default function AdminAddPromotionScreen() {
 
   const [name, setName] = useState("");
   const [discount, setDiscount] = useState("");
+  const [code, setCode] = useState("");
+  const [minOrder, setMinOrder] = useState("");
+  const [image, setImage] = useState("");
   const [until, setUntil] = useState("");
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -56,6 +59,9 @@ export default function AdminAddPromotionScreen() {
         name: name.trim(),
         discount: discountNum,
         until: until.trim(),
+        code: code.trim() || undefined,
+        minOrder: minOrder.trim() ? parseFloat(minOrder) : undefined,
+        image: image.trim() || undefined,
         description: description.trim() || undefined,
         isActive,
       });
@@ -155,6 +161,34 @@ export default function AdminAddPromotionScreen() {
             onChangeText={setUntil}
             placeholder="YYYY-MM-DD (ví dụ: 2025-12-31)"
             hint="Định dạng: YYYY-MM-DD"
+          />
+
+          <InputField
+            label="Mã giảm giá (Coupon Code)"
+            icon="barcode-scan"
+            value={code}
+            onChangeText={setCode}
+            placeholder="Ví dụ: SALE50"
+            hint="Để trống nếu không dùng mã"
+          />
+
+          <InputField
+            label="Đơn tối thiểu (VNĐ)"
+            icon="cart-arrow-down"
+            value={minOrder}
+            onChangeText={setMinOrder}
+            placeholder="Ví dụ: 100000"
+            keyboardType="numeric"
+            hint="Đơn hàng tối thiểu để được áp dụng"
+          />
+
+          <InputField
+            label="Hình ảnh (URL)"
+            icon="image-outline"
+            value={image}
+            onChangeText={setImage}
+            placeholder="Link ảnh minh họa..."
+            hint="Nhập link ảnh (https://...)"
           />
 
           <View className="mb-5">

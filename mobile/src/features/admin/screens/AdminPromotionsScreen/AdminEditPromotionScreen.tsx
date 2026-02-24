@@ -31,6 +31,9 @@ export default function AdminEditPromotionScreen() {
 
   const [name, setName] = useState("");
   const [discount, setDiscount] = useState("");
+  const [code, setCode] = useState("");
+  const [minOrder, setMinOrder] = useState("");
+  const [image, setImage] = useState("");
   const [until, setUntil] = useState("");
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -46,6 +49,9 @@ export default function AdminEditPromotionScreen() {
         if (data) {
           setName(data.name);
           setDiscount(String(data.discount));
+          setCode(data.code || "");
+          setMinOrder(data.minOrder ? String(data.minOrder) : "");
+          setImage(data.image || "");
           setUntil(data.until ? data.until.slice(0, 10) : "");
           setDescription(data.description || "");
           setIsActive(data.isActive);
@@ -91,6 +97,9 @@ export default function AdminEditPromotionScreen() {
         name: name.trim(),
         discount: discountNum,
         until: until.trim(),
+        code: code.trim() || undefined,
+        minOrder: minOrder.trim() ? parseFloat(minOrder) : undefined,
+        image: image.trim() || undefined,
         description: description.trim() || undefined,
         isActive,
       });
@@ -196,6 +205,34 @@ export default function AdminEditPromotionScreen() {
             onChangeText={setUntil}
             placeholder="YYYY-MM-DD"
             hint="Định dạng: YYYY-MM-DD"
+          />
+
+          <InputField
+            label="Mã giảm giá (Coupon Code)"
+            icon="barcode-scan"
+            value={code}
+            onChangeText={setCode}
+            placeholder="Ví dụ: SALE50"
+            hint="Mã áp dụng tại giỏ hàng"
+          />
+
+          <InputField
+            label="Đơn tối thiểu (VNĐ)"
+            icon="cart-arrow-down"
+            value={minOrder}
+            onChangeText={setMinOrder}
+            placeholder="Ví dụ: 100000"
+            keyboardType="numeric"
+            hint="Giá trị đơn hàng tối thiểu"
+          />
+
+          <InputField
+            label="Hình ảnh (URL)"
+            icon="image-outline"
+            value={image}
+            onChangeText={setImage}
+            placeholder="Link ảnh minh họa..."
+            hint="Link ảnh sản phẩm/banner"
           />
 
           <View className="mb-5">

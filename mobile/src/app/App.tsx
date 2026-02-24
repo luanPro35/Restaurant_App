@@ -5,6 +5,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, ActivityIndicator } from "react-native";
 import RootNavigator from "./navigation/RootNavigator";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import { GlobalCart } from "./context/GlobalCart";
 
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
@@ -26,10 +28,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NavigationContainer onReady={() => console.log("Navigation ready")}>
-          <StatusBar style="auto" />
-          <RootNavigator />
-        </NavigationContainer>
+        <CartProvider>
+          <NavigationContainer onReady={() => console.log("Navigation ready")}>
+            <StatusBar style="auto" />
+            <RootNavigator />
+            <GlobalCart />
+          </NavigationContainer>
+        </CartProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

@@ -15,9 +15,14 @@ interface MenuItem {
 interface MenuItemCardProps {
   item: MenuItem;
   onAddToCart: (item: MenuItem) => void;
+  onPress: (item: MenuItem) => void;
 }
 
-export default function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
+export default function MenuItemCard({
+  item,
+  onAddToCart,
+  onPress,
+}: MenuItemCardProps) {
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -62,6 +67,7 @@ export default function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
         activeOpacity={0.9}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        onPress={() => onPress(item)}
         className="bg-white rounded-2xl overflow-hidden shadow-md"
         style={{ elevation: 3 }}
       >

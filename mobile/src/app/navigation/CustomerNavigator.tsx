@@ -13,6 +13,8 @@ import MessagesScreen from "../../features/messages/screens/MessagesScreen";
 import ProfileScreen from "../../features/profile/screens/ProfileScreen";
 import ChangeProfileScreen from "../../features/profile/components/ChangeProfile";
 
+import DetailProduct from "../../features/menu/screens/DetailProduct";
+
 export type CustomerStackParamList = {
   Home: undefined;
   AtRestaurant: undefined;
@@ -26,6 +28,7 @@ export type CustomerStackParamList = {
   Messages: undefined;
   Profile: undefined;
   ChangeProfile: undefined;
+  DetailProduct: { id: string };
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -48,6 +51,7 @@ export default function CustomerNavigator() {
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ChangeProfile" component={ChangeProfileScreen} />
+      <Stack.Screen name="DetailProduct" component={DetailProduct} />
     </Stack.Navigator>
   );
 }

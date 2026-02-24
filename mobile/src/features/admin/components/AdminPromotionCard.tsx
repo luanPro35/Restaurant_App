@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AdminPromotion } from "../types/admin.types";
 
@@ -39,6 +39,23 @@ export const AdminPromotionCard = ({
         }}
       />
 
+      {promotion.image ? (
+        <View
+          style={{
+            width: 80,
+            height: "100%",
+            paddingVertical: 10,
+            paddingLeft: 10,
+          }}
+        >
+          <Image
+            source={{ uri: promotion.image }}
+            className="w-full h-full bg-gray-100 rounded-xl"
+            resizeMode="cover"
+          />
+        </View>
+      ) : null}
+
       <View style={{ flex: 1, padding: 14 }}>
         <View className="flex-row items-center justify-between mb-2">
           <Text
@@ -58,25 +75,57 @@ export const AdminPromotionCard = ({
           </View>
         </View>
 
-        <View className="flex-row items-center mb-3">
-          <View className="bg-orange-50 rounded-lg px-3 py-1 mr-3 flex-row items-center">
+        <View className="flex-row items-center mb-3 flex-wrap">
+          <View className="bg-orange-50 rounded-lg px-2 py-1 mr-2 mb-1 flex-row items-center">
             <MaterialCommunityIcons
               name="ticket-percent-outline"
-              size={14}
+              size={13}
               color="#E07B39"
             />
-            <Text className="text-[#E07B39] font-black text-sm ml-1">
+            <Text className="text-[#E07B39] font-black text-xs ml-1">
               -{promotion.discount}%
             </Text>
           </View>
-          <MaterialCommunityIcons
-            name="calendar-clock-outline"
-            size={13}
-            color="#9CA3AF"
-          />
-          <Text className="text-gray-400 text-xs ml-1">
-            {promotion.until ? promotion.until.slice(0, 10) : "—"}
-          </Text>
+
+          {promotion.code ? (
+            <View className="bg-blue-50 rounded-lg px-2 py-1 mr-2 mb-1 flex-row items-center">
+              <MaterialCommunityIcons
+                name="barcode-scan"
+                size={13}
+                color="#3B82F6"
+              />
+              <Text className="text-[#3B82F6] font-black text-xs ml-1 uppercase">
+                {promotion.code}
+              </Text>
+            </View>
+          ) : null}
+
+          {promotion.minOrder ? (
+            <View className="bg-purple-50 rounded-lg px-2 py-1 mr-2 mb-1 flex-row items-center">
+              <MaterialCommunityIcons
+                name="cart-arrow-down"
+                size={13}
+                color="#9333EA"
+              />
+              <Text className="text-[#9333EA] font-black text-xs ml-1">
+                ≥
+                {promotion.minOrder >= 1000
+                  ? promotion.minOrder / 1000 + "k"
+                  : promotion.minOrder}
+              </Text>
+            </View>
+          ) : null}
+
+          <View className="flex-row items-center mb-1">
+            <MaterialCommunityIcons
+              name="calendar-clock-outline"
+              size={13}
+              color="#9CA3AF"
+            />
+            <Text className="text-gray-400 text-xs ml-1">
+              {promotion.until ? promotion.until.slice(0, 10) : "—"}
+            </Text>
+          </View>
         </View>
 
         {promotion.description ? (

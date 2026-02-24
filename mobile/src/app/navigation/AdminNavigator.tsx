@@ -19,6 +19,7 @@ import AdminNotificationsScreen from "@/features/admin/screens/AdminNotification
 import AdminAddNotificationsScreen from "@/features/admin/screens/AdminNotificationsScreen/AdminAddNotificationsScreen";
 import AdminEditNotificationScreen from "@/features/admin/screens/AdminNotificationsScreen/AdminEditNotificationScreen";
 import AdminEditProduct from "@/features/admin/screens/AdminProductsScreen/AdminEditProduct";
+import DetailProduct from "../../features/menu/screens/DetailProduct";
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
@@ -39,6 +40,7 @@ export type AdminStackParamList = {
   AdminAddNotificationsScreen: undefined;
   AdminEditNotificationScreen: { notificationId: string };
   AdminEditProduct: { productId: string };
+  DetailProduct: { id: string };
 };
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
@@ -85,6 +87,7 @@ export default function AdminNavigator() {
         component={AdminEditNotificationScreen}
       />
       <Stack.Screen name="AdminEditProduct" component={AdminEditProduct} />
+      <Stack.Screen name="DetailProduct" component={DetailProduct} />
     </Stack.Navigator>
   );
 }

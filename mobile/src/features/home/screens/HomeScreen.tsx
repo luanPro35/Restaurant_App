@@ -10,13 +10,21 @@ import Quick_Combo from "./Quick_Combo";
 import MealOption from "./MealOption";
 import Shopping_Cart from "../../../app/providers/Shopping_Cart";
 import Navbar from "./Navbar";
-import { useAuth } from "../../../app/context/AuthContext";
+import { useCart } from "../../../app/context/CartContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen() {
-  const { logout } = useAuth();
+  const { totalItems, setIsCartVisible, setShouldHideFloatingCart } = useCart();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setShouldHideFloatingCart(true);
+      return () => setShouldHideFloatingCart(false);
+    }, [setShouldHideFloatingCart]),
+  );
   return (
     <View className="flex-1 bg-[#F9F6E7]">
-      <Header onLogout={logout} />
+      <Header />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-6 pt-8">
@@ -47,7 +55,10 @@ export default function HomeScreen() {
         <View className="flex-1 mr-3">
           <Navbar />
         </View>
-        <Shopping_Cart />
+        <Shopping_Cart
+          itemCount={totalItems}
+          onPress={() => setIsCartVisible(true)}
+        />
       </View>
     </View>
   );
