@@ -9,8 +9,9 @@ import { AdminManageUserController } from "./controllers/admin-manage_user.contr
 import { AdminManageUserService } from "./services/admin-manage_user.service";
 import { AdminPromotionController } from "./controllers/admin-promotion.controller";
 import { AdminPromotionService } from "./services/admin-promotion.service";
-import { AdminRepository } from "./repositories/admin-repository";
+import { AdminPromotionRepository } from "./repositories/admin-promotion.repository";
 import { AdminNotificationController } from "./controllers/admin-notification.controller";
+import { NotificationController } from "./controllers/notification.controller";
 import { AdminNotificationService } from "./services/admin-notification.service";
 import { AdminNotificationRepository } from "./repositories/admin-notification.repository";
 
@@ -21,6 +22,7 @@ import { AdminNotificationRepository } from "./repositories/admin-notification.r
     AdminManageUserController,
     AdminPromotionController,
     AdminNotificationController,
+    NotificationController,
   ],
   providers: [
     AdminProductService,
@@ -28,7 +30,7 @@ import { AdminNotificationRepository } from "./repositories/admin-notification.r
     AdminManageUserRepository,
     AdminManageUserService,
     AdminPromotionService,
-    AdminRepository,
+    AdminPromotionRepository,
     AdminNotificationService,
     AdminNotificationRepository,
   ],
