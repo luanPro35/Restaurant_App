@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StatusBar,
   TouchableOpacity,
   FlatList,
+  Modal,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -13,69 +14,57 @@ import { LinearGradient } from "expo-linear-gradient";
 import PromotionCard from "../components/PromotionCard";
 import VoucherItem from "../components/VoucherItem";
 import { usePromotion } from "../hooks/usePromotion";
+import { useNotification } from "../hooks/useNotification";
+import Notification from "../components/Notification";
+import { RefreshControl } from "react-native";
+import DetailNotification from "../components/DetailNotification";
+import { AdminNotification } from "@/services/api/admin-notification";
 
 type TabType = "promotions" | "notifications";
 
-const NOTIFICATIONS = [
-  {
-    id: "n1",
-    title: "Đơn hàng #1234 đã giao thành công",
-    time: "2 giờ trước",
-    icon: "check-circle",
-    color: "#4CAF50",
-    read: false,
-  },
-  {
-    id: "n2",
-    title: "Bạn có mã giảm giá sắp hết hạn",
-    time: "5 giờ trước",
-    icon: "ticket-confirmation",
-    color: "#E07B39",
-    read: true,
-  },
-  {
-    id: "n3",
-    title: "Nhà hàng nghỉ tết từ 01/02 - 05/02",
-    time: "1 ngày trước",
-    icon: "calendar-alert",
-    color: "#2196F3",
-    read: true,
-  },
-];
-
 export default function PromotionScreen({ navigation }: any) {
   const [activeTab, setActiveTab] = useState<TabType>("promotions");
-  const { promotions, loading, error, fetchPromotions } = usePromotion();
+  const {
+    promotions,
+    loading: loadingPromos,
+    fetchPromotions,
+  } = usePromotion();
+  const {
+    notifications,
+    loading: loadingNotifs,
+    refreshing,
+    handleRefresh,
+    total: totalNotifs,
+    fetchNotifications,
+    getNotificationById,
+  } = useNotification();
 
-  const renderNotification = ({
-    item,
-  }: {
-    item: (typeof NOTIFICATIONS)[0];
-  }) => (
-    <View
-      className={`flex-row p-4 border-b border-gray-100 items-center ${item.read ? "bg-white" : "bg-[#FFF9F2]"}`}
-    >
-      <View
-        className={`w-12 h-12 rounded-full justify-center items-center mr-4`}
-        style={{ backgroundColor: `${item.color}20` }}
-      >
-        <MaterialCommunityIcons
-          name={item.icon as any}
-          size={24}
-          color={item.color}
-        />
-      </View>
-      <View className="flex-1">
-        <Text
-          className={`text-base mb-1 text-[#2D2D2D] ${item.read ? "font-normal" : "font-bold"}`}
-        >
-          {item.title}
-        </Text>
-        <Text className="text-xs text-gray-400">{item.time}</Text>
-      </View>
-      {!item.read && <View className="w-2 h-2 rounded-full bg-[#E07B39]" />}
-    </View>
+  const [selectedNotification, setSelectedNotification] =
+    useState<AdminNotification | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleOpenDetail = async (id: string) => {
+    try {
+      const detail = await getNotificationById(id);
+      setSelectedNotification(detail);
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error("Error fetching notification detail:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPromotions({ page: 1, limit: 10 });
+      fetchNotifications({ page: 1, limit: 10 });
+    }, [fetchPromotions, fetchNotifications]),
   );
+
+  useEffect(() => {
+    if (activeTab === "notifications") {
+      fetchNotifications({ page: 1, limit: 10 });
+    }
+  }, [activeTab, fetchNotifications]);
 
   const renderNotPromotion = () => {
     return (
@@ -136,7 +125,7 @@ export default function PromotionScreen({ navigation }: any) {
             <Text
               className={`text-white font-bold text-base ${activeTab === "notifications" ? "opacity-100" : "opacity-70"}`}
             >
-              Thông Báo (3)
+              Thông Báo {totalNotifs > 0 ? `(${totalNotifs})` : ""}
             </Text>
           </TouchableOpacity>
         </View>
@@ -152,14 +141,14 @@ export default function PromotionScreen({ navigation }: any) {
               <Text className="text-lg font-bold text-[#2D2D2D] mb-3">
                 Mã Giảm Giá Của Bạn
               </Text>
-              {loading ? (
+              {loadingPromos ? (
                 <View className="py-4 items-center">
                   <Text className="text-gray-400">Đang tải mã giảm giá...</Text>
                 </View>
               ) : promotions.length > 0 ? (
                 promotions
-                  .filter((p) => p.code)
-                  .map((item) => <VoucherItem key={item.id} item={item} />)
+                  .filter((p: any) => p.code)
+                  .map((item: any) => <VoucherItem key={item.id} item={item} />)
               ) : (
                 <View className="py-10 items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                   <Text className="text-gray-400">
@@ -173,12 +162,12 @@ export default function PromotionScreen({ navigation }: any) {
               <Text className="text-lg font-bold text-[#2D2D2D] mb-3">
                 Chương Trình Nổi Bật
               </Text>
-              {loading ? (
+              {loadingPromos ? (
                 <View className="py-20 items-center justify-center">
                   <Text className="text-gray-400">Đang tải khuyến mãi...</Text>
                 </View>
               ) : promotions.length > 0 ? (
-                promotions.map((item) => (
+                promotions.map((item: any) => (
                   <PromotionCard
                     key={item.id}
                     item={{
@@ -201,15 +190,54 @@ export default function PromotionScreen({ navigation }: any) {
               )}
             </View>
           </ScrollView>
+        ) : loadingNotifs && notifications.length === 0 ? (
+          <View className="flex-1 items-center justify-center bg-white">
+            <Text className="text-gray-400 mt-4">Đang tải thông báo...</Text>
+          </View>
         ) : (
           <FlatList
-            data={NOTIFICATIONS}
-            renderItem={renderNotification}
+            data={notifications}
+            renderItem={({ item }) => (
+              <Notification item={item} onPress={handleOpenDetail} />
+            )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 20 }}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={["#E91E63"]}
+              />
+            }
+            ListEmptyComponent={
+              <View className="py-20 items-center justify-center">
+                <MaterialCommunityIcons
+                  name="bell-off-outline"
+                  size={48}
+                  color="#D1D5DB"
+                />
+                <Text className="text-gray-400 mt-2">
+                  Không có thông báo nào
+                </Text>
+              </View>
+            }
           />
         )}
       </View>
+
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        {selectedNotification && (
+          <DetailNotification
+            item={selectedNotification}
+            onClose={() => setIsModalVisible(false)}
+          />
+        )}
+      </Modal>
     </View>
   );
 }

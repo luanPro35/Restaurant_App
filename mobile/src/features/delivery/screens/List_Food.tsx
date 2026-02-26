@@ -1,16 +1,23 @@
-import React, { forwardRef, useRef, useImperativeHandle } from "react";
+import React, {
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
 import {
   View,
   Text,
   SectionList,
   TouchableOpacity,
   Animated,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import { MENU_SECTIONS } from "../../../data/dish";
+import { useDelivery } from "../hooks/useDelivery";
 
-const ITEM_HEIGHT = 140;
-const HEADER_HEIGHT = 50;
+const ITEM_HEIGHT = 160;
+const HEADER_HEIGHT = 60;
 
 const List_Food = forwardRef(
   (
@@ -20,7 +27,30 @@ const List_Food = forwardRef(
     }: { onScroll?: any; ListHeaderComponent?: any },
     ref,
   ) => {
+    const { menu, loading, fetchMenu } = useDelivery();
     const sectionListRef = useRef<SectionList>(null);
+
+    useEffect(() => {
+      fetchMenu();
+    }, [fetchMenu]);
+
+    const MENU_SECTIONS = React.useMemo(() => {
+      if (!menu || menu.length === 0) return [];
+
+      const grouped = menu.reduce((acc: any, item: any) => {
+        const categoryName = item.category?.name || "Đặc sắc";
+        if (!acc[categoryName]) {
+          acc[categoryName] = [];
+        }
+        acc[categoryName].push(item);
+        return acc;
+      }, {});
+
+      return Object.keys(grouped).map((title) => ({
+        title,
+        data: grouped[title],
+      }));
+    }, [menu]);
 
     useImperativeHandle(ref, () => ({
       scrollToLocation: (params: any) => {
@@ -58,68 +88,125 @@ const List_Food = forwardRef(
       return { length: ITEM_HEIGHT, offset, index };
     };
 
+    const formatPrice = (price: any) => {
+      if (typeof price === "string") return price;
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(price);
+    };
+
+    if (loading && menu.length === 0) {
+      return (
+        <View className="flex-1 justify-center items-center bg-[#FDFCF7]">
+          <ActivityIndicator size="large" color="#E07B39" />
+          <Text className="mt-4 text-[#888888] font-medium italic">
+            Đang chuẩn bị thực đơn...
+          </Text>
+        </View>
+      );
+    }
+
     return (
-      <View className="flex-1 bg-[#F9F6E7]">
+      <View className="flex-1 bg-[#FDFCF7]">
         <Animated.SectionList
           ref={sectionListRef}
           sections={MENU_SECTIONS}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) =>
+            item.id ? item.id.toString() : Math.random().toString()
+          }
           stickySectionHeadersEnabled={true}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: 280 }}
+          contentContainerStyle={{ paddingTop: 280, paddingBottom: 100 }}
           ListHeaderComponent={ListHeaderComponent}
           getItemLayout={getItemLayout}
           onScroll={onScroll}
           scrollEventThrottle={16}
           renderSectionHeader={({ section: { title } }) => (
-            <View className="bg-[#F9F6E7] py-3 px-4 shadow-sm border-b border-gray-100 h-[50px]">
-              <View className="flex-row items-center h-full">
-                <View className="w-1 h-6 bg-[#E07B39] rounded-full mr-2" />
-                <Text className="text-xl font-bold text-[#2D2D2D]">
-                  {title}
-                </Text>
-              </View>
+            <View className="bg-[#FDFCF7]/95 py-4 px-6 h-[60px] border-b border-gray-50 flex-row items-center">
+              <View className="w-1.5 h-6 bg-[#E07B39] rounded-full mr-3" />
+              <Text className="text-xl font-bold text-[#1A1A1A]">{title}</Text>
             </View>
           )}
           renderItem={({ item }) => (
-            <View className="px-4 py-3 bg-white mb-2 mx-4 rounded-xl shadow-sm border border-gray-50 flex-row h-[132px]">
-              <View className="w-24 h-24 bg-orange-50 rounded-lg justify-center items-center mr-3">
-                <MaterialCommunityIcons
-                  name="food"
-                  size={32}
-                  color="#E07B39"
-                  className="opacity-50"
-                />
-              </View>
-
-              <View className="flex-1 justify-between py-1">
-                <View>
-                  <Text
-                    className="text-lg font-bold text-[#2D2D2D]"
-                    numberOfLines={1}
-                  >
-                    {item.name}
-                  </Text>
-                  <Text
-                    className="text-[#888888] text-xs mt-1"
-                    numberOfLines={2}
-                  >
-                    {item.description || "Món ăn ngon hấp dẫn"}
-                  </Text>
+            <TouchableOpacity activeOpacity={0.7} className="px-4 py-3">
+              <View className="bg-white rounded-[32px] p-4 flex-row shadow-sm border border-gray-100/50">
+                <View className="relative">
+                  <View className="w-24 h-24 bg-[#F9F6E7] rounded-3xl overflow-hidden justify-center items-center">
+                    {item.images ? (
+                      <Image
+                        source={{
+                          uri:
+                            typeof item.images === "string" &&
+                            item.images.startsWith("[")
+                              ? JSON.parse(item.images)[0]
+                              : item.images,
+                        }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="food-outline"
+                        size={32}
+                        color="#E07B39"
+                        className="opacity-40"
+                      />
+                    )}
+                  </View>
+                  {item.isBestSeller && (
+                    <View className="absolute -top-1 -left-1 bg-red-500 px-2 py-0.5 rounded-full shadow-sm">
+                      <Text className="text-[8px] text-white font-black">
+                        HOT
+                      </Text>
+                    </View>
+                  )}
                 </View>
 
-                <View className="flex-row items-center justify-between mt-2">
-                  <Text className="text-[#E07B39] font-bold text-base">
-                    {item.price}
-                  </Text>
+                <View className="flex-1 ml-4 justify-between py-1">
+                  <View>
+                    <Text
+                      className="text-lg font-bold text-[#1A1A1A]"
+                      numberOfLines={1}
+                    >
+                      {item.name}
+                    </Text>
+                    <Text
+                      className="text-[#9CA3AF] text-xs mt-1 leading-4"
+                      numberOfLines={2}
+                    >
+                      {item.description ||
+                        "Hương vị truyền thống đậm đà khó cưỡng từ bếp nhà"}
+                    </Text>
+                  </View>
 
-                  <TouchableOpacity className="bg-[#E07B39] rounded-full p-1.5 shadow-md active:opacity-80">
-                    <Ionicons name="add" size={20} color="white" />
-                  </TouchableOpacity>
+                  <View className="flex-row items-end justify-between">
+                    <Text className="text-[#E07B39] font-black text-lg">
+                      {formatPrice(item.price)}
+                    </Text>
+
+                    <TouchableOpacity className="bg-[#E07B39] w-9 h-9 rounded-2xl justify-center items-center shadow-lg shadow-orange-200 active:scale-90">
+                      <Ionicons name="add" size={24} color="white" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
+          ListEmptyComponent={() =>
+            !loading && (
+              <View className="flex-1 justify-center items-center pt-20">
+                <MaterialCommunityIcons
+                  name="food-off-outline"
+                  size={64}
+                  color="#D1D5DB"
+                />
+                <Text className="mt-4 text-[#9CA3AF] font-medium">
+                  Hiện tại thực đơn đang trống
+                </Text>
+              </View>
+            )
+          }
         />
       </View>
     );

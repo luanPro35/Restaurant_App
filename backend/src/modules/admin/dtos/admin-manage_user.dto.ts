@@ -18,6 +18,10 @@ export class GetUsersDto {
   @IsOptional()
   email?: string;
 
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
   @IsEnum(USER_ROLE)
   @IsOptional()
   role?: UserRole;
@@ -50,6 +54,10 @@ export class CreateUserDto {
   @MinLength(2)
   name!: string;
 
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
   @IsEnum(USER_ROLE)
   role!: UserRole;
 }
@@ -62,6 +70,10 @@ export class UpdateUserDto {
   @IsOptional()
   @MinLength(2)
   name?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
 
   @IsEnum(USER_ROLE)
   @IsOptional()

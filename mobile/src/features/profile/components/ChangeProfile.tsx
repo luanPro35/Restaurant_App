@@ -8,15 +8,37 @@ import {
 } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { useChangeProfile } from "../hooks/useChangeProfile";
+import { useEffect } from "react";
+import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 
 export default function ChangeProfile() {
   const navigation = useNavigation();
-  const [name, setName] = React.useState("Luân");
-  const [phone, setPhone] = React.useState("0987654321");
-  const [email, setEmail] = React.useState("luan@example.com");
-  const [idCard, setIdCard] = React.useState("");
-  const [gender, setGender] = React.useState("male");
+  const route = useRoute<RouteProp<CustomerStackParamList, "ChangeProfile">>();
+  const item = route.params?.item;
+
+  const { changeProfile, loading, error, data } = useChangeProfile();
+  const [name, setName] = React.useState(item?.name || "");
+  const [phone, setPhone] = React.useState(item?.phone || "");
+  const [email, setEmail] = React.useState(item?.email || "");
+
+  useEffect(() => {
+    if (item) {
+      setName(item.name);
+      setPhone(item.phone || "");
+      setEmail(item.email);
+    }
+  }, [item]);
+
+  const handleUpdate = async () => {
+    try {
+      await changeProfile({ name, phone });
+      navigation.goBack();
+    } catch (err) {
+      console.error("Update failed:", err);
+    }
+  };
 
   const InputField = ({
     label,
@@ -95,56 +117,18 @@ export default function ChangeProfile() {
           keyboardType="email-address"
         />
 
-        <View className="mb-6">
-          <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
-            Giới tính
+        <TouchableOpacity
+          onPress={handleUpdate}
+          disabled={loading}
+          className={`mt-6 py-4 rounded-2xl shadow-lg items-center ${
+            loading
+              ? "bg-orange-300"
+              : "bg-orange-500 active:bg-orange-600 shadow-orange-300"
+          }`}
+        >
+          <Text className="text-white font-bold text-lg">
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Text>
-          <View className="flex-row bg-gray-50 p-1 rounded-2xl border border-gray-100">
-            <TouchableOpacity
-              onPress={() => setGender("male")}
-              className={`flex-1 flex-row items-center justify-center py-3 rounded-xl ${gender === "male" ? "bg-white shadow-sm" : ""}`}
-            >
-              <Ionicons
-                name="male"
-                size={18}
-                color={gender === "male" ? "#f97316" : "#94a3b8"}
-              />
-              <Text
-                className={`ml-2 font-semibold ${gender === "male" ? "text-orange-500" : "text-gray-400"}`}
-              >
-                Nam
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setGender("female")}
-              className={`flex-1 flex-row items-center justify-center py-3 rounded-xl ${gender === "female" ? "bg-white shadow-sm" : ""}`}
-            >
-              <Ionicons
-                name="female"
-                size={18}
-                color={gender === "female" ? "#f97316" : "#94a3b8"}
-              />
-              <Text
-                className={`ml-2 font-semibold ${gender === "female" ? "text-orange-500" : "text-gray-400"}`}
-              >
-                Nữ
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <InputField
-          label="Số CCCD"
-          value={idCard}
-          onChangeText={setIdCard}
-          placeholder="Nhập số căn cước"
-          icon="card-outline"
-          keyboardType="numeric"
-        />
-
-        <TouchableOpacity className="mt-6 bg-orange-500 py-4 rounded-2xl shadow-lg shadow-orange-300 items-center active:bg-orange-600">
-          <Text className="text-white font-bold text-lg">Lưu thay đổi</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

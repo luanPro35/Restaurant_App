@@ -1,3 +1,4 @@
+export * from "../../features/admin/types/admin-user.types";
 import api from "./axios.instance";
 import {
   AdminUserQuery,

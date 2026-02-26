@@ -114,16 +114,10 @@ export class UpdateProfileDto {
   @ApiPropertyOptional()
   name?: string;
 
-  @IsEmail()
-  @IsOptional()
-  @ApiPropertyOptional()
-  email?: string;
-
   @IsString()
   @IsOptional()
-  @MinLength(6)
   @ApiPropertyOptional()
-  password?: string;
+  phone?: string;
 }
 
 export class SendOtpDto {

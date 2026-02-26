@@ -28,6 +28,6 @@ import { TokenService } from "../tokens/token.service";
     RolesGuard,
   ],
   controllers: [AuthController],
-  exports: [AuthService, TokenService, RolesGuard, PassportModule],
+  exports: [AuthService, TokenService, RolesGuard, PassportModule, JwtStrategy],
 })
 export class AuthModule {}

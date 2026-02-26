@@ -5,6 +5,7 @@ import {
   UseGuards,
   Request,
   Get,
+  Patch,
 } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import {
@@ -14,6 +15,7 @@ import {
   VerifyOtpDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  UpdateProfileDto,
 } from "../validations/auth.validation";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
@@ -92,8 +94,22 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get("profile")
-  getProfile(@CurrentUser() user: any) {
-    return user;
+  async getProfile(@CurrentUser() user: any) {
+    const userId = user.sub || user.id;
+    return this.authService.getUserProfile(userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch("profile")
+  @ApiOperation({ summary: "Update user profile" })
+  @ApiResponse({ status: 200, description: "Profile updated successfully" })
+  async updateProfile(
+    @CurrentUser() user: any,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    const userId = user.sub || user.id;
+    return this.authService.updateProfile(userId, updateProfileDto);
   }
 
   @ApiOperation({ summary: "Send OTP" })

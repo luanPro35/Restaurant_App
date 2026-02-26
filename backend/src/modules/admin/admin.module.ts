@@ -14,6 +14,9 @@ import { AdminNotificationController } from "./controllers/admin-notification.co
 import { NotificationController } from "./controllers/notification.controller";
 import { AdminNotificationService } from "./services/admin-notification.service";
 import { AdminNotificationRepository } from "./repositories/admin-notification.repository";
+import { AddressController } from "./controllers/admin-address.controller";
+import { AdminAddressService } from "./services/admin-address.service";
+import { AdminAddressRepository } from "./repositories/admin-address.repository";
 
 @Module({
   imports: [ProductModule, AuthModule],
@@ -23,6 +26,7 @@ import { AdminNotificationRepository } from "./repositories/admin-notification.r
     AdminPromotionController,
     AdminNotificationController,
     NotificationController,
+    AddressController,
   ],
   providers: [
     AdminProductService,
@@ -33,12 +37,15 @@ import { AdminNotificationRepository } from "./repositories/admin-notification.r
     AdminPromotionRepository,
     AdminNotificationService,
     AdminNotificationRepository,
+    AdminAddressService,
+    AdminAddressRepository,
   ],
   exports: [
     AdminProductService,
     AdminManageUserService,
     AdminPromotionService,
     AdminNotificationService,
+    AdminAddressService,
   ],
 })
 export class AdminModule {}

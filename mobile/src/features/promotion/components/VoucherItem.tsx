@@ -35,7 +35,6 @@ const VoucherItem = ({ item }: VoucherItemProps) => {
 
   return (
     <View className="flex-row bg-white rounded-2xl mb-4 overflow-hidden shadow-md elevation-4 h-[100px] relative border border-gray-100">
-      {/* Left Section - Discount Tag */}
       <LinearGradient
         colors={["#E91E63", "#E07B39"]}
         start={{ x: 0, y: 0 }}
@@ -51,14 +50,12 @@ const VoucherItem = ({ item }: VoucherItemProps) => {
           </Text>
         </View>
 
-        {/* Ticket Dotted Line */}
         <View
           className="absolute right-0 top-0 bottom-0 w-[1px] border-r border-white/30"
           style={{ borderStyle: "dashed" }}
         />
       </LinearGradient>
 
-      {/* Right Section - Content */}
       <View className="flex-1 p-3.5 justify-between">
         <View>
           <View className="flex-row justify-between items-start">
@@ -113,7 +110,6 @@ const VoucherItem = ({ item }: VoucherItemProps) => {
         </View>
       </View>
 
-      {/* Decorative Circles (Punch holes) */}
       <View className="absolute -top-3 left-[106px] w-6 h-6 rounded-full bg-[#F9F6E7] border border-gray-100" />
       <View className="absolute -bottom-3 left-[106px] w-6 h-6 rounded-full bg-[#F9F6E7] border border-gray-100" />
     </View>

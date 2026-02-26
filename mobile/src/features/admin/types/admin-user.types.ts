@@ -9,6 +9,7 @@ export interface AdminUser {
   name: string;
   email: string;
   role: UserRole;
+  phone?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,4 +44,5 @@ export interface CreateAdminUserDto {
 export interface UpdateAdminUserDto {
   name?: string;
   role?: UserRole;
+  phone?: string;
 }

@@ -1,25 +1,28 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AdminNotification } from "@/services/api/admin-notification";
 
 interface MessageItemProps {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-  type: "promotion" | "system" | "order";
-  isRead?: boolean;
-  onPress: () => void;
+  notification: AdminNotification;
+  onPress: (id: string) => void;
 }
 
 export default function MessageItem({
-  title,
-  description,
-  time,
-  type,
-  isRead = false,
+  notification,
   onPress,
 }: MessageItemProps) {
+  const isRead = (notification as any).isRead ?? false;
+  const type = (notification as any).type || "system";
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   const getIcon = () => {
     switch (type) {
       case "promotion":
@@ -35,17 +38,18 @@ export default function MessageItem({
   const getColor = () => {
     switch (type) {
       case "promotion":
-        return "#E07B39"; // Orange for promo
+        return "#E07B39";
       case "order":
-        return "#4CAF50"; // Green for order
+        return "#4CAF50";
       default:
-        return "#3B82F6"; // Blue for system
+        return "#3B82F6";
     }
   };
 
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={() => onPress(notification.id)}
+      activeOpacity={0.7}
       className={`flex-row p-4 mb-3 rounded-2xl border ${
         isRead ? "bg-white border-gray-100" : "bg-orange-50 border-orange-100"
       } shadow-sm`}
@@ -63,21 +67,24 @@ export default function MessageItem({
             className={`text-base flex-1 mr-2 ${
               isRead
                 ? "font-bold text-gray-800"
-                : "font-extrabold text-[#E07B39]"
+                : "font-extrabold text-[#2D2D2D]"
             }`}
             numberOfLines={1}
           >
-            {title}
+            {notification.title}
           </Text>
-          <Text className="text-xs text-gray-400 mt-1">{time}</Text>
+          <Text className="text-xs text-gray-400 mt-1">
+            {formatDate(notification.createdAt)}
+          </Text>
         </View>
         <Text
           className={`text-sm ${isRead ? "text-gray-500" : "text-gray-800"}`}
           numberOfLines={2}
         >
-          {description}
+          {notification.description || notification.content}
         </Text>
       </View>
+
       {!isRead && (
         <View className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full" />
       )}

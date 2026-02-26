@@ -16,7 +16,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => {
@@ -29,8 +28,9 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response) {
-    } else if (error.request) {
+    if (error.response?.status === 401) {
+      console.warn("🔒 [Axios] 401 Unauthorized - Clearing token");
+      tokenManager.setToken(null);
     }
     return Promise.reject(error);
   },

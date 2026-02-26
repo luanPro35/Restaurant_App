@@ -12,8 +12,10 @@ import PaymentScreen from "../../features/payment/screens/PaymentScreen";
 import MessagesScreen from "../../features/messages/screens/MessagesScreen";
 import ProfileScreen from "../../features/profile/screens/ProfileScreen";
 import ChangeProfileScreen from "../../features/profile/components/ChangeProfile";
-
 import DetailProduct from "../../features/menu/screens/DetailProduct";
+import { AdminUser } from "../../features/admin/types/admin-user.types";
+import FormAddress from "../../features/delivery/Header/FormAddress";
+import AddAdress from "../../features/delivery/Header/AddAdress";
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -27,8 +29,10 @@ export type CustomerStackParamList = {
   Payment: undefined;
   Messages: undefined;
   Profile: undefined;
-  ChangeProfile: undefined;
+  ChangeProfile: { item?: AdminUser | null };
   DetailProduct: { id: string };
+  FormAddress: undefined;
+  AddAdress: undefined;
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -52,6 +56,8 @@ export default function CustomerNavigator() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ChangeProfile" component={ChangeProfileScreen} />
       <Stack.Screen name="DetailProduct" component={DetailProduct} />
+      <Stack.Screen name="FormAddress" component={FormAddress} />
+      <Stack.Screen name="AddAdress" component={AddAdress} />
     </Stack.Navigator>
   );
 }

@@ -26,9 +26,7 @@ export const GlobalCart: React.FC = () => {
       }
       return route.name as string;
     });
-  } catch (e) {
-    // console.log("Navigation state not available yet");
-  }
+  } catch (e) {}
 
   const isAdminScreen = currentRouteName?.startsWith("Admin");
 

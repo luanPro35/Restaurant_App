@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -24,9 +25,16 @@ import {
 } from "../dtos/admin-notification.dto";
 import { ADMIN_NOTIFICATION_CONSTANTS } from "../constants/admin-notification.contant";
 
+import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../auth/guards/roles.guard";
+import { Roles } from "../../auth/decorators/roles.decorator";
+import { Role } from "../../auth/enums/role.enum";
+
 @ApiTags("Admin - Notifications")
 @ApiBearerAuth()
 @Controller("admin/notifications")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminNotificationController {
   constructor(private readonly service: AdminNotificationService) {}
 

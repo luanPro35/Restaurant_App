@@ -39,6 +39,12 @@ export const authApi = {
     return response.data;
   },
 
+  // PATCH: http://localhost:4000/api/v1/auth/profile
+  updateProfile: async (data: any) => {
+    const response = await api.patch("/auth/profile", data);
+    return response.data;
+  },
+
   // POST: http://localhost:4000/api/v1/auth/forgot-password
   forgotPassword: async (email: string) => {
     const response = await api.post("/auth/forgot-password", { email });

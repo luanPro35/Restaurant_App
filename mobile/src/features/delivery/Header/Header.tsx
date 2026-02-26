@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path } from "react-native-svg";
 import Search_Dish from "./Search_Dish";
 import Utilities from "./Utilities";
+import { useDelivery } from "../../../app/context/DeliveryContext";
 
 interface HeaderProps {
   scrollY?: Animated.Value;
@@ -22,6 +23,7 @@ interface HeaderProps {
 export default function Header({ scrollY, onPress }: HeaderProps) {
   const navigation = useNavigation();
   const slideAnim = useRef(new Animated.Value(-300)).current;
+  const { selectedAddress } = useDelivery();
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -106,12 +108,17 @@ export default function Header({ scrollY, onPress }: HeaderProps) {
                   Giao tới địa chỉ
                 </Text>
               </View>
-              <View className="flex-row items-center mt-0.5">
+              <TouchableOpacity
+                onPress={() => navigation.navigate("FormAddress" as never)}
+                className="flex-row items-center mt-0.5"
+              >
                 <Text
                   className="text-xl font-black text-white flex-1"
                   numberOfLines={1}
                 >
-                  123 Đường ABC, Quận 1
+                  {selectedAddress
+                    ? selectedAddress.address
+                    : "Chọn địa chỉ giao hàng"}
                 </Text>
                 <MaterialCommunityIcons
                   name="chevron-down"
@@ -119,7 +126,7 @@ export default function Header({ scrollY, onPress }: HeaderProps) {
                   color="#FFFFFF"
                   style={{ marginLeft: 2 }}
                 />
-              </View>
+              </TouchableOpacity>
             </TouchableOpacity>
 
             <Utilities />

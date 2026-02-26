@@ -203,4 +203,35 @@ export class AuthService {
       throw new UnauthorizedException("Invalid refresh token");
     }
   }
+
+  async getUserProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException("User not found");
+    }
+    const { password, ...result } = user;
+    return result;
+  }
+
+  async updateProfile(userId: string, data: any) {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: data.name,
+        phone: data.phone,
+      },
+    });
+    return {
+      message: "Profile updated successfully",
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        phone: user.phone,
+      },
+    };
+  }
 }

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { AdminRepository } from "../repositories/admin-repository";
+import { AdminPromotionRepository } from "../repositories/admin-promotion.repository";
 import {
   GetPromotionsDto,
   CreatePromotionDto,
@@ -10,11 +10,11 @@ import { ADMIN_PROMOTION_MESSAGES } from "../constants/admin-promotion.constant"
 
 @Injectable()
 export class AdminPromotionService {
-  constructor(private readonly adminRepository: AdminRepository) {}
+  constructor(private readonly repository: AdminPromotionRepository) {}
 
   async getPromotions(query: GetPromotionsDto) {
-    const data = await this.adminRepository.getPromotions(query);
-    const total = await this.adminRepository.countPromotions(query);
+    const data = await this.repository.getPromotions(query);
+    const total = await this.repository.countPromotions(query);
 
     return {
       data,
@@ -28,7 +28,7 @@ export class AdminPromotionService {
   }
 
   async findById(id: string) {
-    const promotion = await this.adminRepository.findById(id);
+    const promotion = await this.repository.findById(id);
     if (!promotion) {
       throw new NotFoundException(ADMIN_PROMOTION_MESSAGES.NOT_FOUND);
     }
@@ -36,16 +36,16 @@ export class AdminPromotionService {
   }
 
   async createPromotion(data: CreatePromotionDto) {
-    return this.adminRepository.createPromotion(data);
+    return this.repository.createPromotion(data);
   }
 
   async updatePromotion(data: UpdatePromotionDto) {
     await this.findById(data.id);
-    return this.adminRepository.updatePromotion(data);
+    return this.repository.updatePromotion(data);
   }
 
   async deletePromotion(data: DeletePromotionDto) {
     await this.findById(data.id);
-    return this.adminRepository.deletePromotion(data);
+    return this.repository.deletePromotion(data);
   }
 }

@@ -18,8 +18,33 @@ model User {
   updatedAt DateTime  @updatedAt
   orders    Order[]
   payments  Payment[]
+  addresses Address[]
 
   @@map("users")
+}
+
+model Address {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String
+  phone     String
+  address   String
+  detail    String?
+  type      AddressType @default(HOME)
+  isDefault Boolean     @default(false)
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("addresses")
+}
+
+enum AddressType {
+  HOME
+  OFFICE
+  OTHER
 }
 
 enum Role {

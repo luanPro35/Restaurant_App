@@ -8,7 +8,7 @@ import {
 } from "../dtos/admin-promotion.dto";
 
 @Injectable()
-export class AdminRepository {
+export class AdminPromotionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   private buildWhereClause(query: GetPromotionsDto) {

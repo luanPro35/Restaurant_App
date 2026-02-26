@@ -21,6 +21,9 @@ export class AdminManageUserRepository {
     if (email) {
       where.email = { contains: email, mode: "insensitive" };
     }
+    if (query.phone) {
+      where.phone = { contains: query.phone, mode: "insensitive" };
+    }
     if (role) {
       where.role = role;
     }

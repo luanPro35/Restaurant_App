@@ -6,6 +6,7 @@ import { View, ActivityIndicator } from "react-native";
 import RootNavigator from "./navigation/RootNavigator";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { DeliveryProvider } from "./context/DeliveryContext";
 import { GlobalCart } from "./context/GlobalCart";
 
 export default function App() {
@@ -28,13 +29,17 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <CartProvider>
-          <NavigationContainer onReady={() => console.log("Navigation ready")}>
-            <StatusBar style="auto" />
-            <RootNavigator />
-            <GlobalCart />
-          </NavigationContainer>
-        </CartProvider>
+        <DeliveryProvider>
+          <CartProvider>
+            <NavigationContainer
+              onReady={() => console.log("Navigation ready")}
+            >
+              <StatusBar style="auto" />
+              <RootNavigator />
+              <GlobalCart />
+            </NavigationContainer>
+          </CartProvider>
+        </DeliveryProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );
