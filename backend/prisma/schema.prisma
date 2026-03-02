@@ -115,8 +115,6 @@ model Table {
 enum TableStatus {
   AVAILABLE
   OCCUPIED
-  RESERVED
-  MAINTENANCE
 }
 
 model Order {
