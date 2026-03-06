@@ -1,5 +1,4 @@
-import Header from "../../home/screens/Header";
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   SafeAreaView,
@@ -11,50 +10,203 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { DeviceEventEmitter, Alert } from "react-native";
 import TableCard from "../components/TableCard";
 import QuickActions from "../components/QuickActions";
 import CurrentOrder from "../components/CurrentOrder";
 import MenuSection from "../components/MenuSection";
+import { useTable } from "../hooks/useTable";
+import { useRestaurantCart } from "../context/RestaurantCartContext";
+import { MenuItem } from "../../menu/types/index";
+import { orderApi } from "../../../services/api/api-order";
+import { QuickActionsProps } from "../components/QuickActions";
 
 type TabType = "tables" | "order" | "menu";
 
 export default function AtRestaurant() {
   const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState<TabType>("order");
-  const [currentTable, setCurrentTable] = useState("A1");
+  const [activeTab, setActiveTab] = useState<TabType>("tables");
+  const [currentTableId, setCurrentTableId] = useState<string | null>(null);
+  const [currentTable, setCurrentTable] = useState<string>("Chưa chọn");
+  const [serverOrders, setServerOrders] = useState<any[]>([]);
 
-  const tables = [
-    { number: "A1", capacity: 4, status: "occupied" as const },
-    { number: "A2", capacity: 2, status: "available" as const },
-    { number: "A3", capacity: 6, status: "reserved" as const },
-    { number: "B1", capacity: 4, status: "available" as const },
-    { number: "B2", capacity: 8, status: "occupied" as const },
-    { number: "B3", capacity: 2, status: "available" as const },
-  ];
+  const {
+    tables,
+    loading,
+    refreshing,
+    pagination,
+    updateTable,
+    fetchTables,
+    handleRefresh,
+    getOrdersByTableId,
+  } = useTable();
 
-  const orderItems = [
-    {
-      id: "1",
-      name: "Phở Bò Đặc Biệt",
-      quantity: 2,
-      price: 65000,
-      status: "served" as const,
-    },
-    {
-      id: "2",
-      name: "Bún Chả Hà Nội",
-      quantity: 1,
-      price: 55000,
-      status: "preparing" as const,
-    },
-    {
-      id: "3",
-      name: "Trà Đá",
-      quantity: 3,
-      price: 10000,
-      status: "ready" as const,
-    },
-  ];
+  const {
+    restaurantCartItems,
+    clearRestaurantCart,
+    updateRestaurantQuantity,
+    removeRestaurantItem
+  } = useRestaurantCart();
+
+  useEffect(() => {
+    fetchTables();
+
+    const subscription = DeviceEventEmitter.addListener(
+      "checkoutSuccess",
+      () => {
+        setActiveTab("tables");
+        fetchTables();
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [fetchTables]);
+
+  useEffect(() => {
+    const loadTableOrder = async () => {
+      if (currentTableId) {
+        try {
+          const order = await getOrdersByTableId(currentTableId);
+          if (order) {
+            setServerOrders(mapOrderItems(order));
+          } else {
+            setServerOrders([]);
+          }
+        } catch (error) {
+          console.error("Failed to load table order:", error);
+          setServerOrders([]);
+        }
+      }
+    };
+    loadTableOrder();
+  }, [currentTableId, activeTab]);
+
+  const requestBill = (order: any) => {
+    if (!order || !order.items) return "Không có thông tin hóa đơn.";
+    const itemsSummary = order.items
+      .map((item: any) => `• ${item.name} x${item.quantity}: ${(item.price * item.quantity).toLocaleString("vi-VN")}đ`)
+      .join("\n");
+    const total = order.totalAmount.toLocaleString("vi-VN");
+    
+    return `Chi tiết hóa đơn - ${currentTable}:\n\n${itemsSummary}\n\n━━━━━━━━━━━━━━━\nTổng cộng: ${total}đ`;
+  };
+  
+  const handleRequestBill = () => {
+    Alert.alert(
+      "Yêu cầu bill",
+      "Bạn có chắc chắn muốn yêu cầu bill không?",
+      [
+        {
+          text: "Hủy",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Đồng ý",
+          onPress: async () => {
+            if (!currentTableId) return;
+            try {
+              const activeOrder = await getOrdersByTableId(currentTableId);
+              if (activeOrder && activeOrder.id) {
+                await orderApi.updateOrderStatus(activeOrder.id, "COMPLETED");
+                await updateTable(currentTableId, { status: "AVAILABLE" });
+                setServerOrders([]);
+                clearRestaurantCart();
+                await fetchTables();
+                setActiveTab("tables");
+                
+                Alert.alert("Thanh toán thành công", requestBill(activeOrder));
+              } else {
+                await updateTable(currentTableId, { status: "AVAILABLE" });
+                await fetchTables();
+                setActiveTab("tables");
+                Alert.alert("Thông báo", "Bàn đã được đặt lại trạng thái trống.");
+              }
+            } catch (error: any) {
+              console.error("Failed to request bill FULL ERROR:", error.response?.data || error);
+              const errorMessage = error.response?.data?.message 
+                ? (Array.isArray(error.response.data.message) ? error.response.data.message.join(", ") : error.response.data.message)
+                : "Không thể xử lý yêu cầu bill.";
+              Alert.alert("Lỗi", errorMessage);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const mapOrderItems = (order: any) => {
+    const actualOrder = order?.data || order;
+    if (!actualOrder || !actualOrder.items) return [];
+
+    return actualOrder.items.map((item: any) => ({
+      id: item.id || item.productId,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      isServerItem: true,
+    }));
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!currentTableId || restaurantCartItems.length === 0) return;
+
+    try {
+      const activeOrder = await getOrdersByTableId(currentTableId);
+      
+      const orderItemsToSubmit = restaurantCartItems.map(item => ({
+        productId: item.id,
+        quantity: item.quantity,
+        note: "", 
+      }));
+
+      if (activeOrder && activeOrder.id) {
+        await orderApi.addItemsToOrder(activeOrder.id, orderItemsToSubmit);
+      } else {
+        await orderApi.createOrder({
+          tableId: currentTableId,
+          items: orderItemsToSubmit,
+          type: "DINE_IN",
+        });
+      }
+
+      const updatedOrder = await getOrdersByTableId(currentTableId);
+      if (updatedOrder) {
+          setServerOrders(mapOrderItems(updatedOrder));
+      }
+      
+      await fetchTables();
+      clearRestaurantCart();
+      Alert.alert("Thành công", "Đơn hàng đã được ghi nhận");
+    } catch (error) {
+      console.error("Failed to confirm order:", error);
+      Alert.alert("Lỗi", "Không thể gửi đơn hàng");
+    }
+  };
+
+  const orderItems = useMemo(() => {
+    return Array.isArray(restaurantCartItems) ? restaurantCartItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      isServerItem: false,
+    })) : [];
+  }, [restaurantCartItems]);
+
+  const mapStatus = (status: string): "available" | "occupied" => {
+    const s = (status || "").toUpperCase();
+    switch (s) {
+      case "AVAILABLE":
+        return "available";
+      case "OCCUPIED":
+        return "occupied";
+      default:
+        return "available";
+    }
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -86,15 +238,22 @@ export default function AtRestaurant() {
               Chọn bàn
             </Text>
             <View className="flex-row flex-wrap justify-between">
-              {tables.map((table) => (
+              {Array.isArray(tables) && tables.map((table) => (
                 <TableCard
-                  key={table.number}
-                  tableNumber={table.number}
+                  key={table.id}
+                  tableNumber={table.name}
                   capacity={table.capacity}
-                  status={table.status}
-                  onPress={() => {
-                    setCurrentTable(table.number);
-                    setActiveTab("order");
+                  status={mapStatus(table.status)}
+                  onPress={async () => {
+                    setCurrentTableId(table.id);
+                    setCurrentTable(table.name);
+                    const status = (table.status || "").toUpperCase();
+                    if (status === "OCCUPIED") {
+                      setActiveTab("order");
+                    } else {
+                      setServerOrders([]);
+                      setActiveTab("menu");
+                    }
                   }}
                 />
               ))}
@@ -103,15 +262,29 @@ export default function AtRestaurant() {
         );
 
       case "order":
+        const allItems = [...(Array.isArray(serverOrders) ? serverOrders : []), ...(Array.isArray(orderItems) ? orderItems : [])];
         return (
           <ScrollView className="flex-1 pt-4">
-            <QuickActions />
-            <CurrentOrder items={orderItems} tableNumber={currentTable} />
+            <QuickActions onRequestBill={handleRequestBill} />
+            <CurrentOrder
+              items={allItems}
+              tableNumber={currentTable}
+              onAddMore={() => setActiveTab("menu")}
+              onConfirm={handleConfirmOrder}
+              onUpdateQuantity={updateRestaurantQuantity}
+              onRemoveItem={removeRestaurantItem}
+            />
           </ScrollView>
         );
 
       case "menu":
-        return <MenuSection />;
+        return (
+          <MenuSection
+            onAddItem={() => {
+              setActiveTab("order");
+            }}
+          />
+        );
 
       default:
         return null;
@@ -126,7 +299,6 @@ export default function AtRestaurant() {
         translucent={true}
       />
 
-      {/* Header */}
       <View className="bg-[#E07B39] pt-12 pb-6 px-4 rounded-b-3xl shadow-lg">
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
@@ -154,13 +326,12 @@ export default function AtRestaurant() {
               color="white"
             />
             <Text className="text-white font-semibold ml-1">
-              Bàn {currentTable}
+              {currentTable.startsWith("Bàn") ? currentTable : `Bàn ${currentTable}`}
             </Text>
           </View>
         </View>
       </View>
 
-      {/* Tab Navigation */}
       <View className="bg-white mx-4 mt-4 rounded-2xl shadow-md flex-row">
         <TouchableOpacity
           onPress={() => setActiveTab("tables")}
@@ -226,7 +397,6 @@ export default function AtRestaurant() {
         </TouchableOpacity>
       </View>
 
-      {/* Content */}
       <View className="flex-1 mt-2">{renderTabContent()}</View>
     </SafeAreaView>
   );

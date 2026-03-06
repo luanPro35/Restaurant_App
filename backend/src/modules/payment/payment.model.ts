@@ -1,39 +1,12 @@
-import mongoose from "mongoose";
+import { Module } from "@nestjs/common";
+import { PaymentController } from "./payment.controller";
+import { PaymentService } from "./payment.service";
+import { PaymentRepository } from "./payment.repository";
+import { PrismaService } from "../../prisma/prisma.service";
 
-const paymentSchema = new mongoose.Schema(
-  {
-    order: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order",
-      required: true,
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    method: {
-      type: String,
-      enum: ["cash", "credit_card", "bank_transfer", "e_wallet"],
-      default: "cash",
-    },
-    status: {
-      type: String,
-      enum: ["pending", "completed", "failed", "refunded"],
-      default: "pending",
-    },
-    transactionId: {
-      type: String, // For external payment gateways
-    },
-  },
-  {
-    timestamps: true,
-  },
-);
-
-const Payment = mongoose.model("Payment", paymentSchema);
-
-export default Payment;
+@Module({
+    controllers: [PaymentController],
+    providers: [PaymentService, PaymentRepository, PrismaService],
+    exports: [PaymentService],
+})
+export class PaymentModule { }

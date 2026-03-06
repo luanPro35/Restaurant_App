@@ -1,43 +1,48 @@
 import { AdminTable } from "../types/admin.types";
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { formatCurrency } from "../utils/admin.utils";
 
 export interface AdminTableCardProps {
   table: AdminTable;
   onEdit?: (table: AdminTable) => void;
   onDelete?: (table: AdminTable) => void;
-  onToggleAvailability?: (id: string, isAvailable: boolean) => void;
 }
+
+const getStatusColor = (status: string = "available") => {
+  switch (status?.toLowerCase()) {
+    case "available":
+    case "trống":
+      return "#10B981";
+    case "occupied":
+    case "có khách":
+      return "#EF4444";
+    case "reserved":
+    case "đã đặt":
+      return "#3B82F6";
+    default:
+      return "#E07B39";
+  }
+};
+
+const getStatusText = (status: string = "available") => {
+  switch (status?.toLowerCase()) {
+    case "available":
+      return "Trống";
+    case "occupied":
+      return "Có khách";
+    case "reserved":
+      return "Đã đặt";
+    default:
+      return status || "Trống";
+  }
+};
 
 export const AdminTableCard = ({
   table,
   onEdit,
   onDelete,
 }: AdminTableCardProps) => {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "available":
-        return "#10B981";
-      case "occupied":
-        return "#EF4444";
-      default:
-        return "#E07B39";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "available":
-        return "Trống";
-      case "occupied":
-        return "Có khách";
-      default:
-        return status;
-    }
-  };
-
   return (
     <View
       className="bg-white rounded-[28px] mb-4 overflow-hidden border border-gray-100 shadow-sm w-[48%]"
@@ -59,7 +64,10 @@ export const AdminTableCard = ({
           </View>
         </View>
 
-        <Text className="text-gray-900 font-bold text-lg mb-1">
+        <Text
+          className="text-gray-900 font-bold text-lg mb-1"
+          numberOfLines={1}
+        >
           {table.name}
         </Text>
         <View className="flex-row items-center mb-4">
@@ -91,16 +99,6 @@ export const AdminTableCard = ({
               name="trash-can-outline"
               size={18}
               color="#EF4444"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="p-2 bg-blue-50 rounded-lg"
-            onPress={() => console.log("View detail")}
-          >
-            <MaterialCommunityIcons
-              name="eye-outline"
-              size={18}
-              color="#3B82F6"
             />
           </TouchableOpacity>
         </View>

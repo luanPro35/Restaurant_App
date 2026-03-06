@@ -1,7 +1,7 @@
-import { userService } from "./user.service";
+import { userService } from "../services/user.service";
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { asyncHandler } from "../../utils/asyncHandler";
+import { asyncHandler } from "../../../utils/asyncHandler";
 
 export const getUserProfile = asyncHandler(
   async (req: Request, res: Response) => {

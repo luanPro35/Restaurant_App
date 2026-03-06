@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,11 @@ import {
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MainStackParamList } from "@/app/navigation/MainNavigator";
+import { AdminStackParamList } from "@/app/navigation/AdminNavigator";
+import { useAdminTable } from "../../hooks/useAdminTable";
 
 type AdminEditTablesRouteProp = RouteProp<
-  MainStackParamList,
+  AdminStackParamList,
   "AdminEditTables"
 >;
 
@@ -19,6 +20,21 @@ const AdminEditTables = () => {
   const navigation = useNavigation();
   const route = useRoute<AdminEditTablesRouteProp>();
   const { table } = route.params;
+  const { updateTable } = useAdminTable();
+
+  const [name, setName] = useState(table.name);
+  const [capacity, setCapacity] = useState(table.capacity.toString());
+  const [listFoods, setListFoods] = useState(table.listFoods?.join(", "));
+  const [price, setPrice] = useState(table.price?.toString());
+
+  const handleUpdateTable = () => {
+    updateTable(table.id, {
+      name,
+      capacity: parseInt(capacity),
+      listFoods: listFoods?.split(", "),
+      price: parseInt(price),
+    });
+  };
 
   return (
     <View className="flex-1 bg-[#FDFCF7]">
@@ -68,7 +84,8 @@ const AdminEditTables = () => {
               />
               <TextInput
                 className="flex-1 p-4 font-semibold text-gray-800"
-                defaultValue={table.name}
+                value={name}
+                onChangeText={(text) => setName(text)}
                 placeholder="Nhập tên bàn..."
               />
             </View>
@@ -86,7 +103,8 @@ const AdminEditTables = () => {
               />
               <TextInput
                 className="flex-1 p-4 font-semibold text-gray-800"
-                defaultValue={table.capacity.toString()}
+                value={capacity}
+                onChangeText={(text) => setCapacity(text)}
                 keyboardType="numeric"
                 placeholder="Nhập sức chứa..."
               />
@@ -121,7 +139,8 @@ const AdminEditTables = () => {
               />
               <TextInput
                 className="flex-1 p-4 font-semibold text-gray-800"
-                defaultValue={table.listFoods?.join(", ")}
+                value={listFoods}
+                onChangeText={(text) => setListFoods(text)}
                 multiline
                 placeholder="Chưa có món ăn..."
               />
@@ -140,7 +159,8 @@ const AdminEditTables = () => {
               />
               <TextInput
                 className="flex-1 p-4 font-semibold text-gray-800 text-lg"
-                defaultValue={table.price?.toString()}
+                value={price}
+                onChangeText={(text) => setPrice(text)}
                 keyboardType="numeric"
                 placeholder="0"
               />
@@ -156,7 +176,10 @@ const AdminEditTables = () => {
           >
             <Text className="text-gray-600 font-black">Hủy</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-[2] bg-[#E07B39] p-5 rounded-3xl items-center shadow-lg shadow-orange-200">
+          <TouchableOpacity
+            onPress={handleUpdateTable}
+            className="flex-[2] bg-[#E07B39] p-5 rounded-3xl items-center shadow-lg shadow-orange-200"
+          >
             <Text className="text-white font-black text-lg">Lưu thay đổi</Text>
           </TouchableOpacity>
         </View>

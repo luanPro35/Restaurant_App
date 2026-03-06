@@ -14,7 +14,6 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../Header/Header";
 import Category_Food from "./Category_Food";
 import List_Food from "./List_Food";
-import Shopping_Cart from "../../../app/providers/Shopping_Cart";
 
 export default function DeliveryScreen() {
   const navigation = useNavigation();
@@ -102,9 +101,6 @@ export default function DeliveryScreen() {
         </Animated.View>
       </View>
 
-      <View className="absolute bottom-16 right-4">
-        <Shopping_Cart />
-      </View>
     </SafeAreaView>
   );
 }

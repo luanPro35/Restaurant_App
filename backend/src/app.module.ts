@@ -6,6 +6,8 @@ import { AdminModule } from "./modules/admin/admin.module";
 import { TableModule } from "./modules/table/table.module";
 import { OrderModule } from "./modules/order/order.module";
 import { ConfigModule } from "@nestjs/config";
+import { PaymentModule } from "./modules/payment/payment.model";
+import { PackageModule } from "./modules/package/package.module";
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { ConfigModule } from "@nestjs/config";
     AdminModule,
     TableModule,
     OrderModule,
+    PaymentModule,
+    PackageModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

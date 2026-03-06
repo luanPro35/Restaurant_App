@@ -49,6 +49,11 @@ export interface AdminTable {
   updatedAt?: string;
 }
 
+export interface AdminTableResponse {
+  data: AdminTable[];
+  pagination: AdminPagination;
+}
+
 export interface AdminOrder {
   id: string;
   name: string;

@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { DeliveryProvider } from "./context/DeliveryContext";
 import { GlobalCart } from "./context/GlobalCart";
+import { RestaurantCartProvider } from "../features/at_restaurant/context/RestaurantCartContext";
 
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
@@ -31,13 +32,15 @@ export default function App() {
       <AuthProvider>
         <DeliveryProvider>
           <CartProvider>
-            <NavigationContainer
-              onReady={() => console.log("Navigation ready")}
-            >
-              <StatusBar style="auto" />
-              <RootNavigator />
-              <GlobalCart />
-            </NavigationContainer>
+            <RestaurantCartProvider>
+              <NavigationContainer
+                onReady={() => console.log("Navigation ready")}
+              >
+                <StatusBar style="auto" />
+                <RootNavigator />
+                <GlobalCart />
+              </NavigationContainer>
+            </RestaurantCartProvider>
           </CartProvider>
         </DeliveryProvider>
       </AuthProvider>

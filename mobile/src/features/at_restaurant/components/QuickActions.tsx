@@ -9,37 +9,21 @@ interface ActionButton {
   onPress: () => void;
 }
 
-export default function QuickActions() {
+export interface QuickActionsProps {
+  onRequestBill?: () => void;
+}
+
+export default function QuickActions({
+  onRequestBill,
+}: QuickActionsProps) {
   const actions: ActionButton[] = [
-    {
-      icon: "bell-ring",
-      label: "Gọi phục vụ",
-      color: "#E07B39",
-      onPress: () => console.log("Call waiter"),
-    },
     {
       icon: "receipt",
       label: "Yêu cầu bill",
       color: "#10B981",
-      onPress: () => console.log("Request bill"),
-    },
-    {
-      icon: "silverware-fork-knife",
-      label: "Thêm món",
-      color: "#3B82F6",
-      onPress: () => console.log("Add dish"),
-    },
-    {
-      icon: "water",
-      label: "Nước uống",
-      color: "#06B6D4",
-      onPress: () => console.log("Water"),
-    },
-    {
-      icon: "tissue",
-      label: "Khăn giấy",
-      color: "#8B5CF6",
-      onPress: () => console.log("Tissue"),
+      onPress() {
+        onRequestBill?.();
+      },
     },
   ];
 

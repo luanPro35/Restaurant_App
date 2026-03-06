@@ -8,12 +8,14 @@ import {
 } from "@prisma/client";
 import { OrderRepository } from "./order.repository";
 import { CreateOrderDto } from "./order.dto";
+import { PaymentService } from "../payment/payment.service";
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly prisma: PrismaService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -70,7 +72,17 @@ export class OrderService {
   }
 
   async updateStatus(id: string, status: string) {
-    return this.orderRepository.updateStatus(id, status as OrderStatus);
+    const updatedOrder = await this.orderRepository.updateStatus(id, status as OrderStatus);
+    
+    if (status === OrderStatus.COMPLETED) {
+      await this.paymentService.create({
+        orderId: id,
+        amount: updatedOrder.totalAmount,
+        method: "CASH" as any,
+      });
+    }
+    
+    return updatedOrder;
   }
 
   async addItems(orderId: string, items: any[]) {

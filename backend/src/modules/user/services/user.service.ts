@@ -1,5 +1,5 @@
 import { get } from "http";
-import User from "./user.model";
+import User from "../models/user.model";
 
 export const userService = {
   getUserById: async (id: string) => {

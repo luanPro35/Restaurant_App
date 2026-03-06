@@ -7,63 +7,26 @@ interface OrderItem {
   name: string;
   quantity: number;
   price: number;
-  status: "pending" | "preparing" | "ready" | "served";
+  isServerItem?: boolean;
 }
 
 interface CurrentOrderProps {
   items?: OrderItem[];
   tableNumber?: string;
+  onAddMore?: () => void;
+  onConfirm?: () => void;
+  onUpdateQuantity?: (id: string, quantity: number) => void;
+  onRemoveItem?: (id: string) => void;
 }
 
 export default function CurrentOrder({
   items = [],
   tableNumber = "A1",
+  onAddMore,
+  onConfirm,
+  onUpdateQuantity,
+  onRemoveItem,
 }: CurrentOrderProps) {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "clock-outline";
-      case "preparing":
-        return "chef-hat";
-      case "ready":
-        return "check-circle";
-      case "served":
-        return "silverware-fork-knife";
-      default:
-        return "help-circle";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "#F59E0B";
-      case "preparing":
-        return "#3B82F6";
-      case "ready":
-        return "#10B981";
-      case "served":
-        return "#6B7280";
-      default:
-        return "#9CA3AF";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "Chờ xử lý";
-      case "preparing":
-        return "Đang làm";
-      case "ready":
-        return "Sẵn sàng";
-      case "served":
-        return "Đã phục vụ";
-      default:
-        return "";
-    }
-  };
-
   const totalAmount = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
@@ -97,7 +60,7 @@ export default function CurrentOrder({
       ) : (
         <>
           <ScrollView className="max-h-64">
-            {items.map((item) => (
+            {Array.isArray(items) && items.map((item) => (
               <View
                 key={item.id}
                 className="flex-row items-center justify-between py-3 border-b border-gray-100"
@@ -106,25 +69,43 @@ export default function CurrentOrder({
                   <Text className="text-gray-800 font-semibold">
                     {item.name}
                   </Text>
-                  <View className="flex-row items-center mt-1">
-                    <MaterialCommunityIcons
-                      name={getStatusIcon(item.status) as any}
-                      size={14}
-                      color={getStatusColor(item.status)}
-                    />
-                    <Text
-                      className="text-xs ml-1"
-                      style={{ color: getStatusColor(item.status) }}
-                    >
-                      {getStatusText(item.status)}
-                    </Text>
-                  </View>
                 </View>
                 <View className="items-end">
-                  <Text className="text-gray-600">x{item.quantity}</Text>
-                  <Text className="text-orange-600 font-semibold">
-                    {(item.price * item.quantity).toLocaleString("vi-VN")}đ
-                  </Text>
+                  {item.isServerItem ? (
+                    <View className="items-end">
+                      <Text className="text-gray-600 font-medium">x{item.quantity}</Text>
+                      <Text className="text-orange-600 font-semibold">
+                        {(item.price * item.quantity).toLocaleString("vi-VN")}đ
+                      </Text>
+                    </View>
+                  ) : (
+                    <View className="items-end">
+                      <View className="flex-row items-center bg-gray-100 rounded-lg px-2 py-1 mb-1">
+                        <TouchableOpacity 
+                          onPress={() => onUpdateQuantity?.(item.id, item.quantity - 1)}
+                          className="p-1"
+                        >
+                          <MaterialCommunityIcons name="minus" size={16} color="#E07B39" />
+                        </TouchableOpacity>
+                        <Text className="mx-2 font-bold text-gray-800">{item.quantity}</Text>
+                        <TouchableOpacity 
+                          onPress={() => onUpdateQuantity?.(item.id, item.quantity + 1)}
+                          className="p-1"
+                        >
+                          <MaterialCommunityIcons name="plus" size={16} color="#E07B39" />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          onPress={() => onRemoveItem?.(item.id)}
+                          className="ml-2 pl-2 border-l border-gray-300"
+                        >
+                          <MaterialCommunityIcons name="close" size={16} color="#EF4444" />
+                        </TouchableOpacity>
+                      </View>
+                      <Text className="text-orange-600 font-semibold">
+                        {(item.price * item.quantity).toLocaleString("vi-VN")}đ
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             ))}
@@ -137,14 +118,24 @@ export default function CurrentOrder({
             </Text>
           </View>
 
-          <TouchableOpacity
-            className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl py-3 mt-4"
-            activeOpacity={0.8}
-          >
-            <Text className="text-white text-center font-bold text-base">
-              Thanh toán
-            </Text>
-          </TouchableOpacity>
+          <View className="flex-row mt-4 gap-3">
+            <TouchableOpacity
+              onPress={onAddMore}
+              className="flex-1 border border-orange-500 rounded-xl py-3 items-center justify-center flex-row"
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons name="plus" size={20} color="#E07B39" />
+              <Text className="text-orange-600 font-bold ml-1">Đặt thêm</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={onConfirm}
+              className="flex-1 bg-orange-500 rounded-xl py-3 justify-center items-center"
+              activeOpacity={0.8}
+            >
+              <Text className="text-white font-bold text-base">Đặt món</Text>
+            </TouchableOpacity>
+          </View>
         </>
       )}
     </View>

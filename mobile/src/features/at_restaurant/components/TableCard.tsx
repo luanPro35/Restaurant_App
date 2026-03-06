@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 interface TableCardProps {
   tableNumber: string;
   capacity: number;
-  status: "available" | "occupied" | "reserved";
+  status: "available" | "occupied";
   onPress?: () => void;
 }
 
@@ -22,8 +22,6 @@ export default function TableCard({
         return ["#10B981", "#059669"];
       case "occupied":
         return ["#EF4444", "#DC2626"];
-      case "reserved":
-        return ["#F59E0B", "#D97706"];
       default:
         return ["#6B7280", "#4B5563"];
     }
@@ -35,8 +33,6 @@ export default function TableCard({
         return "Trống";
       case "occupied":
         return "Đang dùng";
-      case "reserved":
-        return "Đã đặt";
       default:
         return "";
     }

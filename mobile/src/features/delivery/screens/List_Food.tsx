@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { useDelivery } from "../hooks/useDelivery";
+import { useCart } from "../../../app/context/CartContext";
 
 const ITEM_HEIGHT = 160;
 const HEADER_HEIGHT = 60;
@@ -28,6 +29,7 @@ const List_Food = forwardRef(
     ref,
   ) => {
     const { menu, loading, fetchMenu } = useDelivery();
+    const { addToCart } = useCart();
     const sectionListRef = useRef<SectionList>(null);
 
     useEffect(() => {
@@ -185,7 +187,10 @@ const List_Food = forwardRef(
                       {formatPrice(item.price)}
                     </Text>
 
-                    <TouchableOpacity className="bg-[#E07B39] w-9 h-9 rounded-2xl justify-center items-center shadow-lg shadow-orange-200 active:scale-90">
+                    <TouchableOpacity
+                      onPress={() => addToCart(item)}
+                      className="bg-[#E07B39] w-9 h-9 rounded-2xl justify-center items-center shadow-lg shadow-orange-200 active:scale-90"
+                    >
                       <Ionicons name="add" size={24} color="white" />
                     </TouchableOpacity>
                   </View>

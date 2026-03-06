@@ -36,9 +36,10 @@ export const useMenu = () => {
         setError(null);
         const response = await menuService.fetchMenu(currentFilter || filter);
 
-        setMenu(response.data);
-        setTotal(response.total);
-        setHasMore(response.data.length < response.total);
+        setMenu(response.data || response || []);
+        setTotal(response.total || response?.length || 0);
+        const actualMenu = response.data || response || [];
+        setHasMore(actualMenu.length < (response.total || 0));
       } catch (err) {
         setError(err as any);
         console.error("Fetch menu error:", err);

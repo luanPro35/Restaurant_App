@@ -1,0 +1,9 @@
+export enum PAYMENT_METHOD {
+  CASH = "CASH",
+  BANK_TRANSFER = "BANK_TRANSFER",
+}
+
+export enum TRANSACTION_STATUS {
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+}

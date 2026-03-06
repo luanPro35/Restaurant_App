@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View, DeviceEventEmitter, Alert } from "react-native";
 import { useCart } from "./CartContext";
 import { useNavigationState } from "@react-navigation/native";
 import Shopping_Cart from "../providers/Shopping_Cart";
@@ -13,6 +13,7 @@ export const GlobalCart: React.FC = () => {
     setIsCartVisible,
     updateQuantity,
     removeItem,
+    clearCart,
     shouldHideFloatingCart,
   } = useCart();
 
@@ -55,6 +56,9 @@ export const GlobalCart: React.FC = () => {
         onRemoveItem={removeItem}
         onCheckout={() => {
           setIsCartVisible(false);
+          clearCart();
+          Alert.alert("Thành công", "Đơn hàng của bạn đã được gửi đi!");
+          DeviceEventEmitter.emit("checkoutSuccess");
         }}
       />
     </>

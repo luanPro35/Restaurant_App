@@ -57,7 +57,6 @@ export default function PackageItem({
 
   return (
     <View className="bg-white rounded-2xl mx-4 mb-4 shadow-lg elevation-4 overflow-hidden border border-gray-100">
-      {/* Header */}
       <View className="bg-[#E07B39] p-4 flex-row justify-between items-center">
         <View>
           <Text className="text-white font-bold text-lg">Đơn hàng #{id}</Text>
@@ -70,17 +69,14 @@ export default function PackageItem({
         </View>
       </View>
 
-      {/* Progress Timeline */}
       <View className="p-6">
         <View className="flex-row justify-between items-center relative mb-8">
-          {/* Connecting Line - Background */}
           <View className="absolute top-4 left-0 right-0 h-1 bg-gray-200 rounded-full" />
 
-          {/* Connecting Line - Active Progress */}
           <Animated.View
             style={{
               position: "absolute",
-              top: 16, // top-4 equivalent
+              top: 16, 
               left: 0,
               height: 4,
               backgroundColor: "#E07B39",
@@ -124,7 +120,6 @@ export default function PackageItem({
           })}
         </View>
 
-        {/* Driver Info */}
         {driver && (
           <View className="flex-row items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
             <Image

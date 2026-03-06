@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { MainStackParamList } from "../../../app/navigation/MainNavigator";
+import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import PackageItem from "../components/PackageItem";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,7 +30,7 @@ const ACTIVE_ORDER = {
 
 export default function PackageScreen() {
   const navigation =
-    useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+    useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
 
   return (
     <View className="flex-1 bg-[#F9F6E7]">
@@ -58,19 +58,7 @@ export default function PackageScreen() {
 
             {/* Map Placeholder */}
             <View className="mx-4 mt-4 bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 h-64 relative">
-              <Image
-                source={{ uri: "https://i.imgur.com/2Xf0Y9y.png" }} // Placeholder map image
-                className="w-full h-full bg-gray-200"
-                resizeMode="cover"
-              />
               <View className="absolute bottom-4 left-4 right-4 bg-white p-3 rounded-xl shadow-md flex-row items-center">
-                <View className="bg-red-100 p-2 rounded-full mr-3">
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={24}
-                    color="#ef4444"
-                  />
-                </View>
                 <View>
                   <Text className="text-xs text-gray-500">
                     Địa chỉ nhận hàng
