@@ -3,39 +3,47 @@ import { View, TouchableOpacity, TextInput } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Header() {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
+
   return (
-    <View className="bg-[#E07B39] pt-12 pb-6 px-4 rounded-b-3xl shadow-lg">
-      <View className="flex-row items-center justify-between gap-3">
-        <TouchableOpacity className="p-2">
-          <MaterialCommunityIcons name="qrcode-scan" size={28} color="white" />
+    <View 
+      className="bg-[#E07B39] pb-10 px-4 rounded-b-[48px] shadow-2xl"
+      style={{ paddingTop: Math.max(insets.top, 20) + 15 }}
+    >
+      <View className="flex-row items-center justify-between">
+        <TouchableOpacity className="p-2 mr-1">
+          <MaterialCommunityIcons name="qrcode-scan" size={30} color="white" />
         </TouchableOpacity>
 
-        <View className="flex-1 flex-row items-center bg-white rounded-xl px-3 py-1">
-          <Ionicons name="search" size={20} color="#999" />
+        <View className="flex-1 flex-row items-center bg-white/95 rounded-2xl px-5 py-3.5 shadow-md">
+          <Ionicons name="search" size={24} color="#999" />
           <TextInput
             placeholder="Search..."
             placeholderTextColor="#999"
-            className="flex-1 ml-2 text-[#2D2D2D] text-sm"
+            className="flex-1 ml-3 text-[#2D2D2D] text-[16px] font-medium"
           />
         </View>
 
-        <TouchableOpacity className="p-2">
-          <MaterialCommunityIcons
-            name="cash-multiple"
-            size={24}
-            color="#FFD700"
-          />
-        </TouchableOpacity>
+        <View className="flex-row items-center ml-2">
+            <TouchableOpacity className="p-2 mr-2">
+            <MaterialCommunityIcons
+                name="cash-multiple"
+                size={28}
+                color="#FFD700"
+            />
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          className="p-2 bg-white rounded-full"
-          onPress={() => navigation.navigate("Profile")}
-        >
-          <MaterialCommunityIcons name="account" size={24} color="#E07B39" />
-        </TouchableOpacity>
+            <TouchableOpacity
+            className="w-12 h-12 bg-white rounded-full items-center justify-center shadow-md active:opacity-80"
+            onPress={() => navigation.navigate("Profile")}
+            >
+            <MaterialCommunityIcons name="account" size={28} color="#E07B39" />
+            </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

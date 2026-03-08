@@ -48,7 +48,7 @@ export default function DeliveryScreen() {
         ref={listRef}
         onScroll={onScroll}
         ListHeaderComponent={
-          <View className="bg-[#F9F6E7] pb-2 pt-10">
+          <View className="bg-[#F9F6E7] pb-2">
             <Category_Food onSelectCategory={handleScrollToCategory} />
           </View>
         }

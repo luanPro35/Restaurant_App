@@ -16,6 +16,8 @@ import DetailProduct from "../../features/menu/screens/DetailProduct";
 import { AdminUser } from "../../features/admin/types/admin-user.types";
 import FormAddress from "../../features/delivery/Header/FormAddress";
 import AddAdress from "../../features/delivery/Header/AddAdress";
+import GamePromotion from "../../features/profile/games/GamePromotion";
+
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -33,6 +35,8 @@ export type CustomerStackParamList = {
   DetailProduct: { id: string };
   FormAddress: undefined;
   AddAdress: undefined;
+  GamePromotion: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -58,6 +62,8 @@ export default function CustomerNavigator() {
       <Stack.Screen name="DetailProduct" component={DetailProduct} />
       <Stack.Screen name="FormAddress" component={FormAddress} />
       <Stack.Screen name="AddAdress" component={AddAdress} />
+      <Stack.Screen name="GamePromotion" component={GamePromotion} />
+
     </Stack.Navigator>
   );
 }

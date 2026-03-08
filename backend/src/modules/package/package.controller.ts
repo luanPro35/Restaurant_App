@@ -1,23 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from "@nestjs/common";
 import { PackageService } from "./package.service";
 import { CreatePackageDto, UpdatePackageDto } from "./package.dto";
-import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CurrentUser } from "../auth/decorators/current-user.decorator";
 
 @ApiTags("Packages")
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller("packages")
 export class PackageController {
     constructor(private readonly packageService: PackageService) { }
 
     @Post()
     @ApiOperation({ summary: "Create a new package" })
-    create(@Body() createPackageDto: CreatePackageDto) {
-        return this.packageService.create(createPackageDto);
+    create(@CurrentUser() user: any, @Body() createPackageDto: CreatePackageDto) {
+        return this.packageService.create({ ...createPackageDto, userId: user.sub });
     }
 
     @Get()
-    @ApiOperation({ summary: "Get all packages" })
-    findAll() {
-        return this.packageService.findAll();
+    @ApiOperation({ summary: "Get all packages for current user" })
+    findAll(@CurrentUser() user: any) {
+        return this.packageService.findAll(user.sub);
+    }
+
+    @Get("count")
+    @ApiOperation({ summary: "Get count packages for current user" })
+    count(@CurrentUser() user: any) {
+        return this.packageService.count(user.sub);
     }
 
     @Get(":id")
@@ -37,4 +47,6 @@ export class PackageController {
     remove(@Param("id") id: string) {
         return this.packageService.delete(id);
     }
+
+
 }

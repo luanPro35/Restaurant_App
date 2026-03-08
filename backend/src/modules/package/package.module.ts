@@ -6,6 +6,6 @@ import { PackageRepository } from "./package.repository";
 @Module({
     controllers: [PackageController],
     providers: [PackageService, PackageRepository],
-    exports: [PackageService],
+    exports: [PackageService, PackageRepository],
 })
 export class PackageModule { }

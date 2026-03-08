@@ -11,6 +11,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path } from "react-native-svg";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Search_Dish from "./Search_Dish";
 import Utilities from "./Utilities";
 import { useDelivery } from "../../../app/context/DeliveryContext";
@@ -22,6 +23,7 @@ interface HeaderProps {
 
 export default function Header({ scrollY, onPress }: HeaderProps) {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(-300)).current;
   const { selectedAddress } = useDelivery();
 
@@ -35,34 +37,34 @@ export default function Header({ scrollY, onPress }: HeaderProps) {
 
   const headerHeight = scrollY
     ? scrollY.interpolate({
-        inputRange: [0, 120],
-        outputRange: [0, -120],
-        extrapolate: "clamp",
-      })
+      inputRange: [0, 120],
+      outputRange: [0, -140],
+      extrapolate: "clamp",
+    })
     : 0;
 
   const searchTranslateY = scrollY
     ? scrollY.interpolate({
-        inputRange: [0, 120],
-        outputRange: [0, 60],
-        extrapolate: "clamp",
-      })
+      inputRange: [0, 120],
+      outputRange: [0, 85],
+      extrapolate: "clamp",
+    })
     : 0;
 
   const opacity = scrollY
     ? scrollY.interpolate({
-        inputRange: [0, 60],
-        outputRange: [1, 0],
-        extrapolate: "clamp",
-      })
+      inputRange: [0, 60],
+      outputRange: [1, 0],
+      extrapolate: "clamp",
+    })
     : 1;
 
   const scale = scrollY
     ? scrollY.interpolate({
-        inputRange: [-100, 0],
-        outputRange: [1.2, 1],
-        extrapolate: "clamp",
-      })
+      inputRange: [-100, 0],
+      outputRange: [1.2, 1],
+      extrapolate: "clamp",
+    })
     : 1;
 
   return (
@@ -81,11 +83,12 @@ export default function Header({ scrollY, onPress }: HeaderProps) {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
-          paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 44,
+          paddingTop: Math.max(insets.top, 20) + 10,
+          paddingBottom: 15,
         }}
       >
         <Animated.View style={{ opacity }}>
-          <View className="flex-row items-center px-4 py-2">
+          <View className="flex-row items-center px-4 py-4">
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               className="w-10 h-10 rounded-full bg-white/20 items-center justify-center mr-3"
@@ -129,18 +132,25 @@ export default function Header({ scrollY, onPress }: HeaderProps) {
               </TouchableOpacity>
             </TouchableOpacity>
 
-            <Utilities />
+            <View className="flex-shrink-0">
+              <Utilities />
+            </View>
           </View>
         </Animated.View>
 
         <Animated.View
-          style={{ transform: [{ translateY: searchTranslateY }] }}
+          style={{
+            transform: [{ translateY: searchTranslateY }],
+            paddingHorizontal: 8,
+            marginTop: 2,
+            marginBottom: 0
+          }}
           className="z-10"
         >
           <Search_Dish />
         </Animated.View>
 
-        <Animated.View style={{ opacity }} className="px-4 pb-6 mt-1">
+        <Animated.View style={{ opacity }} className="px-2 mt-2 pb-2">
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => navigation.navigate("Promotion" as never)}
@@ -148,44 +158,57 @@ export default function Header({ scrollY, onPress }: HeaderProps) {
           >
             <LinearGradient
               colors={["rgba(255,255,255,0.25)", "rgba(255,255,255,0.1)"]}
-              className="px-4 py-3.5 flex-row items-center"
+              style={{ borderRadius: 16 }}
             >
-              <View className="bg-white/30 rounded-xl p-2.5 mr-3 shadow-sm">
-                <MaterialCommunityIcons
-                  name="ticket-percent"
-                  size={22}
-                  color="#FFFFFF"
-                />
-              </View>
-              <View className="flex-1">
-                <Text className="text-white font-black text-base leading-5">
-                  Bạn có nhiều mã giảm giá mới!
-                </Text>
-                <Text className="text-white/80 text-xs mt-0.5 font-medium">
-                  Giảm tới 50k cho đơn hàng tối nay
-                </Text>
-              </View>
-              <View className="bg-white/20 px-3 py-1.5 rounded-lg ml-2">
-                <Text className="text-white text-[10px] font-bold uppercase">
-                  Xem ngay
-                </Text>
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12 }}
+              >
+                <View className="bg-white/30 w-10 h-10 rounded-xl items-center justify-center mr-3 shadow-sm">
+                  <MaterialCommunityIcons
+                    name="ticket-percent"
+                    size={22}
+                    color="#FFFFFF"
+                  />
+                </View>
+
+                <View className="flex-1 justify-center mr-2">
+                  <Text
+                    className="text-white font-black text-[13px] leading-tight"
+                    numberOfLines={1}
+                  >
+                    Ưu đãi cực khủng cho bạn!
+                  </Text>
+                  <Text
+                    className="text-white/80 text-[10px] mt-0.5 font-medium"
+                    numberOfLines={1}
+                  >
+                    Giảm ngay 50k cho đơn hàng
+                  </Text>
+                </View>
+
+                <View className="bg-white/30 px-3 py-1.5 rounded-lg border border-white/20 items-center justify-center">
+                  <Text className="text-white text-[9px] font-black uppercase tracking-tighter">
+                    Xem ngay
+                  </Text>
+                </View>
               </View>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
 
-        <Svg
-          height="30"
-          width="100%"
-          viewBox="0 0 1440 120"
-          className="-mb-px"
-          style={{ transform: [{ translateY: 1 }] }}
-        >
-          <Path
-            fill="#F9F6E7"
-            d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-          />
-        </Svg>
+        <View className="absolute bottom-0 left-0 right-0 h-8">
+          <Svg
+            height="35"
+            width="100%"
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+          >
+            <Path
+              fill="#F9F6E7"
+              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+            />
+          </Svg>
+        </View>
       </LinearGradient>
     </Animated.View>
   );

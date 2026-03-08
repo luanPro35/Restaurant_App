@@ -39,6 +39,10 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  userId?: string;
 }
 
 export class UpdateOrderStatusDto {

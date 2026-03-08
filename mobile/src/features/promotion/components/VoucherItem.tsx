@@ -28,7 +28,7 @@ const VoucherItem = ({ item }: VoucherItemProps) => {
 
   const discountValue =
     item.discount > 100
-      ? formatCurrency(item.discount).replace("đ", "K")
+      ? formatCurrency(item.discount)
       : `${item.discount}%`;
 
   const expiryDate = item.until ? item.until.split("T")[0] : "Vô thời hạn";

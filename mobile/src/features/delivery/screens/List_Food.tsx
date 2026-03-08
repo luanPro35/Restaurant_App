@@ -140,7 +140,7 @@ const List_Food = forwardRef(
                         source={{
                           uri:
                             typeof item.images === "string" &&
-                            item.images.startsWith("[")
+                              item.images.startsWith("[")
                               ? JSON.parse(item.images)[0]
                               : item.images,
                         }}

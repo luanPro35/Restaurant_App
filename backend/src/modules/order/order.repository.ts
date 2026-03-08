@@ -24,10 +24,11 @@ export class OrderRepository {
     });
   }
 
-  async findActiveOrderByTable(tableId: string) {
+  async findActiveOrderByTable(tableId: string, userId?: string) {
     return this.prisma.order.findFirst({
       where: {
         tableId,
+        userId,
         status: {
           notIn: [OrderStatus.COMPLETED, OrderStatus.CANCELLED],
         },
@@ -96,5 +97,13 @@ export class OrderRepository {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+  async countCompletedByUserId(userId: string) {
+    return this.prisma.order.count({
+      where: {
+        userId,
+        status: OrderStatus.COMPLETED,
+      },
+    });
   }
 }

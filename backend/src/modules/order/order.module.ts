@@ -9,6 +9,6 @@ import { PaymentModule } from "../payment/payment.model";
   imports: [PaymentModule],
   providers: [OrderService, PrismaService, OrderRepository],
   controllers: [OrderController],
-  exports: [OrderService],
+  exports: [OrderService, OrderRepository],
 })
 export class OrderModule {}

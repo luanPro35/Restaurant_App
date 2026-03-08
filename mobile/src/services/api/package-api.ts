@@ -48,6 +48,11 @@ export const packageApi = {
   remove: async (id: string): Promise<void> => {
     await api.delete(`/packages/${id}`);
   },
+
+  count: async (): Promise<number> => {
+    const response = await api.get("/packages/count");
+    return response.data;
+  },
 };
 
 export default packageApi;

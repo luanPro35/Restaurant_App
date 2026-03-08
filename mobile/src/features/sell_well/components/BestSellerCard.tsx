@@ -2,17 +2,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, Animated } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-
-interface BestSellerItem {
-  id: string;
-  name: string;
-  price: string;
-  image: string;
-  description: string;
-  soldCount: number;
-  rating: number;
-  rank: number;
-}
+import { BestSellerItem } from "../hooks/useBestSellers";
 
 interface BestSellerCardProps {
   item: BestSellerItem;
@@ -46,13 +36,13 @@ export default function BestSellerCard({
   ): readonly [string, string, ...string[]] => {
     switch (rank) {
       case 1:
-        return ["#FFD700", "#FFA500"]; // Gold gradient
+        return ["#FFD700", "#FFA500"];
       case 2:
-        return ["#C0C0C0", "#808080"]; // Silver gradient
+        return ["#C0C0C0", "#808080"];
       case 3:
-        return ["#CD7F32", "#8B4513"]; // Bronze gradient
+        return ["#CD7F32", "#8B4513"];
       default:
-        return ["#E07B39", "#D66A28"]; // Orange gradient
+        return ["#E07B39", "#D66A28"];
     }
   };
 
@@ -84,7 +74,6 @@ export default function BestSellerCard({
         }}
       >
         <View style={{ flexDirection: "row", padding: 12 }}>
-          {/* Rank Badge */}
           <View
             style={{
               position: "relative",
@@ -102,7 +91,6 @@ export default function BestSellerCard({
               resizeMode="cover"
             />
 
-            {/* Rank Number with Gradient */}
             <LinearGradient
               colors={getRankColor(item.rank)}
               start={{ x: 0, y: 0 }}
@@ -143,7 +131,6 @@ export default function BestSellerCard({
               </Text>
             </LinearGradient>
 
-            {/* Rating Badge */}
             <View
               style={{
                 position: "absolute",
@@ -171,7 +158,6 @@ export default function BestSellerCard({
             </View>
           </View>
 
-          {/* Content */}
           <View style={{ flex: 1, justifyContent: "space-between" }}>
             <View>
               <Text
@@ -200,7 +186,6 @@ export default function BestSellerCard({
                 </Text>
               )}
 
-              {/* Sold Count */}
               <View
                 style={{
                   flexDirection: "row",
@@ -222,7 +207,6 @@ export default function BestSellerCard({
               </View>
             </View>
 
-            {/* Price and Add Button */}
             <View
               style={{
                 flexDirection: "row",

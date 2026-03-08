@@ -43,7 +43,7 @@ export class OrderService {
     });
 
     const order = await this.orderRepository.create({
-      userId: null,
+      userId: createOrderDto.userId,
       tableId,
       totalAmount,
       type: type || OrderType.DINE_IN,
@@ -63,12 +63,16 @@ export class OrderService {
     return order;
   }
 
+  async findAll(query: any) {
+    return this.orderRepository.findAll(query);
+  }
+
   async findById(id: string) {
     return this.orderRepository.findById(id);
   }
 
-  async findActiveOrderByTable(tableId: string) {
-    return this.orderRepository.findActiveOrderByTable(tableId);
+  async findActiveOrderByTable(tableId: string, userId?: string) {
+    return this.orderRepository.findActiveOrderByTable(tableId, userId);
   }
 
   async updateStatus(id: string, status: string) {

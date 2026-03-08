@@ -9,11 +9,11 @@ export class PackageService {
 
     async create(data: CreatePackageDto) {
         const validatedData = createPackageSchema.parse(data);
-        return this.packageRepository.create(validatedData as CreatePackageDto);
+        return this.packageRepository.create(data as CreatePackageDto);
     }
 
-    async findAll() {
-        return this.packageRepository.findAll();
+    async findAll(userId: string) {
+        return this.packageRepository.findAll(userId);
     }
 
     async findOne(id: string) {
@@ -33,5 +33,9 @@ export class PackageService {
     async delete(id: string) {
         await this.findOne(id);
         return this.packageRepository.delete(id);
+    }
+
+    async count(userId: string) {
+        return this.packageRepository.count(userId);
     }
 }

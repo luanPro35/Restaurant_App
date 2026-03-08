@@ -26,6 +26,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { CartItem } from "../types";
 import { formatCurrency } from "../../../shared/utils";
 import { useNavigation } from "@react-navigation/native";
+import { Promotion as Voucher } from "../../promotion/types/promotion.types";
+import { usePromotion } from "../../promotion/hooks/usePromotion";
+import { useMilestones } from "../../profile/games/hooks/useMilestones";
+import { MILESTONES } from "../../profile/games/constants/milestones";
+import { useUsedVouchers } from "../../promotion/hooks/useUsedVouchers";
 
 const { height } = Dimensions.get("window");
 
@@ -36,6 +41,12 @@ interface CartModalProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
+  selectedVoucher: Voucher | null;
+  onApplyVoucher: (voucher: Voucher) => void;
+  onRemoveVoucher: () => void;
+  discountAmount: number;
+  subtotal: number;
+  totalPrice: number;
 }
 
 export default function CartModal({
@@ -45,15 +56,44 @@ export default function CartModal({
   onUpdateQuantity,
   onRemoveItem,
   onCheckout,
+  selectedVoucher,
+  onApplyVoucher,
+  onRemoveVoucher,
+  discountAmount,
+  subtotal,
+  totalPrice,
 }: CartModalProps) {
   const slideAnim = React.useRef(new Animated.Value(height)).current;
   const [quantityInput, setQuantityInput] = React.useState("");
-  const [name, setName] = React.useState("");
+  const [isVoucherModalVisible, setIsVoucherModalVisible] = React.useState(false);
 
-  const totalPrice = React.useMemo(
-    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
-    [items],
-  );
+  const { promotions } = usePromotion();
+  const { claimedIds } = useMilestones();
+  const { usedCodes } = useUsedVouchers();
+
+  const availableVouchers = React.useMemo(() => {
+    const promoVouchers = promotions.filter(p => !!p.code).map(p => ({
+        ...p,
+        isUsed: usedCodes.includes(p.code || ""),
+        isApplicable: subtotal >= (p.minOrder || 0)
+    }));
+    
+    const milestoneVouchers = MILESTONES.filter(m => claimedIds.includes(m.id)).map(m => {
+        const code = `REWARD${m.id}`;
+        return {
+            id: `m-${m.id}`,
+            name: `Mốc ${m.label}`,
+            discount: parseInt(m.reward.replace("k", "000")),
+            code,
+            description: "Phần thưởng thử thách",
+            minOrder: 0,
+            until: "Vô thời hạn",
+            isUsed: usedCodes.includes(code),
+            isApplicable: true
+        } as any;
+    });
+    return [...promoVouchers, ...milestoneVouchers];
+  }, [promotions, claimedIds, usedCodes, subtotal]);
 
   const totalQuantity = React.useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
@@ -351,38 +391,70 @@ export default function CartModal({
                 </View>
               </View>
 
-              <View className="flex-row items-center justify-between mb-4 px-2">
-                <View className="flex-row items-center">
-                  <Text className="text-[14px] font-bold text-slate-400 mr-3">
+              <View className="flex-row justify-between items-center mb-4 px-2">
+                <Text className="text-[14px] font-bold text-slate-400">
                     Tạm tính
-                  </Text>
-                  <View className="flex-row items-center bg-orange-50 px-3 py-1.5 rounded-2xl">
-                    <TextInput
-                      className="text-sm font-black text-[#E07B39] min-w-[24px] text-center"
-                      value={quantityInput}
-                      keyboardType="numeric"
-                      onChangeText={setQuantityInput}
-                      onSubmitEditing={handleTotalQuantitySubmit}
-                      onBlur={handleTotalQuantitySubmit}
-                      selectTextOnFocus
-                    />
-                    <Text className="text-[11px] font-black text-[#E07B39] ml-1 uppercase">
-                      Món
-                    </Text>
-                  </View>
-                </View>
-                <Text className="text-xl font-black text-slate-800">
-                  {formatCurrency(totalPrice)}
                 </Text>
-              </View>
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-sm text-gray-400">Phí giao hàng</Text>
-                <Text className="text-sm text-green-500 font-semibold">
-                  Miễn phí
+                <Text className="text-xl font-black text-slate-800">
+                  {formatCurrency(subtotal)}
                 </Text>
               </View>
 
+              <View className="flex-row justify-between items-center mb-4 px-2">
+                <Text className="text-[14px] font-bold text-slate-400">
+                    Phí giao hàng
+                </Text>
+                <Text className="text-[14px] font-bold text-green-500">
+                    Miễn phí
+                </Text>
+              </View>
+
+              {selectedVoucher && (
+                <View className="flex-row justify-between items-center mb-4 px-2">
+                  <View className="flex-row items-center">
+                    <Text className="text-[14px] font-bold text-slate-400 mr-2">
+                      Giảm giá
+                    </Text>
+                    <View className="bg-red-50 px-2 py-0.5 rounded-lg border border-red-100">
+                        <Text className="text-[10px] font-black text-red-500 uppercase">
+                            {selectedVoucher.code}
+                        </Text>
+                    </View>
+                  </View>
+                  <Text className="text-base font-black text-red-500">
+                    -{formatCurrency(discountAmount)}
+                  </Text>
+                </View>
+              )}
+
               <View className="border-t border-dashed border-gray-200 mb-4" />
+
+              <TouchableOpacity 
+                onPress={() => setIsVoucherModalVisible(true)}
+                activeOpacity={0.7}
+                className="bg-orange-50/50 border border-dashed border-orange-200 rounded-2xl p-4 mb-5 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                    <View className="w-10 h-10 rounded-xl bg-orange-100 items-center justify-center mr-3">
+                        <MaterialCommunityIcons name="ticket-percent" size={20} color="#E07B39" />
+                    </View>
+                    <View>
+                        <Text className="text-[14px] font-black text-gray-800">
+                            {selectedVoucher ? `Đã áp dụng: ${selectedVoucher.name}` : "Dùng mã giảm giá"}
+                        </Text>
+                        <Text className="text-[11px] text-orange-500 font-bold">
+                            {selectedVoucher ? "Nhấn để đổi mã khác" : "Chọn voucher để được giảm giá thêm"}
+                        </Text>
+                    </View>
+                </View>
+                {selectedVoucher ? (
+                    <TouchableOpacity onPress={onRemoveVoucher} className="p-1">
+                        <MaterialCommunityIcons name="close-circle" size={20} color="#999" />
+                    </TouchableOpacity>
+                ) : (
+                    <MaterialCommunityIcons name="chevron-right" size={20} color="#E07B39" />
+                )}
+              </TouchableOpacity>
 
               <View className="flex-row justify-between items-center mb-5">
                 <Text className="text-base font-bold text-gray-800">
@@ -415,6 +487,74 @@ export default function CartModal({
           )}
         </Animated.View>
       </View>
+      <Modal
+        visible={isVoucherModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsVoucherModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/60 justify-end">
+          <View className="bg-white rounded-t-[32px] p-6 h-[70%]">
+             <View className="flex-row justify-between items-center mb-6">
+                <Text className="text-xl font-black text-gray-800">Chọn Voucher</Text>
+                <TouchableOpacity onPress={() => setIsVoucherModalVisible(false)}>
+                    <MaterialCommunityIcons name="close" size={24} color="#333" />
+                </TouchableOpacity>
+             </View>
+             
+             <ScrollView showsVerticalScrollIndicator={false}>
+                {availableVouchers.length === 0 ? (
+                    <View className="py-10 items-center">
+                        <MaterialCommunityIcons name="ticket-outline" size={48} color="#ccc" />
+                        <Text className="text-gray-400 mt-2">Bạn không có voucher nào</Text>
+                    </View>
+                ) : (
+                    availableVouchers.map(v => (
+                        <TouchableOpacity 
+                            key={v.id}
+                            disabled={v.isUsed || !v.isApplicable}
+                            onPress={() => {
+                                onApplyVoucher(v);
+                                setIsVoucherModalVisible(false);
+                            }}
+                            className={`p-4 rounded-2xl mb-3 border-2 ${selectedVoucher?.id === v.id ? 'border-orange-500 bg-orange-50' : 'border-gray-100 bg-gray-50'}`}
+                            style={{ opacity: (v.isUsed || !v.isApplicable) ? 0.4 : 1 }}
+                        >
+                            <View className="flex-row justify-between items-center">
+                                <View style={{ flex: 1 }}>
+                                    <View className="flex-row items-center mb-1">
+                                        <Text className="font-black text-gray-800 text-base mr-2">{v.name}</Text>
+                                        {v.isUsed && (
+                                            <View className="bg-gray-200 px-2 py-0.5 rounded-md">
+                                                <Text className="text-[10px] font-bold text-gray-500">ĐÃ DÙNG</Text>
+                                            </View>
+                                        )}
+                                        {!v.isApplicable && !v.isUsed && (
+                                            <View className="bg-red-50 px-2 py-0.5 rounded-md">
+                                                <Text className="text-[10px] font-bold text-red-500">KHÔNG ĐỦ MIN</Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                    <Text className="text-orange-500 font-bold">-{v.discount > 100 ? formatCurrency(v.discount) : `${v.discount}%`}</Text>
+                                    <Text className="text-[11px] text-gray-400 mt-1">{v.description || "Dùng cho mọi đơn hàng"}</Text>
+                                    {!v.isApplicable && !v.isUsed && (
+                                        <Text className="text-[10px] text-red-500 mt-1 font-bold">Cần thêm {formatCurrency((v.minOrder || 0) - subtotal)} nữa</Text>
+                                    )}
+                                </View>
+                                {selectedVoucher?.id === v.id && (
+                                    <MaterialCommunityIcons name="check-circle" size={24} color="#E07B39" />
+                                )}
+                                {(v.isUsed || !v.isApplicable) && !selectedVoucher?.id === v.id && (
+                                    <MaterialCommunityIcons name="lock-outline" size={20} color="#ccc" />
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    ))
+                )}
+             </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 }

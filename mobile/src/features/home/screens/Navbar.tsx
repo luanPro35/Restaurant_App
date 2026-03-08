@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const List_Navbar = [
   {
@@ -10,7 +11,7 @@ const List_Navbar = [
   },
   {
     id: 2,
-    name: "Thanh toán",
+    name: "hanh toán",
     icon: "credit-card-outline",
   },
   {
@@ -30,6 +31,7 @@ import { useNavigation } from "@react-navigation/native";
 export default function Navbar() {
   const [activeTab, setActiveTab] = useState(1);
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   const handlePress = (id: number) => {
     setActiveTab(id);
@@ -45,7 +47,10 @@ export default function Navbar() {
   };
 
   return (
-    <View className="flex-row justify-around items-center bg-white py-3 px-2 rounded-3xl shadow-2xl border border-gray-100">
+    <View
+      className="flex-row justify-around items-center bg-white pt-4 px-2 rounded-t-[32px] shadow-2xl border-t border-gray-100"
+      style={{ paddingBottom: Math.max(insets.bottom, 15) }}
+    >
       {List_Navbar.map((item) => (
         <TouchableOpacity
           key={item.id}
@@ -54,13 +59,12 @@ export default function Navbar() {
         >
           <MaterialCommunityIcons
             name={item.icon as any}
-            size={24}
+            size={26}
             color={activeTab === item.id ? "#E07B39" : "#9CA3AF"}
           />
           <Text
-            className={`text-[10px] mt-1 font-bold ${
-              activeTab === item.id ? "text-[#E07B39]" : "text-gray-400"
-            }`}
+            className={`text-[11px] mt-1.5 font-bold ${activeTab === item.id ? "text-[#E07B39]" : "text-gray-400"
+              }`}
           >
             {item.name}
           </Text>

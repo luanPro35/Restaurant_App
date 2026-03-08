@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -8,148 +8,177 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import HistoryItem from "../components/HistoryItem";
+import { usePackage } from "../../package/hooks/usePackage";
+import { LinearGradient } from "expo-linear-gradient";
 
-type TabType = "all" | "completed" | "cancelled";
+interface HistoryCardProps {
+  pack: any;
+}
 
-const ORDERS = [
-  {
-    id: "10234",
-    date: "20/05/2026 18:30",
-    total: "450.000đ",
-    items: "2x Lẩu Thái, 1x Combo nướng, 4x Pepsi...",
-    status: "completed" as const,
-    image:
-      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  },
-  {
-    id: "10233",
-    date: "15/05/2026 12:15",
-    total: "125.000đ",
-    items: "1x Cơm gà, 1x Canh rong biển",
-    status: "completed" as const,
-    image:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  },
-  {
-    id: "10232",
-    date: "10/05/2026 19:00",
-    total: "890.000đ",
-    items: "Set Sashimi tổng hợp, 2x Sake...",
-    status: "cancelled" as const,
-    image:
-      "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  },
-  {
-    id: "10231",
-    date: "01/05/2026 20:45",
-    total: "320.000đ",
-    items: "Pizza Hải sản, Mì Ý Carbonara...",
-    status: "completed" as const,
-    image:
-      "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  },
-];
+const HistoryCard: React.FC<HistoryCardProps> = ({ pack }) => {
+  const isConfirmed = pack.status === "CONFIRMED";
+  const date = new Date(pack.createdAt).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return (
+    <TouchableOpacity 
+      activeOpacity={0.9}
+      className="bg-white rounded-[32px] mx-4 mb-5 shadow-sm overflow-hidden border border-gray-100"
+    >
+      <View className="p-5">
+        <View className="flex-row justify-between items-center mb-4">
+          <View className="flex-row items-center">
+            <View className="w-10 h-10 bg-orange-50 rounded-2xl items-center justify-center mr-3">
+              <MaterialCommunityIcons name="clipboard-text-outline" size={22} color="#E07B39" />
+            </View>
+            <View>
+              <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Mã đơn hàng</Text>
+              <Text className="text-[#2D2D2D] font-black text-sm">#{pack.id.slice(0, 8).toUpperCase()}</Text>
+            </View>
+          </View>
+          <View className={`px-4 py-1.5 rounded-full ${isConfirmed ? 'bg-green-50' : 'bg-orange-50'}`}>
+            <Text className={`text-[11px] font-bold ${isConfirmed ? 'text-green-600' : 'text-orange-600'}`}>
+              {isConfirmed ? "ĐÃ GIAO" : "ĐANG XỬ LÝ"}
+            </Text>
+          </View>
+        </View>
+
+        <View className="mb-4 space-y-2">
+          <View className="flex-row items-center">
+            <MaterialCommunityIcons name="account-outline" size={16} color="#9CA3AF" />
+            <Text className="text-gray-600 font-bold ml-2 text-sm">{pack.name}</Text>
+          </View>
+          <View className="flex-row items-start">
+            <MaterialCommunityIcons name="map-marker-outline" size={16} color="#9CA3AF" style={{ marginTop: 2 }} />
+            <Text className="text-gray-400 font-medium ml-2 text-xs flex-1" numberOfLines={1}>{pack.address}</Text>
+          </View>
+        </View>
+
+        <View className="h-[1px] bg-gray-50 w-full mb-4" />
+
+        <View className="flex-row justify-between items-end">
+          <View className="flex-1 mr-4">
+            <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">Món đã đặt</Text>
+            <Text className="text-[#2D2D2D] font-medium text-sm leading-5" numberOfLines={2}>
+              {pack.description || "Không có mô tả món ăn"}
+            </Text>
+          </View>
+          <View className="items-end">
+            <Text className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1 text-right">Tổng tiền</Text>
+            <Text className="text-[#E07B39] font-black text-xl">
+              {pack.price?.toLocaleString("vi-VN")}đ
+            </Text>
+          </View>
+        </View>
+      </View>
+      
+      <View className="bg-gray-50/50 px-5 py-3 flex-row justify-between items-center border-t border-gray-50/10">
+        <View className="flex-row items-center">
+          <MaterialCommunityIcons name="calendar-clock" size={14} color="#9CA3AF" />
+          <Text className="text-[#9CA3AF] text-[11px] font-medium ml-1.5">{date}</Text>
+        </View>
+        <TouchableOpacity className="flex-row items-center">
+          <Text className="text-[#E07B39] text-[12px] font-bold mr-1">Chi tiết</Text>
+          <MaterialCommunityIcons name="chevron-right" size={16} color="#E07B39" />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 export default function HistoryScreen() {
-  const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState<TabType>("all");
+  const navigation = useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
+  const { packages, loading, error, fetchPackages } = usePackage();
 
-  const getFilteredOrders = () => {
-    if (activeTab === "all") return ORDERS;
-    return ORDERS.filter((order) => order.status === activeTab);
-  };
-
-  const filteredOrders = getFilteredOrders();
+  useEffect(() => {
+    fetchPackages();
+  }, []);
 
   return (
     <View className="flex-1 bg-[#F9F6E7]">
-      <StatusBar barStyle="light-content" backgroundColor="#795548" />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-      {/* Header */}
-      <View className="bg-[#795548] pt-12 pb-4 rounded-b-3xl shadow-lg elevation-8 z-10">
-        <View className="flex-row justify-between items-center px-4 mb-4">
-          <View className="flex-row items-center">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="mr-3"
-            >
-              <MaterialCommunityIcons
-                name="arrow-left"
-                size={28}
-                color="white"
-              />
-            </TouchableOpacity>
-            <Text className="text-2xl font-bold text-white">
-              Lịch Sử Đơn Hàng
-            </Text>
+      <View className="bg-white pt-14 pb-6 px-6 rounded-b-[40px] shadow-sm z-10 border-b border-gray-100">
+        <View className="flex-row items-center justify-between">
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="w-12 h-12 bg-gray-50 rounded-2xl items-center justify-center"
+          >
+            <MaterialCommunityIcons name="chevron-left" size={28} color="#2D2D2D" />
+          </TouchableOpacity>
+          <View className="items-center">
+            <Text className="text-xl font-black text-[#2D2D2D] tracking-tight">Lịch Sử Đặt Hàng</Text>
+            <View className="w-8 h-1 bg-[#E07B39] rounded-full mt-1" />
           </View>
-          <View className="bg-white/20 p-2 rounded-full">
-            <Text className="text-white font-bold">{ORDERS.length}</Text>
-          </View>
-        </View>
-
-        {/* Tabs */}
-        <View className="flex-row px-4 mt-2">
-          <TouchableOpacity
-            onPress={() => setActiveTab("all")}
-            className={`mr-4 px-4 py-2 rounded-full border ${activeTab === "all" ? "bg-white border-white" : "border-white/50 bg-transparent"}`}
-          >
-            <Text
-              className={`font-bold ${activeTab === "all" ? "text-[#795548]" : "text-white"}`}
-            >
-              Tất cả
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setActiveTab("completed")}
-            className={`mr-4 px-4 py-2 rounded-full border ${activeTab === "completed" ? "bg-white border-white" : "border-white/50 bg-transparent"}`}
-          >
-            <Text
-              className={`font-bold ${activeTab === "completed" ? "text-[#795548]" : "text-white"}`}
-            >
-              Hoàn tất
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setActiveTab("cancelled")}
-            className={`px-4 py-2 rounded-full border ${activeTab === "cancelled" ? "bg-white border-white" : "border-white/50 bg-transparent"}`}
-          >
-            <Text
-              className={`font-bold ${activeTab === "cancelled" ? "text-[#795548]" : "text-white"}`}
-            >
-              Đã hủy
-            </Text>
-          </TouchableOpacity>
+          <View className="w-12" />
         </View>
       </View>
 
-      {/* Content */}
-      <ScrollView
-        className="flex-1 px-4 pt-4"
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ paddingTop: 20, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
       >
-        {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => (
-            <HistoryItem
-              key={order.id}
-              {...order}
-              onReorder={() => console.log("Reorder", order.id)}
-              onViewDetail={() => console.log("Detail", order.id)}
-            />
-          ))
+        {loading ? (
+          <View className="flex-1 items-center justify-center mt-20">
+            <View className="w-20 h-20 bg-white rounded-3xl items-center justify-center shadow-sm">
+              <MaterialCommunityIcons name="loading" size={32} color="#E07B39" />
+            </View>
+            <Text className="text-gray-400 mt-4 font-bold tracking-widest uppercase text-[10px]">Đang tải dữ liệu...</Text>
+          </View>
+        ) : error ? (
+          <View className="items-center justify-center mt-20 px-10">
+            <MaterialCommunityIcons name="alert-circle-outline" size={60} color="#FF6B6B" />
+            <Text className="text-gray-500 text-center mt-4 mb-6">Có lỗi xảy ra khi tải lịch sử đơn hàng.</Text>
+            <TouchableOpacity
+              className="bg-[#E07B39] px-10 py-4 rounded-[20px] shadow-lg shadow-orange-200"
+              onPress={() => fetchPackages()}
+            >
+              <Text className="text-white font-black uppercase text-sm">Thử lại</Text>
+            </TouchableOpacity>
+          </View>
+        ) : packages.length > 0 ? (
+          <View>
+            {packages.map((pack) => (
+              <HistoryCard key={pack.id} pack={pack} />
+            ))}
+          </View>
         ) : (
-          <View className="items-center justify-center mt-20 opacity-50">
-            <MaterialCommunityIcons
-              name="clipboard-text-outline"
-              size={80}
-              color="#795548"
-            />
-            <Text className="text-gray-500 mt-4 text-lg">
-              Chưa có đơn hàng nào
+          <View className="items-center justify-center mt-20 px-10">
+            <View className="w-48 h-48 bg-white rounded-full items-center justify-center mb-8 shadow-sm">
+               <Image
+                source={{
+                  uri: "https://cdn-icons-png.flaticon.com/512/2038/2038854.png",
+                }}
+                className="w-32 h-32 opacity-80"
+              />
+            </View>
+            <Text className="text-[#2D2D2D] text-lg font-black mb-2">Chưa có đơn hàng nào</Text>
+            <Text className="text-gray-400 text-center text-sm leading-5 mb-8">
+              Có vẻ như bạn chưa đặt món ăn nào. Hãy khám phá thực đơn của chúng tôi ngay nhé!
             </Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("Delivery" as any, { screen: "Menu" })}
+              className="overflow-hidden rounded-[24px]"
+            >
+              <LinearGradient
+                colors={["#E91E63", "#E07B39"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="px-10 py-4 items-center justify-center"
+              >
+                <Text className="text-white font-black uppercase text-sm">Khám phá Menu ngay</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>

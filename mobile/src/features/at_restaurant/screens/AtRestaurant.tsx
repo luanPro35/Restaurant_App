@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { DeviceEventEmitter, Alert } from "react-native";
+import { DeviceEventEmitter, Alert, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TableCard from "../components/TableCard";
 import QuickActions from "../components/QuickActions";
 import CurrentOrder from "../components/CurrentOrder";
@@ -25,6 +26,7 @@ type TabType = "tables" | "order" | "menu";
 
 export default function AtRestaurant() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabType>("tables");
   const [currentTableId, setCurrentTableId] = useState<string | null>(null);
   const [currentTable, setCurrentTable] = useState<string>("Chưa chọn");
@@ -89,10 +91,10 @@ export default function AtRestaurant() {
       .map((item: any) => `• ${item.name} x${item.quantity}: ${(item.price * item.quantity).toLocaleString("vi-VN")}đ`)
       .join("\n");
     const total = order.totalAmount.toLocaleString("vi-VN");
-    
+
     return `Chi tiết hóa đơn - ${currentTable}:\n\n${itemsSummary}\n\n━━━━━━━━━━━━━━━\nTổng cộng: ${total}đ`;
   };
-  
+
   const handleRequestBill = () => {
     Alert.alert(
       "Yêu cầu bill",
@@ -100,7 +102,7 @@ export default function AtRestaurant() {
       [
         {
           text: "Hủy",
-          onPress: () => {},
+          onPress: () => { },
           style: "cancel",
         },
         {
@@ -116,7 +118,7 @@ export default function AtRestaurant() {
                 clearRestaurantCart();
                 await fetchTables();
                 setActiveTab("tables");
-                
+
                 Alert.alert("Thanh toán thành công", requestBill(activeOrder));
               } else {
                 await updateTable(currentTableId, { status: "AVAILABLE" });
@@ -126,7 +128,7 @@ export default function AtRestaurant() {
               }
             } catch (error: any) {
               console.error("Failed to request bill FULL ERROR:", error.response?.data || error);
-              const errorMessage = error.response?.data?.message 
+              const errorMessage = error.response?.data?.message
                 ? (Array.isArray(error.response.data.message) ? error.response.data.message.join(", ") : error.response.data.message)
                 : "Không thể xử lý yêu cầu bill.";
               Alert.alert("Lỗi", errorMessage);
@@ -155,11 +157,11 @@ export default function AtRestaurant() {
 
     try {
       const activeOrder = await getOrdersByTableId(currentTableId);
-      
+
       const orderItemsToSubmit = restaurantCartItems.map(item => ({
         productId: item.id,
         quantity: item.quantity,
-        note: "", 
+        note: "",
       }));
 
       if (activeOrder && activeOrder.id) {
@@ -174,9 +176,9 @@ export default function AtRestaurant() {
 
       const updatedOrder = await getOrdersByTableId(currentTableId);
       if (updatedOrder) {
-          setServerOrders(mapOrderItems(updatedOrder));
+        setServerOrders(mapOrderItems(updatedOrder));
       }
-      
+
       await fetchTables();
       clearRestaurantCart();
       Alert.alert("Thành công", "Đơn hàng đã được ghi nhận");
@@ -292,19 +294,22 @@ export default function AtRestaurant() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F9F6E7]">
+    <View className="flex-1 bg-[#F9F6E7]">
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
         translucent={true}
       />
 
-      <View className="bg-[#E07B39] pt-12 pb-6 px-4 rounded-b-3xl shadow-lg">
+      <View
+        className="bg-[#E07B39] pb-12 px-4 rounded-b-[48px] shadow-2xl"
+        style={{ paddingTop: Math.max(insets.top, 20) + 25 }}
+      >
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              className="mr-3"
+              className="mr-3 p-1"
             >
               <MaterialCommunityIcons
                 name="arrow-left"
@@ -317,15 +322,15 @@ export default function AtRestaurant() {
               size={28}
               color="white"
             />
-            <Text className="text-white text-2xl font-bold ml-3">Tại Quán</Text>
+            <Text className="text-white text-2xl font-black ml-3">Tại Quán</Text>
           </View>
-          <View className="flex-row items-center bg-white/20 px-3 py-2 rounded-full">
+          <View className="flex-row items-center bg-white/30 px-4 py-2.5 rounded-2xl border border-white/20">
             <MaterialCommunityIcons
               name="table-furniture"
-              size={20}
+              size={22}
               color="white"
             />
-            <Text className="text-white font-semibold ml-1">
+            <Text className="text-white font-black ml-2 text-base">
               {currentTable.startsWith("Bàn") ? currentTable : `Bàn ${currentTable}`}
             </Text>
           </View>
@@ -335,9 +340,8 @@ export default function AtRestaurant() {
       <View className="bg-white mx-4 mt-4 rounded-2xl shadow-md flex-row">
         <TouchableOpacity
           onPress={() => setActiveTab("tables")}
-          className={`flex-1 py-4 items-center rounded-2xl ${
-            activeTab === "tables" ? "bg-orange-500" : ""
-          }`}
+          className={`flex-1 py-4 items-center rounded-2xl ${activeTab === "tables" ? "bg-orange-500" : ""
+            }`}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
@@ -346,9 +350,8 @@ export default function AtRestaurant() {
             color={activeTab === "tables" ? "white" : "#9CA3AF"}
           />
           <Text
-            className={`mt-1 font-semibold ${
-              activeTab === "tables" ? "text-white" : "text-gray-400"
-            }`}
+            className={`mt-1 font-semibold ${activeTab === "tables" ? "text-white" : "text-gray-400"
+              }`}
           >
             Bàn
           </Text>
@@ -356,9 +359,8 @@ export default function AtRestaurant() {
 
         <TouchableOpacity
           onPress={() => setActiveTab("order")}
-          className={`flex-1 py-4 items-center rounded-2xl ${
-            activeTab === "order" ? "bg-orange-500" : ""
-          }`}
+          className={`flex-1 py-4 items-center rounded-2xl ${activeTab === "order" ? "bg-orange-500" : ""
+            }`}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
@@ -367,9 +369,8 @@ export default function AtRestaurant() {
             color={activeTab === "order" ? "white" : "#9CA3AF"}
           />
           <Text
-            className={`mt-1 font-semibold ${
-              activeTab === "order" ? "text-white" : "text-gray-400"
-            }`}
+            className={`mt-1 font-semibold ${activeTab === "order" ? "text-white" : "text-gray-400"
+              }`}
           >
             Đơn hàng
           </Text>
@@ -377,9 +378,8 @@ export default function AtRestaurant() {
 
         <TouchableOpacity
           onPress={() => setActiveTab("menu")}
-          className={`flex-1 py-4 items-center rounded-2xl ${
-            activeTab === "menu" ? "bg-orange-500" : ""
-          }`}
+          className={`flex-1 py-4 items-center rounded-2xl ${activeTab === "menu" ? "bg-orange-500" : ""
+            }`}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
@@ -388,9 +388,8 @@ export default function AtRestaurant() {
             color={activeTab === "menu" ? "white" : "#9CA3AF"}
           />
           <Text
-            className={`mt-1 font-semibold ${
-              activeTab === "menu" ? "text-white" : "text-gray-400"
-            }`}
+            className={`mt-1 font-semibold ${activeTab === "menu" ? "text-white" : "text-gray-400"
+              }`}
           >
             Thực đơn
           </Text>
@@ -398,6 +397,6 @@ export default function AtRestaurant() {
       </View>
 
       <View className="flex-1 mt-2">{renderTabContent()}</View>
-    </SafeAreaView>
+    </View>
   );
 }

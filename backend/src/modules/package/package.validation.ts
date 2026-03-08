@@ -9,13 +9,7 @@ export const createPackageSchema = z.object({
     status: z.enum([PackageStatus.PENDING, PackageStatus.CONFIRMED]),
 });
 
-export const updatePackageSchema = z.object({
-    name: z.string(),
-    address: z.string(),
-    description: z.string(),
-    price: z.number(),
-    status: z.enum([PackageStatus.PENDING, PackageStatus.CONFIRMED]),
-});
+export const updatePackageSchema = createPackageSchema.partial();
 
 export const deletePackageSchema = z.object({
     id: z.string(),

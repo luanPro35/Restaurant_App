@@ -1,111 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
   ScrollView,
   StatusBar,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { PRODUCTS, Product } from "../../../data/dish";
 import BestSellerCard from "../components/BestSellerCard";
-import Shopping_Cart from "../../../app/providers/Shopping_Cart";
-import CartModal from "../../menu/components/CartModal";
 import Search_Dish from "../../delivery/Header/Search_Dish";
-
-interface BestSellerItem {
-  id: string;
-  name: string;
-  price: string;
-  image: string;
-  description: string;
-  soldCount: number;
-  rating: number;
-  rank: number;
-}
-
-interface CartItem extends BestSellerItem {
-  quantity: number;
-}
+import { useBestSellers, BestSellerItem } from "../hooks/useBestSellers";
+import { useCart } from "../../../app/context/CartContext";
 
 type FilterType = "all" | "today" | "week" | "month";
 
 export default function BestSellerScreen() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartVisible, setIsCartVisible] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  
+  const { items, loading, refresh } = useBestSellers();
+  const { addToCart } = useCart();
 
-  // Mock best seller data with ranking
-  const getBestSellerItems = (): BestSellerItem[] => {
-    return PRODUCTS.slice(0, 20).map((product, index) => ({
-      id: product.id.toString(),
-      name: product.name,
-      price: product.price,
-      image:
-        product.image ||
-        "https://via.placeholder.com/400x300/E07B39/ffffff?text=" +
-          encodeURIComponent(product.name),
-      description: product.description || "",
-      soldCount: Math.floor(Math.random() * 500) + 100,
-      rating: 4 + Math.random() * 1,
-      rank: index + 1,
-    }));
-  };
-
-  const getFilteredItems = (): BestSellerItem[] => {
-    let items = getBestSellerItems();
+  const filteredItems = useMemo(() => {
+    let result = [...items];
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      items = items.filter(
+      result = result.filter(
         (item) =>
           item.name.toLowerCase().includes(query) ||
           item.description.toLowerCase().includes(query),
       );
     }
 
-    // Sort by rank
-    return items.sort((a, b) => a.rank - b.rank);
-  };
+    if (activeFilter === "today") {
+       result = [...result].sort((a, b) => (a.id.length % 3) - (b.id.length % 3));
+    } else if (activeFilter === "week") {
+       result = [...result].sort((a, b) => b.name.length - a.name.length);
+    } else if (activeFilter === "month") {
+       result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+    }
 
-  const bestSellerItems = getFilteredItems();
+    return result;
+  }, [items, searchQuery, activeFilter]);
 
   const handleAddToCart = (item: BestSellerItem) => {
-    setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id);
-      if (existingItem) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.rawPrice,
+      image: item.image,
+      description: item.description,
+      category: "Best Seller"
     });
   };
-
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      handleRemoveItem(id);
-      return;
-    }
-    setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleCheckout = () => {
-    console.log("Checkout with items:", cartItems);
-    setIsCartVisible(false);
-  };
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const filters: { type: FilterType; label: string; icon: string }[] = [
     { type: "all", label: "Tất cả", icon: "fire" },
@@ -176,7 +128,7 @@ export default function BestSellerScreen() {
             }}
           >
             <Text style={{ color: "white", fontWeight: "600" }}>
-              Top {bestSellerItems.length}
+              Top {items.length}
             </Text>
           </View>
         </View>
@@ -255,12 +207,17 @@ export default function BestSellerScreen() {
             }}
           >
             <Text style={{ color: "#FF6B6B", fontWeight: "600", fontSize: 13 }}>
-              Tìm thấy {bestSellerItems.length} món
+              Tìm thấy {filteredItems.length} món
             </Text>
           </View>
         )}
 
-        {bestSellerItems.length === 0 ? (
+        {loading ? (
+          <View style={{ paddingVertical: 100 }}>
+             <ActivityIndicator size="large" color="#FF6B6B" />
+             <Text style={{ textAlign: 'center', color: '#999', marginTop: 12 }}>Đang tải món ăn...</Text>
+          </View>
+        ) : filteredItems.length === 0 ? (
           <View
             style={{
               alignItems: "center",
@@ -270,11 +227,17 @@ export default function BestSellerScreen() {
           >
             <MaterialCommunityIcons name="fire-off" size={80} color="#ddd" />
             <Text style={{ color: "#999", fontSize: 16, marginTop: 16 }}>
-              Không tìm thấy món ăn
+              {searchQuery ? "Không tìm thấy món ăn phù hợp" : "Danh sách trống"}
             </Text>
+            <TouchableOpacity 
+              onPress={refresh}
+              style={{ marginTop: 20, padding: 10, backgroundColor: '#FF6B6B', borderRadius: 10 }}
+            >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>Tải lại</Text>
+            </TouchableOpacity>
           </View>
         ) : (
-          bestSellerItems.map((item) => (
+          filteredItems.map((item) => (
             <BestSellerCard
               key={item.id}
               item={item}
@@ -283,31 +246,6 @@ export default function BestSellerScreen() {
           ))
         )}
       </ScrollView>
-
-      {/* Shopping Cart Button */}
-      <View
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          zIndex: 1000,
-        }}
-      >
-        <Shopping_Cart
-          itemCount={totalItems}
-          onPress={() => setIsCartVisible(true)}
-        />
-      </View>
-
-      {/* Cart Modal */}
-      <CartModal
-        visible={isCartVisible}
-        items={cartItems}
-        onClose={() => setIsCartVisible(false)}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={handleCheckout}
-      />
     </View>
   );
 }

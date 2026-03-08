@@ -8,6 +8,7 @@ import { OrderModule } from "./modules/order/order.module";
 import { ConfigModule } from "@nestjs/config";
 import { PaymentModule } from "./modules/payment/payment.model";
 import { PackageModule } from "./modules/package/package.module";
+import { MilestoneModule } from "./modules/milestone/milestone.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PackageModule } from "./modules/package/package.module";
     OrderModule,
     PaymentModule,
     PackageModule,
+    MilestoneModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

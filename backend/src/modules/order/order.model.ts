@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const orderStatus = {
-  PENDING: "pending", // Just created
-  CONFIRMED: "confirmed", // Restaurant confirmed
-  COOKING: "cooking", // Kitchen is preparing
-  SERVED: "served", // Food delivered to table
-  COMPLETED: "completed", // Paid and finished
+  PENDING: "pending",
+  CONFIRMED: "confirmed",
+  COOKING: "cooking",
+  SERVED: "served",
+  COMPLETED: "completed",
   CANCELLED: "cancelled",
 };
 
@@ -25,7 +25,6 @@ const orderSchema = new mongoose.Schema(
     table: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Table",
-      // Required only if type is dine_in
     },
     items: [
       {
@@ -34,7 +33,7 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        name: String, // Snapshot of product name
+        name: String,
         quantity: {
           type: Number,
           required: true,
@@ -45,7 +44,7 @@ const orderSchema = new mongoose.Schema(
           required: true,
         },
         variant: {
-          type: String, // Optional variant name selected
+          type: String,
         },
         note: String,
       },
@@ -73,7 +72,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
     },
     deliveryAddress: {
-      type: String, // Only for delivery
+      type: String,
     },
   },
   {

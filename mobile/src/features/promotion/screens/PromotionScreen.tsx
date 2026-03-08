@@ -7,18 +7,19 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
+  RefreshControl,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import PromotionCard from "../components/PromotionCard";
 import VoucherItem from "../components/VoucherItem";
 import { usePromotion } from "../hooks/usePromotion";
 import { useNotification } from "../hooks/useNotification";
 import Notification from "../components/Notification";
-import { RefreshControl } from "react-native";
 import DetailNotification from "../components/DetailNotification";
 import { AdminNotification } from "@/services/api/admin-notification";
+import { useMilestones } from "../../profile/games/hooks/useMilestones";
+import { MILESTONES } from "../../profile/games/constants/milestones";
 
 type TabType = "promotions" | "notifications";
 
@@ -29,6 +30,9 @@ export default function PromotionScreen({ navigation }: any) {
     loading: loadingPromos,
     fetchPromotions,
   } = usePromotion();
+
+  const { claimedIds, loading: loadingMilestones } = useMilestones();
+
   const {
     notifications,
     loading: loadingNotifs,
@@ -141,19 +145,38 @@ export default function PromotionScreen({ navigation }: any) {
               <Text className="text-lg font-bold text-[#2D2D2D] mb-3">
                 Mã Giảm Giá Của Bạn
               </Text>
-              {loadingPromos ? (
+              {(loadingPromos || loadingMilestones) ? (
                 <View className="py-4 items-center">
                   <Text className="text-gray-400">Đang tải mã giảm giá...</Text>
                 </View>
-              ) : promotions.length > 0 ? (
-                promotions
-                  .filter((p: any) => p.code)
-                  .map((item: any) => <VoucherItem key={item.id} item={item} />)
               ) : (
-                <View className="py-10 items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                  <Text className="text-gray-400">
-                    Bạn chưa có mã giảm giá nào
-                  </Text>
+                <View>
+                  {promotions.filter((p: any) => p.code).map((item: any) => (
+                    <VoucherItem key={item.id} item={item} />
+                  ))}
+
+                  {MILESTONES.filter(m => claimedIds.includes(m.id)).map((milestone) => (
+                    <VoucherItem
+                      key={`milestone-${milestone.id}`}
+                      item={{
+                        id: `m-${milestone.id}`,
+                        name: `Quà tặng mốc ${milestone.label}`,
+                        discount: parseInt(milestone.reward.replace("k", "000")),
+                        minOrder: 0,
+                        until: "Không thời hạn",
+                        code: `REWARD${milestone.id}`,
+                        description: `Phần thưởng từ thử thách đặt đơn hàng.`
+                      } as any}
+                    />
+                  ))}
+
+                  {promotions.filter((p: any) => p.code).length === 0 && claimedIds.length === 0 && (
+                    <View className="py-10 items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                      <Text className="text-gray-400">
+                        Bạn chưa có mã giảm giá nào
+                      </Text>
+                    </View>
+                  )}
                 </View>
               )}
             </View>

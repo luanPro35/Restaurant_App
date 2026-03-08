@@ -19,7 +19,7 @@ export const usePackage = () => {
                 setPackages(data);
             } catch (err) {
                 setError(err as any);
-                console.error("Fetch packages error:", err);
+                console.warn("Fetch packages error:", err);
             } finally {
                 setLoading(false);
             }

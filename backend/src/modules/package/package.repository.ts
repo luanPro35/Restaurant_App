@@ -7,20 +7,21 @@ import { PackageStatus } from "@prisma/client";
 export class PackageRepository {
     constructor(private readonly prisma: PrismaService) { }
 
-    async create(data: CreatePackageDto) {
-        return this.prisma.package.create({
+    async create(data: CreatePackageDto & { userId?: string }) {
+        return (this.prisma as any).package.create({
             data: {
                 name: data.name,
                 address: data.address,
                 description: data.description,
                 price: data.price,
-                status: data.status as PackageStatus,
+                status: (data.status as PackageStatus) || PackageStatus.PENDING,
+                userId: data.userId,
             },
         });
     }
 
-    async update(id: string, data: UpdatePackageDto) {
-        return this.prisma.package.update({
+    async update(id: string, data: UpdatePackageDto & { userId?: string }) {
+        return (this.prisma as any).package.update({
             where: { id },
             data: {
                 name: data.name,
@@ -28,6 +29,7 @@ export class PackageRepository {
                 description: data.description,
                 price: data.price,
                 status: data.status as PackageStatus,
+                userId: data.userId,
             },
         });
     }
@@ -38,8 +40,9 @@ export class PackageRepository {
         });
     }
 
-    async findAll() {
-        return this.prisma.package.findMany({
+    async findAll(userId?: string) {
+        return (this.prisma as any).package.findMany({
+            where: userId ? { userId } : {},
             orderBy: {
                 createdAt: 'desc'
             }
@@ -49,6 +52,15 @@ export class PackageRepository {
     async findById(id: string) {
         return this.prisma.package.findUnique({
             where: { id },
+        });
+    }
+
+    async count(userId: string) {
+        return (this.prisma as any).package.count({
+            where: {
+                userId,
+                status: "CONFIRMED"
+            },
         });
     }
 }

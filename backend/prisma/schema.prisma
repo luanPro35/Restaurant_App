@@ -19,8 +19,21 @@ model User {
   orders    Order[]
   payments  Payment[]
   addresses Address[]
+  packages  Package[] @relation("UserPackages")
+  milestones UserMilestone[]
 
   @@map("users")
+}
+
+model UserMilestone {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestoneId Int
+  claimedAt   DateTime @default(now())
+
+  @@unique([userId, milestoneId])
+  @@map("user_milestones")
 }
 
 model Address {
@@ -206,6 +219,9 @@ model Package {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   status      PackageStatus @default(PENDING)
+
+  userId      String?
+  user        User?    @relation("UserPackages", fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("packages")
 }
