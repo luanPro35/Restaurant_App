@@ -24,7 +24,7 @@ export default function PackageItem({
 
   const handleComplete = async () => {
     if (pack.status === "CONFIRMED" || loading) return;
-    
+
     setLoading(true);
     try {
       await packageApi.update(pack.id, { status: "CONFIRMED" });
@@ -41,7 +41,6 @@ export default function PackageItem({
 
   return (
     <View className="bg-white rounded-3xl mx-4 mb-6 shadow-xl elevation-5 overflow-hidden border border-gray-50">
-      {/* Header Info */}
       <View className="flex-row justify-between items-center p-4 border-b border-gray-50 bg-gray-50/30">
         <View>
           <Text className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Mã đơn hàng</Text>
@@ -53,17 +52,14 @@ export default function PackageItem({
         </View>
       </View>
 
-      {/* Stepper Area */}
       <View className="py-8 px-10 relative">
-        {/* Progress Line Background */}
-        <View 
-          className="absolute bg-gray-100" 
-          style={{ top: 55, left: 70, right: 70, height: 2 }} 
+        <View
+          className="absolute bg-gray-100"
+          style={{ top: 55, left: 70, right: 70, height: 2 }}
         />
-        {/* Active Progress Line */}
-        <View 
-          className="absolute bg-[#E07B39]" 
-          style={{ top: 55, left: 70, width: isConfirmed ? '62%' : 0, height: 2 }} 
+        <View
+          className="absolute bg-[#E07B39]"
+          style={{ top: 55, left: 70, width: isConfirmed ? '62%' : 0, height: 2 }}
         />
 
         <View className="flex-row justify-between relative">
@@ -103,9 +99,8 @@ export default function PackageItem({
         </View>
       </View>
 
-      {/* Action Button */}
-      <TouchableOpacity 
-        onPress={handleComplete} 
+      <TouchableOpacity
+        onPress={handleComplete}
         disabled={isConfirmed || loading}
         activeOpacity={0.8}
         className="mx-4 mb-4 overflow-hidden rounded-2xl"
@@ -119,7 +114,7 @@ export default function PackageItem({
           {isConfirmed && (
             <MaterialCommunityIcons name="check-decagram" size={20} color="white" style={{ marginRight: 8 }} />
           )}
-          <Text 
+          <Text
             style={{ color: 'white', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}
             numberOfLines={1}
             adjustsFontSizeToFit
