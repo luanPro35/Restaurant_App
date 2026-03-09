@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PackageItem from "../components/PackageItem";
 import PackageAddress from "../components/PackageAddress";
 import PackageDish from "../components/PackageDish";
@@ -19,6 +20,7 @@ import { usePackage } from "../hooks/usePackage";
 export default function PackageScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
+  const insets = useSafeAreaInsets();
 
   const {packages, loading, error, fetchPackages} = usePackage();
 
@@ -30,15 +32,18 @@ export default function PackageScreen() {
     <View className="flex-1 bg-[#F9F6E7]">
       <StatusBar barStyle="light-content" backgroundColor="#E07B39" />
 
-      <View className="bg-[#E07B39] pt-12 pb-6 px-4 rounded-b-3xl shadow-lg elevation-5 z-10 mb-[-20px]">
+      <View 
+        className="bg-[#E07B39] pb-10 px-4 rounded-b-[40px] shadow-lg elevation-5 z-10 mb-[-25px]"
+        style={{ paddingTop: Math.max(insets.top, 20) + 10 }}
+      >
         <View className="flex-row items-center">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="mr-3"
+            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center mr-3"
           >
             <MaterialCommunityIcons name="arrow-left" size={28} color="white" />
           </TouchableOpacity>
-          <Text className="text-2xl font-bold text-white">
+          <Text className="text-2xl font-black text-white">
             Theo Dõi Đơn Hàng
           </Text>
         </View>

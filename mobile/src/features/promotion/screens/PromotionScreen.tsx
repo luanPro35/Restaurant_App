@@ -8,9 +8,11 @@ import {
   FlatList,
   Modal,
   RefreshControl,
+  Platform,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PromotionCard from "../components/PromotionCard";
 import VoucherItem from "../components/VoucherItem";
 import { usePromotion } from "../hooks/usePromotion";
@@ -25,6 +27,7 @@ type TabType = "promotions" | "notifications";
 
 export default function PromotionScreen({ navigation }: any) {
   const [activeTab, setActiveTab] = useState<TabType>("promotions");
+  const insets = useSafeAreaInsets();
   const {
     promotions,
     loading: loadingPromos,
@@ -89,12 +92,15 @@ export default function PromotionScreen({ navigation }: any) {
     <View className="flex-1 bg-[#F9F6E7]">
       <StatusBar barStyle="light-content" backgroundColor="#E91E63" />
 
-      <View className="bg-[#E91E63] pt-12 pb-4 rounded-b-3xl shadow-lg elevation-8">
+      <View 
+        className="bg-[#E91E63] pb-4 rounded-b-3xl shadow-lg elevation-8"
+        style={{ paddingTop: Math.max(insets.top, 20) + 10 }}
+      >
         <View className="flex-row justify-between items-center px-4 mb-4">
           <View className="flex-row items-center">
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              className="mr-3"
+              className="mr-3 p-1"
             >
               <MaterialCommunityIcons
                 name="arrow-left"
@@ -200,7 +206,7 @@ export default function PromotionScreen({ navigation }: any) {
                       image:
                         item.image ||
                         "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-                      discount: `-${item.discount}%`,
+                      discount: item.discount > 0 ? `-${item.discount}%` : "Mới",
                       expiryDate: item.until,
                     }}
                     onPress={(promo) =>

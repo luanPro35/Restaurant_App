@@ -8,29 +8,32 @@ const List_Navbar = [
     id: 1,
     name: "Trang chủ",
     icon: "home-variant",
+    activeIcon: "home-variant",
   },
   {
     id: 2,
-    name: "hanh toán",
+    name: "Thanh toán",
     icon: "credit-card-outline",
+    activeIcon: "credit-card",
   },
   {
     id: 3,
     name: "Hoạt động",
     icon: "history",
+    activeIcon: "history",
   },
   {
     id: 4,
     name: "Thông báo",
-    icon: "bell",
+    icon: "bell-outline",
+    activeIcon: "bell",
   },
 ];
 
 import { useNavigation } from "@react-navigation/native";
 
-export default function Navbar() {
+export default function Navbar({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState(1);
-  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
   const handlePress = (id: number) => {
@@ -48,31 +51,41 @@ export default function Navbar() {
 
   return (
     <View
-      className="flex-row justify-around items-center bg-white pt-4 px-2 rounded-t-[32px] shadow-2xl border-t border-gray-100"
-      style={{ paddingBottom: Math.max(insets.bottom, 15) }}
+      className="flex-row justify-around items-center bg-white/95 py-3 px-4 rounded-[32px] shadow-2xl border border-gray-100/50"
+      style={{
+        elevation: 10,
+      }}
     >
-      {List_Navbar.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          onPress={() => handlePress(item.id)}
-          className="items-center justify-center flex-1"
-        >
-          <MaterialCommunityIcons
-            name={item.icon as any}
-            size={26}
-            color={activeTab === item.id ? "#E07B39" : "#9CA3AF"}
-          />
-          <Text
-            className={`text-[11px] mt-1.5 font-bold ${activeTab === item.id ? "text-[#E07B39]" : "text-gray-400"
-              }`}
+      {List_Navbar.map((item) => {
+        const isActive = activeTab === item.id;
+        return (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => handlePress(item.id)}
+            className="items-center justify-center flex-1"
+            activeOpacity={0.7}
           >
-            {item.name}
-          </Text>
-          {activeTab === item.id && (
-            <View className="absolute -bottom-1 w-1 h-1 bg-[#E07B39] rounded-full" />
-          )}
-        </TouchableOpacity>
-      ))}
+            <View
+              className={`p-1.5 rounded-2xl items-center justify-center ${
+                isActive ? "bg-orange-50" : ""
+              }`}
+            >
+              <MaterialCommunityIcons
+                name={(isActive ? item.activeIcon : item.icon) as any}
+                size={isActive ? 24 : 22}
+                color={isActive ? "#E07B39" : "#9CA3AF"}
+              />
+            </View>
+            <Text
+              className={`text-[9px] mt-1 font-bold tracking-tight uppercase ${
+                isActive ? "text-[#E07B39]" : "text-gray-400"
+              }`}
+            >
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }

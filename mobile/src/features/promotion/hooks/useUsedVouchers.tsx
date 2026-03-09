@@ -13,25 +13,25 @@ export const useUsedVouchers = () => {
       setUsedCodes([]);
       return;
     }
-    
+
     setLoading(true);
     try {
       const packages = await packageApi.findAll();
       const codes: string[] = [];
-      
+
       packages.forEach((pkg) => {
-        console.log("Checking package desc:", pkg.description);
         const match = pkg.description?.match(/Voucher: ([^(\n]+)/);
         if (match && match[1]) {
           const code = match[1].trim();
-          console.log("Found used voucher code:", code);
           codes.push(code);
         }
       });
-      
+
       setUsedCodes([...new Set(codes)]);
-    } catch (error) {
-      console.error("Error fetching used vouchers:", error);
+    } catch (error: any) {
+      if (error.response?.status !== 401) {
+        console.log("Unable to fetch used vouchers:", error?.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -39,8 +39,6 @@ export const useUsedVouchers = () => {
 
   useEffect(() => {
     fetchUsedCodes();
-    
-    // Refresh when a checkout is successful
     const listener = DeviceEventEmitter.addListener("checkoutSuccess", fetchUsedCodes);
     return () => listener.remove();
   }, [fetchUsedCodes]);

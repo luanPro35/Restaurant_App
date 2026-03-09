@@ -53,16 +53,14 @@ const List_Feature = (
       onPress: () => navigation.navigate("History"),
     },
     {
-      name: "Tất cả",
-      icon: "apps",
+      name: "Tư vấn",
+      icon: "chat",
       color: "#9C27B0",
-      onPress: onOpenModal,
+      onPress: () => navigation.navigate("Chat"),
     },
   ];
 
-export default function Choose_Feature() {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
+export default function Choose_Feature({ navigation }: { navigation: any }) {
   const [modalVisible, setModalVisible] = useState(false);
 
   const features = List_Feature(navigation, () => setModalVisible(true));
@@ -94,6 +92,7 @@ export default function Choose_Feature() {
       <FeaturesModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+        navigation={navigation}
       />
     </View>
   );

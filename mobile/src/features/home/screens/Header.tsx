@@ -5,8 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function Header() {
-  const navigation = useNavigation<any>();
+export default function Header({ navigation }: { navigation: any }) {
   const insets = useSafeAreaInsets();
 
   return (

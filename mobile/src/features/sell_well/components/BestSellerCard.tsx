@@ -1,5 +1,8 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, Animated } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { BestSellerItem } from "../hooks/useBestSellers";
@@ -13,6 +16,7 @@ export default function BestSellerCard({
   item,
   onAddToCart,
 }: BestSellerCardProps) {
+  const navigation = useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -60,6 +64,7 @@ export default function BestSellerCard({
     >
       <TouchableOpacity
         activeOpacity={0.9}
+        onPress={() => navigation.navigate("DetailProduct", { id: item.id })}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={{

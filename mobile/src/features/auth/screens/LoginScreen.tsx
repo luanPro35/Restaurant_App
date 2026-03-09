@@ -68,7 +68,7 @@ export default function LoginScreen() {
             Welcome Back
           </Text>
 
-          <View className="w-full bg-white rounded-2xl px-5 py-4 mb-4 flex-row items-center border border-[#E5D5C3] shadow-sm">
+          <View className="w-full bg-white rounded-2xl px-5 py-5 mb-4 flex-row items-center border border-[#E5D5C3] shadow-sm">
             <MaterialIcons name="email" size={20} color="#6B4423" />
             <TextInput
               placeholder="Email"
@@ -81,7 +81,7 @@ export default function LoginScreen() {
             />
           </View>
 
-          <View className="w-full bg-white rounded-2xl px-5 py-4 mb-3 flex-row items-center border border-[#E5D5C3] shadow-sm">
+          <View className="w-full bg-white rounded-2xl px-5 py-5 mb-3 flex-row items-center border border-[#E5D5C3] shadow-sm">
             <Ionicons name="lock-closed" size={20} color="#6B4423" />
             <TextInput
               placeholder="Password"
@@ -102,7 +102,7 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg active:bg-[#C96A2E] ${loading ? "opacity-70" : ""}`}
+            className={`w-full bg-[#E07B39] rounded-2xl py-5 items-center shadow-lg active:bg-[#C96A2E] ${loading ? "opacity-70" : ""}`}
             onPress={onLoginPress}
             disabled={loading}
           >

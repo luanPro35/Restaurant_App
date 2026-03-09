@@ -13,7 +13,7 @@ import Navbar from "./Navbar";
 import { useCart } from "../../../app/context/CartContext";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }: any) {
   const { totalItems, setIsCartVisible, setShouldHideFloatingCart } = useCart();
 
   useFocusEffect(
@@ -24,36 +24,36 @@ export default function HomeScreen() {
   );
   return (
     <View className="flex-1 bg-[#F9F6E7]">
-      <Header />
+      <Header navigation={navigation} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-6 pt-8">
-          <Choose_Feature />
+          <Choose_Feature navigation={navigation} />
         </View>
         <View className="px-3">
           <Banner_Introduce />
         </View>
         <View className="px-3">
-          <Today_Feautured />
+          <Today_Feautured navigation={navigation} />
         </View>
         <View className="px-3">
-          <Best_Seller_Today />
+          <Best_Seller_Today navigation={navigation} />
         </View>
         <View className="px-3">
-          <New_Dish />
+          <New_Dish navigation={navigation} />
         </View>
         <View className="px-3">
-          <Quick_Combo />
+          <Quick_Combo navigation={navigation} />
         </View>
         <View className="px-3">
-          <MealOption />
+          <MealOption navigation={navigation} />
         </View>
         <View className="h-32" />
       </ScrollView>
 
       <View className="absolute bottom-8 left-4 right-4 flex-row items-center">
         <View className="flex-1 mr-3">
-          <Navbar />
+          <Navbar navigation={navigation} />
         </View>
         <Shopping_Cart
           itemCount={totalItems}

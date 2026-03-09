@@ -9,6 +9,7 @@ import { ConfigModule } from "@nestjs/config";
 import { PaymentModule } from "./modules/payment/payment.model";
 import { PackageModule } from "./modules/package/package.module";
 import { MilestoneModule } from "./modules/milestone/milestone.module";
+import { ChatModule } from "./modules/chat/chat.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MilestoneModule } from "./modules/milestone/milestone.module";
     PaymentModule,
     PackageModule,
     MilestoneModule,
+    ChatModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -28,4 +30,4 @@ import { MilestoneModule } from "./modules/milestone/milestone.module";
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

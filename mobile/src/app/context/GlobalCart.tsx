@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, DeviceEventEmitter, Alert } from "react-native";
 import { useCart } from "./CartContext";
-import { useNavigationState, useNavigation } from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
 import Shopping_Cart from "../providers/Shopping_Cart";
 import CartModal from "../../features/menu/components/CartModal";
 import { useDelivery } from "./DeliveryContext";
 import { packageApi } from "../../services/api/package-api";
 
-export const GlobalCart: React.FC = () => {
-  const navigation = useNavigation<any>();
+interface GlobalCartProps {
+  navigationRef: any;
+}
+
+export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
   const { isAuthenticated, logout } = useAuth();
+  const [currentRoute, setCurrentRoute] = useState<string | null>(null);
+
   const {
     cartItems,
     totalItems,
@@ -30,20 +34,36 @@ export const GlobalCart: React.FC = () => {
 
   const { selectedAddress } = useDelivery();
 
-  let currentRouteName: string | null = null;
-  try {
-    currentRouteName = useNavigationState((state) => {
-      if (!state) return null;
-      let route = state.routes[state.index] as any;
-      while (route.state && route.state.index !== undefined) {
-        route = route.state.routes[route.state.index];
+  useEffect(() => {
+    const updateRoute = () => {
+      try {
+        if (navigationRef.isReady()) {
+          const rootState = navigationRef.getRootState();
+          if (rootState) {
+            let route = rootState.routes[rootState.index];
+            while (route && route.state && route.state.index !== undefined) {
+              route = (route.state.routes as any)[(route.state.index as any)];
+            }
+            if (route && route.name !== currentRoute) {
+              setCurrentRoute(route.name);
+            }
+          }
+        }
+      } catch (e) {
+        // Just fail silently if navigation is temporarily unavailable
       }
-      return route.name as string;
-    });
-  } catch (e) { }
+    };
 
-  const isAdminScreen = currentRouteName?.startsWith("Admin");
-  const isAuthScreen = ["Login", "Register", "Welcome", "Forgot"].includes(currentRouteName || "");
+    const interval = setInterval(updateRoute, 500); // Polling as a fallback
+    const unsubscribe = navigationRef.addListener('state', updateRoute);
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
+  }, [navigationRef, currentRoute]);
+
+  const isAdminScreen = currentRoute?.startsWith("Admin");
+  const isAuthScreen = ["Login", "Register", "Welcome", "Forgot"].includes(currentRoute || "");
 
   if (isAdminScreen || isAuthScreen) return null;
   if (cartItems.length === 0 && !isCartVisible) return null;
@@ -52,7 +72,7 @@ export const GlobalCart: React.FC = () => {
     <>
       {!shouldHideFloatingCart && (
         <View
-          className="absolute bottom-5 right-5 z-[1000]"
+          style={{ position: 'absolute', bottom: 20, right: 20, zIndex: 1000 }}
           pointerEvents="box-none"
         >
           <Shopping_Cart
@@ -85,7 +105,7 @@ export const GlobalCart: React.FC = () => {
                   text: "Đăng nhập",
                   onPress: () => {
                     setIsCartVisible(false);
-                    navigation.navigate("Profile");
+                    if (navigationRef.isReady()) navigationRef.navigate("Profile");
                   }
                 }
               ]
@@ -117,7 +137,7 @@ export const GlobalCart: React.FC = () => {
             clearCart();
             Alert.alert("Thành công", "Đơn hàng của bạn đã được gửi đi!");
             DeviceEventEmitter.emit("checkoutSuccess");
-            navigation.navigate("Package" as any);
+            if (navigationRef.isReady()) navigationRef.navigate("Package");
           } catch (error: any) {
             console.error("Lỗi khi thanh toán:", error);
             if (error.response?.status === 401) {

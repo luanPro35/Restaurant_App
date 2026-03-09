@@ -85,7 +85,7 @@ export default function RegisterScreen() {
             Create Account
           </Text>
 
-          <View className="w-full bg-white rounded-2xl px-5 py-3 mb-3 flex-row items-center border border-[#E5D5C3] shadow-sm">
+          <View className="w-full bg-white rounded-2xl px-5 py-4 mb-3 flex-row items-center border border-[#E5D5C3] shadow-sm">
             <Ionicons name="person" size={20} color="#6B4423" />
             <TextInput
               placeholder="Full Name"
@@ -97,7 +97,7 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View className="w-full bg-white rounded-2xl px-5 py-3 mb-3 flex-row items-center border border-[#E5D5C3] shadow-sm">
+          <View className="w-full bg-white rounded-2xl px-5 py-4 mb-3 flex-row items-center border border-[#E5D5C3] shadow-sm">
             <MaterialIcons name="email" size={20} color="#6B4423" />
             <TextInput
               placeholder="Email"
@@ -110,7 +110,7 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View className="w-full bg-white rounded-2xl px-5 py-3 mb-4 flex-row items-center border border-[#E5D5C3] shadow-sm">
+          <View className="w-full bg-white rounded-2xl px-5 py-5 mb-4 flex-row items-center border border-[#E5D5C3] shadow-sm">
             <Ionicons name="lock-closed" size={20} color="#6B4423" />
             <TextInput
               placeholder="Password"
@@ -123,7 +123,7 @@ export default function RegisterScreen() {
           </View>
 
           <View className="w-full flex-row items-center mb-6">
-            <View className="flex-1 bg-white rounded-2xl px-5 py-3 flex-row items-center border border-[#E5D5C3] shadow-sm mr-2">
+            <View className="flex-1 bg-white rounded-2xl px-5 py-4 flex-row items-center border border-[#E5D5C3] shadow-sm mr-2">
               <Ionicons name="keypad" size={20} color="#6B4423" />
               <TextInput
                 placeholder="OTP Code"
@@ -135,7 +135,7 @@ export default function RegisterScreen() {
               />
             </View>
             <TouchableOpacity
-              className={`bg-[#E07B39] rounded-2xl px-4 py-3 items-center justify-center shadow-md active:bg-[#C96A2E] ${sendingOtp ? "opacity-70" : ""}`}
+              className={`bg-[#E07B39] rounded-2xl px-4 py-4 items-center justify-center shadow-md active:bg-[#C96A2E] ${sendingOtp ? "opacity-70" : ""}`}
               onPress={onSendOtp}
               disabled={sendingOtp}
             >
@@ -148,7 +148,7 @@ export default function RegisterScreen() {
           </View>
 
           <TouchableOpacity
-            className={`w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg active:bg-[#C96A2E] ${loading ? "opacity-70" : ""}`}
+            className={`w-full bg-[#E07B39] rounded-2xl py-5 items-center shadow-lg active:bg-[#C96A2E] ${loading ? "opacity-70" : ""}`}
             onPress={onSignUp}
             disabled={loading}
           >

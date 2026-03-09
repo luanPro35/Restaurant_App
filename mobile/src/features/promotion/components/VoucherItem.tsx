@@ -28,31 +28,43 @@ const VoucherItem = ({ item }: VoucherItemProps) => {
 
   const discountValue =
     item.discount > 100
-      ? formatCurrency(item.discount)
+      ? formatCurrency(item.discount).replace("đ", "K")
       : `${item.discount}%`;
 
   const expiryDate = item.until ? item.until.split("T")[0] : "Vô thời hạn";
 
   return (
-    <View className="flex-row bg-white rounded-2xl mb-4 overflow-hidden shadow-md elevation-4 h-[100px] relative border border-gray-100">
+    <View className="flex-row bg-white rounded-2xl mb-4 overflow-hidden shadow-sm border border-gray-100 min-h-[105px] relative">
       <LinearGradient
         colors={["#E91E63", "#E07B39"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="w-28 justify-center items-center px-2 relative"
+        style={{ width: 112, justifyContent: "center", alignItems: "center" }}
       >
-        <View className="items-center">
-          <Text className="text-white text-2xl font-black tracking-tighter">
+        <View className="items-center px-1">
+          <Text 
+            className="text-white text-2xl font-black tracking-tighter"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {discountValue}
           </Text>
-          <Text className="text-white/80 text-[9px] font-bold uppercase mt-1 tracking-widest text-center">
-            Đơn từ {formatCurrency(item.minOrder || 0)}
+          <Text className="text-white/80 text-[10px] font-bold uppercase mt-1 tracking-widest text-center">
+            Đơn từ {formatCurrency(item.minOrder || 0).replace("đ", "")}
           </Text>
         </View>
 
         <View
-          className="absolute right-0 top-0 bottom-0 w-[1px] border-r border-white/30"
-          style={{ borderStyle: "dashed" }}
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 10,
+            bottom: 10,
+            width: 1,
+            borderRightWidth: 1,
+            borderRightColor: "rgba(255,255,255,0.4)",
+            borderStyle: "dashed",
+          }}
         />
       </LinearGradient>
 
@@ -110,8 +122,15 @@ const VoucherItem = ({ item }: VoucherItemProps) => {
         </View>
       </View>
 
-      <View className="absolute -top-3 left-[106px] w-6 h-6 rounded-full bg-[#F9F6E7] border border-gray-100" />
-      <View className="absolute -bottom-3 left-[106px] w-6 h-6 rounded-full bg-[#F9F6E7] border border-gray-100" />
+      {/* Cut-outs */}
+      <View 
+        className="absolute -top-3 left-[100px] w-6 h-6 rounded-full bg-[#F9F6E7] border border-gray-100 z-10" 
+        style={{ position: 'absolute' }}
+      />
+      <View 
+        className="absolute -bottom-3 left-[100px] w-6 h-6 rounded-full bg-[#F9F6E7] border border-gray-100 z-10" 
+        style={{ position: 'absolute' }}
+      />
     </View>
   );
 };

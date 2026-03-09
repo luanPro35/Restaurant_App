@@ -17,6 +17,7 @@ import PromoBanner from "./PromoBanner";
 interface FeaturesModalProps {
   visible: boolean;
   onClose: () => void;
+  navigation: any;
 }
 
 const { height } = Dimensions.get("window");
@@ -54,8 +55,8 @@ const FEATURE_ITEMS = [
 export default function FeaturesModal({
   visible,
   onClose,
+  navigation,
 }: FeaturesModalProps) {
-  const navigation = useNavigation<any>();
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showModal, setShowModal] = useState(visible);

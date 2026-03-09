@@ -1,5 +1,5 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigationContainerRef } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, ActivityIndicator } from "react-native";
@@ -12,6 +12,7 @@ import { RestaurantCartProvider } from "../features/at_restaurant/context/Restau
 
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
+  const navigationRef = useNavigationContainerRef();
 
   React.useEffect(() => {
     // Small delay to ensure everything is mounted
@@ -34,11 +35,12 @@ export default function App() {
           <CartProvider>
             <RestaurantCartProvider>
               <NavigationContainer
+                ref={navigationRef}
                 onReady={() => console.log("Navigation ready")}
               >
                 <StatusBar style="auto" />
                 <RootNavigator />
-                <GlobalCart />
+                <GlobalCart navigationRef={navigationRef} />
               </NavigationContainer>
             </RestaurantCartProvider>
           </CartProvider>

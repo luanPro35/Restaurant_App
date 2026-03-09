@@ -14,6 +14,9 @@ import {
   Image,
 } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { useDelivery } from "../hooks/useDelivery";
 import { useCart } from "../../../app/context/CartContext";
 
@@ -29,6 +32,7 @@ const List_Food = forwardRef(
     ref,
   ) => {
     const { menu, loading, fetchMenu } = useDelivery();
+    const navigation = useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
     const { addToCart } = useCart();
     const sectionListRef = useRef<SectionList>(null);
 
@@ -131,7 +135,11 @@ const List_Food = forwardRef(
             </View>
           )}
           renderItem={({ item }) => (
-            <TouchableOpacity activeOpacity={0.7} className="px-4 py-3">
+            <TouchableOpacity 
+              activeOpacity={0.7} 
+              className="px-4 py-3"
+              onPress={() => navigation.navigate("DetailProduct", { id: item.id.toString() })}
+            >
               <View className="bg-white rounded-[32px] p-4 flex-row shadow-sm border border-gray-100/50">
                 <View className="relative">
                   <View className="w-24 h-24 bg-[#F9F6E7] rounded-3xl overflow-hidden justify-center items-center">

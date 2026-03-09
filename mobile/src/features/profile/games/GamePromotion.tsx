@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -129,54 +130,84 @@ export default function GamePromotion() {
             <View className="w-12" />
           </View>
 
-          <View className="flex-row gap-x-4 mb-10">
-            <LinearGradient
-              colors={["#E07B39", "#E91E63"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="flex-1 p-5 rounded-[28px] shadow-lg shadow-orange-500/30"
+          <View className="flex-row mb-10">
+            <View 
+              className="flex-1 mr-2"
+              style={{
+                ...Platform.select({
+                  ios: {
+                    shadowColor: "#E07B39",
+                    shadowOffset: { width: 0, height: 10 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 15,
+                  },
+                })
+              }}
             >
-              <View className="w-10 h-10 bg-white/20 rounded-xl items-center justify-center mb-3">
-                <MaterialCommunityIcons name="silverware-variant" size={24} color="white" />
-              </View>
-              <Text className="text-white/80 text-xs font-bold mb-1 uppercase tracking-wider">
-                Tại nhà hàng
-              </Text>
-              <View className="flex-row items-baseline">
-                <Text className="text-white font-black text-3xl">{currentOrders}</Text>
-                <Text className="text-white/70 text-[10px] font-bold ml-1">đơn</Text>
-              </View>
-              <View className="h-1.5 bg-white/20 rounded-full mt-3 overflow-hidden">
-                <View
-                  className="h-full bg-white rounded-full"
-                  style={{ width: `${Math.min((currentOrders / 30) * 100, 100)}%` }}
-                />
-              </View>
-            </LinearGradient>
+              <LinearGradient
+                colors={["#E07B39", "#E91E63"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                className="p-5 rounded-[28px]"
+                style={Platform.OS === "android" ? { elevation: 8 } : {}}
+              >
+                <View className="w-10 h-10 bg-white/20 rounded-xl items-center justify-center mb-3">
+                  <MaterialCommunityIcons name="silverware-variant" size={24} color="white" />
+                </View>
+                <Text className="text-white/80 text-[10px] font-bold mb-1 uppercase tracking-wider" numberOfLines={1}>
+                  Tại nhà hàng
+                </Text>
+                <View className="flex-row items-baseline">
+                  <Text className="text-white font-black text-3xl">{currentOrders}</Text>
+                  <Text className="text-white/70 text-[10px] font-bold ml-1">đơn</Text>
+                </View>
+                <View className="h-1.5 bg-white/20 rounded-full mt-3 overflow-hidden">
+                  <View
+                    className="h-full bg-white rounded-full"
+                    style={{ width: `${Math.min((currentOrders / 30) * 100, 100)}%` }}
+                  />
+                </View>
+              </LinearGradient>
+            </View>
 
-            <LinearGradient
-              colors={["#4A90E2", "#3F51B5"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="flex-1 p-5 rounded-[28px] shadow-lg shadow-blue-500/30"
+            <View 
+              className="flex-1 ml-2"
+              style={{
+                ...Platform.select({
+                  ios: {
+                    shadowColor: "#4A90E2",
+                    shadowOffset: { width: 0, height: 10 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 15,
+                  },
+                })
+              }}
             >
-              <View className="w-10 h-10 bg-white/20 rounded-xl items-center justify-center mb-3">
-                <MaterialCommunityIcons name="truck-delivery" size={24} color="white" />
-              </View>
-              <Text className="text-white/80 text-xs font-bold mb-1 uppercase tracking-wider">
-                Giao hàng
-              </Text>
-              <View className="flex-row items-baseline">
-                <Text className="text-white font-black text-3xl">{count}</Text>
-                <Text className="text-white/70 text-[10px] font-bold ml-1">đơn</Text>
-              </View>
-              <View className="h-1.5 bg-white/20 rounded-full mt-3 overflow-hidden">
-                <View
-                  className="h-full bg-white rounded-full"
-                  style={{ width: `${Math.min((count / 30) * 100, 100)}%` }}
-                />
-              </View>
-            </LinearGradient>
+              <LinearGradient
+                colors={["#4A90E2", "#3F51B5"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                className="p-5 rounded-[28px]"
+                style={Platform.OS === "android" ? { elevation: 8 } : {}}
+              >
+                <View className="w-10 h-10 bg-white/20 rounded-xl items-center justify-center mb-3">
+                  <MaterialCommunityIcons name="truck-delivery" size={24} color="white" />
+                </View>
+                <Text className="text-white/80 text-[10px] font-bold mb-1 uppercase tracking-wider" numberOfLines={1}>
+                  Giao hàng
+                </Text>
+                <View className="flex-row items-baseline">
+                  <Text className="text-white font-black text-3xl">{count}</Text>
+                  <Text className="text-white/70 text-[10px] font-bold ml-1">đơn</Text>
+                </View>
+                <View className="h-1.5 bg-white/20 rounded-full mt-3 overflow-hidden">
+                  <View
+                    className="h-full bg-white rounded-full"
+                    style={{ width: `${Math.min((count / 30) * 100, 100)}%` }}
+                  />
+                </View>
+              </LinearGradient>
+            </View>
           </View>
 
           <Text className="text-white font-black text-2xl mb-6 uppercase tracking-tighter">
