@@ -54,7 +54,10 @@ export default function WelcomeScreen() {
       </View>
 
       <Animated.View style={{ opacity: fadeAnim, width: "100%" }}>
-        <TouchableOpacity className="w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg mb-4">
+        <TouchableOpacity
+          onPress={() => navigation.navigate("QRScanner")}
+          className="w-full bg-[#E07B39] rounded-2xl py-4 items-center shadow-lg mb-4"
+        >
           <Text className="text-white text-lg font-bold">
             Quét QR – Đặt món tại quán
           </Text>

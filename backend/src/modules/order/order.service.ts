@@ -71,7 +71,7 @@ export class OrderService {
     return this.orderRepository.findById(id);
   }
 
-  async findActiveOrderByTable(tableId: string, userId?: string) {
+  async findActiveOrderByTable(tableId: number, userId?: string) {
     return this.orderRepository.findActiveOrderByTable(tableId, userId);
   }
 
@@ -122,7 +122,7 @@ export class OrderService {
 
   async createOrder(
     userId: string,
-    tableId: string | null,
+    tableId: number | null,
     items: any[],
     totalAmount: number,
     type: OrderType,
@@ -143,7 +143,7 @@ export class OrderService {
     });
   }
 
-  async getOrdersByTableId(tableId: string) {
+  async getOrdersByTableId(tableId: number) {
     return this.orderRepository.findActiveOrderByTable(tableId);
   }
 }

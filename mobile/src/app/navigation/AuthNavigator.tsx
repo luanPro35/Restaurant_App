@@ -10,9 +10,18 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   Forgot: undefined;
+  QRScanner: undefined;
+  AtRestaurant: { 
+    scannedTableId?: number; 
+    scannedTableName?: string; 
+    initialTab?: "tables" | "order" | "menu" 
+  } | undefined;
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
+
+import QRScannerScreen from "../../features/at_restaurant/screens/QRScannerScreen";
+import AtRestaurant from "../../features/at_restaurant/screens/AtRestaurant";
 
 export default function AuthNavigator() {
   return (
@@ -27,6 +36,8 @@ export default function AuthNavigator() {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Forgot" component={ForgotScreen} />
+      <Stack.Screen name="QRScanner" component={QRScannerScreen} />
+      <Stack.Screen name="AtRestaurant" component={AtRestaurant} />
     </Stack.Navigator>
   );
 }

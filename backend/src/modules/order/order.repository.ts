@@ -24,7 +24,7 @@ export class OrderRepository {
     });
   }
 
-  async findActiveOrderByTable(tableId: string, userId?: string) {
+  async findActiveOrderByTable(tableId: number, userId?: string) {
     return this.prisma.order.findFirst({
       where: {
         tableId,

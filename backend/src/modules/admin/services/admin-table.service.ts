@@ -17,13 +17,13 @@ export class AdminTableService {
     return this.adminTableRepository.createTable(validatedData);
   }
 
-  async updateTable(id: string, data: any) {
+  async updateTable(id: number, data: any) {
     const validatedData = updateTableSchema.parse({ ...data, id });
     const { id: _, ...updateData } = validatedData;
     return this.adminTableRepository.updateTable(id, updateData);
   }
 
-  async deleteTable(id: string) {
+  async deleteTable(id: number) {
     deleteTableSchema.parse({ id });
     return this.adminTableRepository.deleteTable(id);
   }
@@ -54,8 +54,12 @@ export class AdminTableService {
     };
   }
 
-  async getTableById(id: string) {
+  async getTableById(id: number) {
     getTableByIdSchema.parse({ id });
     return this.adminTableRepository.getTableById(id);
+  }
+
+  async findTableByNumber(tableNumber: string) {
+    return this.adminTableRepository.getTableByName(tableNumber);
   }
 }

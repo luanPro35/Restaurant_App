@@ -16,7 +16,7 @@ export class AdminTableRepository {
   }
 
   async updateTable(
-    id: string,
+    id: number,
     data: {
       name?: string;
       capacity?: number;
@@ -27,7 +27,7 @@ export class AdminTableRepository {
     return this.prisma.table.update({ where: { id }, data });
   }
 
-  async deleteTable(id: string) {
+  async deleteTable(id: number) {
     return this.prisma.table.delete({ where: { id } });
   }
 
@@ -49,7 +49,17 @@ export class AdminTableRepository {
     return this.prisma.table.count({ where: { status, location } });
   }
 
-  async getTableById(id: string) {
+  async getTableById(id: number) {
     return this.prisma.table.findUnique({ where: { id } });
+  }
+
+  async getTableByName(name: string) {
+    return this.prisma.table.findFirst({
+      where: {
+        name: {
+          contains: name,
+        },
+      },
+    });
   }
 }

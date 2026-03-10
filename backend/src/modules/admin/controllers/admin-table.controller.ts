@@ -58,7 +58,7 @@ export class AdminTableController {
     @Param("id") id: string,
     @Body() updateTableDto: UpdateTableDto,
   ) {
-    return this.adminTableService.updateTable(id, updateTableDto);
+    return this.adminTableService.updateTable(Number(id), updateTableDto);
   }
 
   @Delete(":id")
@@ -70,7 +70,7 @@ export class AdminTableController {
   })
   @ApiResponse({ status: 404, description: ADMIN_TABLE_CONSTANTS.NOTFOUND })
   async deleteTable(@Param("id") id: string) {
-    return this.adminTableService.deleteTable(id);
+    return this.adminTableService.deleteTable(Number(id));
   }
 
   @Get()
@@ -86,6 +86,6 @@ export class AdminTableController {
   @ApiResponse({ status: 200, description: "Thành công" })
   @ApiResponse({ status: 404, description: ADMIN_TABLE_CONSTANTS.NOTFOUND })
   async getTableById(@Param("id") id: string) {
-    return this.adminTableService.getTableById(id);
+    return this.adminTableService.getTableById(Number(id));
   }
 }

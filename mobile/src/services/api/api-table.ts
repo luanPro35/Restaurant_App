@@ -20,7 +20,7 @@ export const tableApi = {
     return response.data;
   },
 
-  getAdminTableById: async (id: string): Promise<AdminTable> => {
+  getAdminTableById: async (id: number): Promise<AdminTable> => {
     const response = await api.get(`/admin/tables/${id}`);
     return response.data;
   },
@@ -31,14 +31,14 @@ export const tableApi = {
   },
 
   updateTable: async (
-    id: string,
+    id: number,
     data: Partial<AdminTable>,
   ): Promise<AdminTable> => {
     const response = await api.patch(`/admin/tables/${id}`, data);
     return response.data;
   },
 
-  deleteTable: async (id: string): Promise<void> => {
+  deleteTable: async (id: number): Promise<void> => {
     await api.delete(`/admin/tables/${id}`);
   },
 
@@ -47,16 +47,21 @@ export const tableApi = {
     return response.data;
   },
 
-  getTableById: async (id: string): Promise<AdminTable> => {
+  getTableById: async (id: number): Promise<AdminTable> => {
     const response = await api.get(`/tables/${id}`);
     return response.data;
   },
 
   updateTablePublic: async (
-    id: string,
+    id: number,
     data: Partial<AdminTable>,
   ): Promise<AdminTable> => {
     const response = await api.patch(`/tables/${id}`, data);
+    return response.data;
+  },
+  
+  getTableByQr: async (tableNumber: string): Promise<AdminTable> => {
+    const response = await api.get(`/tables/qr/${tableNumber}`);
     return response.data;
   },
 };

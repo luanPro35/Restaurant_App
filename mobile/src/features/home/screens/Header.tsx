@@ -14,7 +14,10 @@ export default function Header({ navigation }: { navigation: any }) {
       style={{ paddingTop: Math.max(insets.top, 20) + 15 }}
     >
       <View className="flex-row items-center justify-between">
-        <TouchableOpacity className="p-2 mr-1">
+        <TouchableOpacity 
+          className="p-2 mr-1"
+          onPress={() => navigation.navigate("QRScanner")}
+        >
           <MaterialCommunityIcons name="qrcode-scan" size={30} color="white" />
         </TouchableOpacity>
 

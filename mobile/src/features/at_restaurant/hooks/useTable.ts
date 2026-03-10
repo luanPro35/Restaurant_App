@@ -39,7 +39,7 @@ export const useTable = () => {
     setRefreshing(false);
   };
 
-  const getTableById = async (id: string) => {
+  const getTableById = async (id: number) => {
     setLoading(true);
     try {
       const response = await tableApi.getTableById(id);
@@ -53,7 +53,7 @@ export const useTable = () => {
     }
   };
 
-  const updateTable = async (id: string, data: any) => {
+  const updateTable = async (id: number, data: any) => {
     setLoading(true);
     try {
       const response = await tableApi.updateTablePublic(id, data);
@@ -67,7 +67,7 @@ export const useTable = () => {
     }
   };
 
-  const getOrdersByTableId = async (tableId: string) => {
+  const getOrdersByTableId = async (tableId: number) => {
     setLoading(true);
     try {
       const response = await orderApi.getOrdersByTableId(tableId);

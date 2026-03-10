@@ -14,7 +14,7 @@ export const createTableSchema = z.object({
 });
 
 export const updateTableSchema = z.object({
-  id: z.string().optional(), // id usually in params, but sometimes in body
+  id: z.coerce.number().optional(),
   name: z.string().min(2, "Tên bàn quá ngắn").optional(),
   capacity: z.number().min(1, "Số chỗ ngồi phải lớn hơn 0").optional(),
   status: z.nativeEnum(TableStatus).optional(),
@@ -22,9 +22,9 @@ export const updateTableSchema = z.object({
 });
 
 export const deleteTableSchema = z.object({
-  id: z.string().min(1, "ID bàn không được để trống"),
+  id: z.coerce.number(),
 });
 
 export const getTableByIdSchema = z.object({
-  id: z.string().min(1, "ID bàn không được để trống"),
+  id: z.coerce.number(),
 });

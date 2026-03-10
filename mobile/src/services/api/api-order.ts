@@ -11,7 +11,7 @@ export interface ProductItem {
 
 export interface Order {
   id: string;
-  tableId: string;
+  tableId: number;
   tableName?: string;
   items: ProductItem[];
   totalAmount: number;
@@ -23,7 +23,7 @@ export interface Order {
 }
 
 export interface CreateOrderDto {
-  tableId: string;
+  tableId: number;
   items: {
     productId: string;
     quantity: number;
@@ -50,7 +50,7 @@ export const orderApi = {
     return response.data;
   },
 
-  getOrdersByTableId: async (tableId: string): Promise<Order> => {
+  getOrdersByTableId: async (tableId: number): Promise<Order> => {
     const response = await api.get(`/orders/table/${tableId}`);
     return response.data;
   },

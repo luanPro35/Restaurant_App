@@ -18,10 +18,15 @@ import FormAddress from "../../features/delivery/Header/FormAddress";
 import AddAdress from "../../features/delivery/Header/AddAdress";
 import GamePromotion from "../../features/profile/games/GamePromotion";
 import ChatScreen from "../../features/chat/screens/ChatScreen";
+import QRScannerScreen from "../../features/at_restaurant/screens/QRScannerScreen";
 
 export type CustomerStackParamList = {
   Home: undefined;
-  AtRestaurant: undefined;
+  AtRestaurant: { 
+    scannedTableId?: string; 
+    scannedTableName?: string; 
+    initialTab?: "tables" | "order" | "menu" 
+  } | undefined;
   Delivery: undefined;
   Menu: undefined;
   BestSeller: undefined;
@@ -37,6 +42,7 @@ export type CustomerStackParamList = {
   AddAdress: undefined;
   GamePromotion: undefined;
   Chat: undefined;
+  QRScanner: undefined;
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -64,6 +70,7 @@ export default function CustomerNavigator() {
       <Stack.Screen name="AddAdress" component={AddAdress} />
       <Stack.Screen name="GamePromotion" component={GamePromotion} />
       <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen name="QRScanner" component={QRScannerScreen} />
     </Stack.Navigator>
   );
 }

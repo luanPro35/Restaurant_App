@@ -27,7 +27,16 @@ export class TableController {
   @ApiResponse({ status: 200, description: "Thành công" })
   @ApiResponse({ status: 404, description: "Không tìm thấy bàn" })
   async getTableById(@Param("id") id: string) {
-    return this.adminTableService.getTableById(id);
+    return this.adminTableService.getTableById(Number(id));
+  }
+
+  @Get("qr/:tableNumber")
+  @ApiOperation({ summary: "Tìm bàn theo số (Dành cho QR Code)" })
+  @ApiParam({ name: "tableNumber", description: "Số bàn trích xuất từ QR" })
+  @ApiResponse({ status: 200, description: "Thành công" })
+  @ApiResponse({ status: 404, description: "Không tìm thấy bàn" })
+  async getTableByQr(@Param("tableNumber") tableNumber: string) {
+    return this.adminTableService.findTableByNumber(tableNumber);
   }
 
   @Patch(":id")
@@ -39,6 +48,6 @@ export class TableController {
     @Param("id") id: string,
     @Body() updateTableDto: UpdateTableDto,
   ) {
-    return this.adminTableService.updateTable(id, updateTableDto);
+    return this.adminTableService.updateTable(Number(id), updateTableDto);
   }
 }

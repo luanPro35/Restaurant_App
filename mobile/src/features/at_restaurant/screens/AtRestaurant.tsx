@@ -24,12 +24,12 @@ import { QuickActionsProps } from "../components/QuickActions";
 
 type TabType = "tables" | "order" | "menu";
 
-export default function AtRestaurant() {
-  const navigation = useNavigation();
+export default function AtRestaurant({ route }: any) {
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<TabType>("tables");
-  const [currentTableId, setCurrentTableId] = useState<string | null>(null);
-  const [currentTable, setCurrentTable] = useState<string>("Chưa chọn");
+  const [activeTab, setActiveTab] = useState<TabType>(route.params?.initialTab || "tables");
+  const [currentTableId, setCurrentTableId] = useState<number | null>(route.params?.scannedTableId ? Number(route.params.scannedTableId) : null);
+  const [currentTable, setCurrentTable] = useState<string>(route.params?.scannedTableName || "Chưa chọn");
   const [serverOrders, setServerOrders] = useState<any[]>([]);
 
   const {
@@ -52,6 +52,13 @@ export default function AtRestaurant() {
 
   useEffect(() => {
     fetchTables();
+
+    // Nếu có dữ liệu từ QR Scanner truyền qua params
+    if (route.params?.scannedTableId) {
+        setCurrentTableId(route.params.scannedTableId);
+        setCurrentTable(route.params.scannedTableName || "Bàn");
+        setActiveTab(route.params.initialTab || "menu");
+    }
 
     const subscription = DeviceEventEmitter.addListener(
       "checkoutSuccess",
@@ -215,26 +222,29 @@ export default function AtRestaurant() {
       case "tables":
         return (
           <ScrollView className="flex-1 px-4 pt-4">
-            <View className="bg-orange-100 rounded-2xl p-4 mb-4 flex-row items-center">
-              <MaterialCommunityIcons
-                name="qrcode-scan"
-                size={40}
-                color="#E07B39"
-              />
-              <View className="flex-1 ml-3">
-                <Text className="text-gray-800 font-bold text-base">
-                  Quét mã QR
-                </Text>
-                <Text className="text-gray-600 text-sm">
-                  Quét mã QR trên bàn để check-in
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={24}
-                color="#E07B39"
-              />
+          <TouchableOpacity 
+            className="bg-orange-100 rounded-2xl p-4 mb-4 flex-row items-center"
+            onPress={() => navigation.navigate("QRScanner")}
+          >
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={40}
+              color="#E07B39"
+            />
+            <View className="flex-1 ml-3">
+              <Text className="text-gray-800 font-bold text-base">
+                Quét mã QR
+              </Text>
+              <Text className="text-gray-600 text-sm">
+                Quét mã QR trên bàn để check-in
+              </Text>
             </View>
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={24}
+              color="#E07B39"
+            />
+          </TouchableOpacity>
 
             <Text className="text-xl font-bold text-gray-800 mb-4">
               Chọn bàn

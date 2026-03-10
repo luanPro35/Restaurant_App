@@ -35,7 +35,7 @@ export interface AdminProductResponse {
 }
 
 export interface AdminTable {
-  id: string;
+  id: number;
   name: string;
   capacity: number;
   status: string;

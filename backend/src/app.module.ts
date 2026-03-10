@@ -10,6 +10,7 @@ import { PaymentModule } from "./modules/payment/payment.model";
 import { PackageModule } from "./modules/package/package.module";
 import { MilestoneModule } from "./modules/milestone/milestone.module";
 import { ChatModule } from "./modules/chat/chat.module";
+import { MomoModule } from "./momo/momo.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ChatModule } from "./modules/chat/chat.module";
     PackageModule,
     MilestoneModule,
     ChatModule,
+    MomoModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

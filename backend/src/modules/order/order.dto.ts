@@ -25,8 +25,8 @@ export class ProductItemDto {
 }
 
 export class CreateOrderDto {
-  @IsString()
-  tableId!: string;
+  @IsNumber()
+  tableId!: number;
 
   @IsArray()
   @ValidateNested({ each: true })

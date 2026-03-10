@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-const SOCKET_URL = "http://192.168.1.8:4000";
+const SOCKET_URL = "http://192.168.1.5:4000";
 
 export const socket = io(SOCKET_URL, {
   autoConnect: false,
