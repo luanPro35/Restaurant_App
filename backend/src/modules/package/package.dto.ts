@@ -23,6 +23,10 @@ export class CreatePackageDto {
     @IsEnum(PackageStatus)
     status!: PackageStatus;
 
+    @IsNotEmpty()
+    @IsString()
+    paymentMethod!: string;
+
     @IsOptional()
     @IsString()
     userId?: string;
