@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, DeviceEventEmitter, Alert } from "react-native";
+import { View, DeviceEventEmitter, Alert, Linking } from "react-native";
 import { useCart } from "./CartContext";
 import { useAuth } from "./AuthContext";
 import Shopping_Cart from "../providers/Shopping_Cart";
 import CartModal from "../../features/menu/components/CartModal";
 import { useDelivery } from "./DeliveryContext";
 import { packageApi } from "../../services/api/package-api";
+import { paymentApi } from "../../services/api/api-payment";
 
 interface GlobalCartProps {
   navigationRef: any;
@@ -50,11 +51,10 @@ export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
           }
         }
       } catch (e) {
-        // Just fail silently if navigation is temporarily unavailable
       }
     };
 
-    const interval = setInterval(updateRoute, 500); // Polling as a fallback
+    const interval = setInterval(updateRoute, 500); 
     const unsubscribe = navigationRef.addListener('state', updateRoute);
     return () => {
       unsubscribe();
@@ -94,7 +94,7 @@ export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
         discountAmount={discountAmount}
         subtotal={subtotal}
         totalPrice={totalPrice}
-        onCheckout={async () => {
+        onCheckout={async (paymentMethod: string) => {
           if (!isAuthenticated) {
             Alert.alert(
               "Yêu cầu đăng nhập",
@@ -128,24 +128,34 @@ export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
               address: selectedAddress.address,
               description: orderDescription,
               price: totalPrice,
+              paymentMethod: paymentMethod,
               status: "PENDING" as const
             };
 
-            await packageApi.create(newOrder);
+            const createdPkg = await packageApi.create(newOrder);
+
+
 
             setIsCartVisible(false);
             clearCart();
-            Alert.alert("Thành công", "Đơn hàng của bạn đã được gửi đi!");
-            DeviceEventEmitter.emit("checkoutSuccess");
-            if (navigationRef.isReady()) navigationRef.navigate("Package");
+
+            if (paymentMethod === "VietQR") {
+              if (navigationRef.isReady()) {
+                navigationRef.navigate("VietQr", { packageId: createdPkg.id });
+              }
+            } else {
+              Alert.alert("Thành công", "Đơn hàng của bạn đã được gửi đi!");
+              DeviceEventEmitter.emit("checkoutSuccess");
+              if (navigationRef.isReady()) navigationRef.navigate("Package");
+            }
           } catch (error: any) {
             console.error("Lỗi khi thanh toán:", error);
             if (error.response?.status === 401) {
-                Alert.alert("Phiên hết hạn", "Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại.");
-                logout();
-                setIsCartVisible(false);
+              Alert.alert("Phiên hết hạn", "Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại.");
+              logout();
+              setIsCartVisible(false);
             } else {
-                Alert.alert("Thất bại", "Không thể tạo đơn hàng, vui lòng thử lại!");
+              Alert.alert("Thất bại", "Không thể tạo đơn hàng, vui lòng thử lại!");
             }
           }
         }}

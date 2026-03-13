@@ -14,29 +14,11 @@ import PaymentMethodItem from "../components/PaymentMethodItem";
 
 const PAYMENT_METHODS = [
   {
-    id: "momo",
-    name: "MoMo Wallet",
-    icon: "wallet",
-    description: "Liên kết ví MoMo",
-  },
-  {
-    id: "card",
-    name: "Thẻ ngân hàng",
-    icon: "credit-card",
-    description: "Visa, Mastercard, JCB",
-  },
-  {
     id: "cash",
     name: "Tiền mặt",
     icon: "cash",
-    description: "Thanh toán khi nhận hàng",
-  },
-  {
-    id: "apple",
-    name: "Apple Pay",
-    icon: "apple",
-    description: "Thanh toán qua Apple Pay",
-  },
+    description: "Thanh toán trực tiếp",
+  }
 ];
 
 const TRANSACTIONS = [
@@ -68,7 +50,7 @@ const TRANSACTIONS = [
 
 export default function PaymentScreen() {
   const navigation = useNavigation();
-  const [selectedMethod, setSelectedMethod] = useState("momo");
+  const [selectedMethod, setSelectedMethod] = useState("cash");
 
   return (
     <View className="flex-1 bg-[#F9F6E7]">
@@ -89,33 +71,12 @@ export default function PaymentScreen() {
             />
           </TouchableOpacity>
         </View>
-
-        {/* Wallet Balance Card */}
-        <View className="mt-6 bg-white/10 p-4 rounded-2xl border border-white/20">
-          <Text className="text-white/80 text-sm mb-1">Số dư ví của bạn</Text>
-          <Text className="text-white text-3xl font-bold">2.450.000đ</Text>
-          <View className="flex-row mt-4 gap-3">
-            <TouchableOpacity className="flex-1 bg-white py-2 rounded-xl items-center flex-row justify-center">
-              <MaterialCommunityIcons
-                name="plus-circle"
-                size={20}
-                color="#E07B39"
-              />
-              <Text className="text-[#E07B39] font-bold ml-2">Nạp tiền</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="flex-1 bg-white/20 py-2 rounded-xl items-center flex-row justify-center">
-              <MaterialCommunityIcons name="history" size={20} color="white" />
-              <Text className="text-white font-bold ml-2">Lịch sử</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
 
       <ScrollView
         className="flex-1 px-4 pt-6"
         showsVerticalScrollIndicator={false}
       >
-        {/* Payment Methods */}
         <Text className="text-lg font-bold text-[#2D2D2D] mb-4">
           Phương thức thanh toán
         </Text>
@@ -136,11 +97,10 @@ export default function PaymentScreen() {
           {TRANSACTIONS.map((trans, index) => (
             <View
               key={trans.id}
-              className={`flex-row items-center py-3 ${
-                index !== TRANSACTIONS.length - 1
-                  ? "border-b border-gray-100"
-                  : ""
-              }`}
+              className={`flex-row items-center py-3 ${index !== TRANSACTIONS.length - 1
+                ? "border-b border-gray-100"
+                : ""
+                }`}
             >
               <View className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center mr-3">
                 <MaterialCommunityIcons
@@ -155,11 +115,10 @@ export default function PaymentScreen() {
               </View>
               <View className="items-end">
                 <Text
-                  className={`font-bold ${
-                    trans.amount.includes("+")
-                      ? "text-green-600"
-                      : "text-gray-800"
-                  }`}
+                  className={`font-bold ${trans.amount.includes("+")
+                    ? "text-green-600"
+                    : "text-gray-800"
+                    }`}
                 >
                   {trans.amount}
                 </Text>

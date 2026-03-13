@@ -7,6 +7,7 @@ export const createPackageSchema = z.object({
     description: z.string(),
     price: z.number(),
     status: z.enum([PackageStatus.PENDING, PackageStatus.CONFIRMED]),
+    paymentMethod: z.string(),
 });
 
 export const updatePackageSchema = createPackageSchema.partial();

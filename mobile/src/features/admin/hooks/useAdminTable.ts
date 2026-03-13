@@ -54,7 +54,7 @@ export const useAdminTable = () => {
     }
   };
 
-  const getTableById = async (id: string) => {
+  const getTableById = async (id: number) => {
     setLoading(true);
     try {
       const response: AdminTable = await tableApi.getAdminTableById(id);
@@ -67,7 +67,7 @@ export const useAdminTable = () => {
     }
   };
 
-  const toggleTableStatus = async (id: string, isActive: boolean) => {
+  const toggleTableStatus = async (id: number, isActive: boolean) => {
     try {
       setTables((prev) =>
         prev.map((t) => (t.id === id ? { ...t, isActive } : t)),
@@ -82,7 +82,7 @@ export const useAdminTable = () => {
     }
   };
 
-  const deleteTable = async (id: string) => {
+  const deleteTable = async (id: number) => {
     Alert.alert("Xác nhận", "Bạn có chắc chắn muốn xóa bàn này?", [
       { text: "Hủy", style: "cancel" },
       {
@@ -113,7 +113,7 @@ export const useAdminTable = () => {
     }
   };
 
-  const updateTable = async (id: string, table: Partial<AdminTable>) => {
+  const updateTable = async (id: number, table: Partial<AdminTable>) => {
     try {
       const response = await tableApi.updateTable(id, table);
       setTables((prev) => prev.map((t) => (t.id === id ? response : t)));

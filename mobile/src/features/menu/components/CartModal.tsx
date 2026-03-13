@@ -40,7 +40,7 @@ interface CartModalProps {
   onClose: () => void;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
-  onCheckout: () => void;
+  onCheckout: (paymentMethod: string) => void;
   selectedVoucher: Voucher | null;
   onApplyVoucher: (voucher: Voucher) => void;
   onRemoveVoucher: () => void;
@@ -67,6 +67,7 @@ export default function CartModal({
   const slideAnim = React.useRef(new Animated.Value(height)).current;
   const [quantityInput, setQuantityInput] = React.useState("");
   const [isVoucherModalVisible, setIsVoucherModalVisible] = React.useState(false);
+  const [paymentMethod, setPaymentMethod] = React.useState("Cash");
 
   const { promotions } = usePromotion();
   const { claimedIds } = useMilestones();
@@ -220,9 +221,8 @@ export default function CartModal({
                   {items.map((item, index) => (
                     <View
                       key={item.id}
-                      className={`flex-row bg-white rounded-3xl p-4 shadow-sm border border-gray-50 ${
-                        index < items.length - 1 ? "mb-3" : ""
-                      }`}
+                      className={`flex-row bg-white rounded-3xl p-4 shadow-sm border border-gray-50 ${index < items.length - 1 ? "mb-3" : ""
+                        }`}
                       style={{ elevation: 2, minHeight: 100 }}
                     >
                       <View className="flex-1 ml-1 justify-between">
@@ -391,6 +391,7 @@ export default function CartModal({
                       </Text>
                     </View>
                   </View>
+
                   {selectedVoucher ? (
                     <TouchableOpacity onPress={onRemoveVoucher} className="p-1">
                       <MaterialCommunityIcons
@@ -407,14 +408,98 @@ export default function CartModal({
                     />
                   )}
                 </TouchableOpacity>
+
+                <View className="mb-5">
+                  <View className="flex-row items-center mb-3 ml-1">
+                    <View className="w-1.5 h-5 bg-[#E07B39] rounded-full mr-3" />
+                    <Text className="text-[14px] font-black text-slate-800 uppercase tracking-widest">
+                      Phương thức thanh toán
+                    </Text>
+                  </View>
+
+                  <View className="flex-row gap-3">
+                    <TouchableOpacity
+                      onPress={() => setPaymentMethod("VietQR")}
+                      activeOpacity={0.7}
+                      className={`flex-1 rounded-2xl p-4 border-2 ${
+                        paymentMethod === "VietQR"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-100 bg-white"
+                      }`}
+                      style={{ elevation: paymentMethod === "VietQR" ? 3 : 1 }}
+                    >
+                      <View className="flex-row items-center justify-between mb-2">
+                        <View className="w-10 h-10 rounded-xl bg-blue-100 items-center justify-center">
+                          <MaterialCommunityIcons
+                            name="qrcode-scan"
+                            size={22}
+                            color="#3B82F6"
+                          />
+                        </View>
+                        <View
+                          className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
+                            paymentMethod === "VietQR"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {paymentMethod === "VietQR" && (
+                            <View className="w-3.5 h-3.5 rounded-full bg-blue-500" />
+                          )}
+                        </View>
+                      </View>
+                      <Text className="text-[14px] font-black text-gray-800">
+                        Chuyển khoản
+                      </Text>
+                      <Text className="text-[11px] text-gray-400 mt-0.5">
+                        Quét mã VietQR
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setPaymentMethod("Cash")}
+                      activeOpacity={0.7}
+                      className={`flex-1 rounded-2xl p-4 border-2 ${paymentMethod === "Cash"
+                          ? "border-green-500 bg-green-50"
+                          : "border-gray-100 bg-white"
+                        }`}
+                      style={{ elevation: paymentMethod === "Cash" ? 3 : 1 }}
+                    >
+                      <View className="flex-row items-center justify-between mb-2">
+                        <View className="w-10 h-10 rounded-xl bg-green-100 items-center justify-center">
+                          <MaterialCommunityIcons
+                            name="cash"
+                            size={22}
+                            color="#16A34A"
+                          />
+                        </View>
+                        <View
+                          className={`w-6 h-6 rounded-full border-2 items-center justify-center ${paymentMethod === "Cash"
+                              ? "border-green-500"
+                              : "border-gray-300"
+                            }`}
+                        >
+                          {paymentMethod === "Cash" && (
+                            <View className="w-3.5 h-3.5 rounded-full bg-green-500" />
+                          )}
+                        </View>
+                      </View>
+                      <Text className="text-[14px] font-black text-gray-800">
+                        Tiền mặt
+                      </Text>
+                      <Text className="text-[11px] text-gray-400 mt-0.5">
+                        Thanh toán khi nhận hàng
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             )}
           </ScrollView>
 
           {items.length > 0 && (
-            <View 
+            <View
               className="px-6 pt-5 bg-white border-t border-gray-50 flex-shrink-0"
-              style={{ 
+              style={{
                 paddingBottom: Math.max(insets.bottom, 24),
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: -8 },
@@ -423,8 +508,8 @@ export default function CartModal({
                 elevation: 10
               }}
             >
-              <TouchableOpacity 
-                onPress={onCheckout} 
+              <TouchableOpacity
+                onPress={() => onCheckout(paymentMethod)}
                 activeOpacity={0.8}
                 style={{ borderRadius: 20, overflow: 'hidden' }}
               >
@@ -439,7 +524,7 @@ export default function CartModal({
                     size={22}
                     color="white"
                   />
-                  <Text 
+                  <Text
                     className="text-white text-[16px] font-black ml-2 uppercase tracking-tight"
                     numberOfLines={1}
                     adjustsFontSizeToFit

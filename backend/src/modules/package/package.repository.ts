@@ -15,6 +15,7 @@ export class PackageRepository {
                 description: data.description,
                 price: data.price,
                 status: (data.status as PackageStatus) || PackageStatus.PENDING,
+                paymentMethod: data.paymentMethod,
                 userId: data.userId,
             },
         });

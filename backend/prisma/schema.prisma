@@ -8,18 +8,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  phone     String?
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  orders    Order[]
-  payments  Payment[]
-  addresses Address[]
-  packages  Package[] @relation("UserPackages")
+  id         String          @id @default(uuid())
+  name       String
+  email      String          @unique
+  password   String
+  phone      String?
+  role       Role            @default(USER)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  addresses  Address[]
+  orders     Order[]
+  packages   Package[]       @relation("UserPackages")
+  payments   Payment[]
   milestones UserMilestone[]
 
   @@map("users")
@@ -28,9 +28,9 @@ model User {
 model UserMilestone {
   id          String   @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   milestoneId Int
   claimedAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, milestoneId])
   @@map("user_milestones")
@@ -39,30 +39,18 @@ model UserMilestone {
 model Address {
   id        String      @id @default(uuid())
   userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   name      String
   phone     String
   address   String
   detail    String?
   type      AddressType @default(HOME)
   isDefault Boolean     @default(false)
-
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "addresses_userId_fkey")
   @@map("addresses")
-}
-
-enum AddressType {
-  HOME
-  OFFICE
-  OTHER
-}
-
-enum Role {
-  USER
-  ADMIN
 }
 
 model Category {
@@ -80,25 +68,23 @@ model Category {
 }
 
 model Product {
-  id            String  @id @default(uuid())
+  id            String           @id @default(uuid())
   name          String
   slug          String?
-  description   String? @db.Text
+  description   String?          @db.Text
   price         Float
   originalPrice Float?
-  images        String  @db.Text // Store as JSON string
-  unit          String  @default("đĩa")
-  isAvailable   Boolean @default(true)
-  isBestSeller  Boolean @default(false)
+  images        String           @db.Text
+  unit          String           @default("đĩa")
+  isAvailable   Boolean          @default(true)
+  isBestSeller  Boolean          @default(false)
+  categoryId    String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  variants      ProductVariant[]
+  category      Category         @relation(fields: [categoryId], references: [id])
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  variants ProductVariant[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  @@index([categoryId], map: "products_categoryId_fkey")
   @@map("products")
 }
 
@@ -109,6 +95,7 @@ model ProductVariant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId], map: "product_variants_productId_fkey")
   @@map("product_variants")
 }
 
@@ -125,144 +112,93 @@ model Table {
   @@map("tables")
 }
 
-enum TableStatus {
-  AVAILABLE
-  OCCUPIED
-}
-
 model Order {
-  id     String @id @default(uuid())
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
-
-  tableId Int?
-  table   Table?  @relation(fields: [tableId], references: [id])
-
-  items       OrderItem[]
-  totalAmount Float
-
-  status        OrderStatus   @default(PENDING)
-  type          OrderType     @default(DINE_IN)
-  paymentStatus PaymentStatus @default(UNPAID)
-
-  note            String? @db.Text
-  deliveryAddress String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  payments  Payment[]
-
+  id              String        @id @default(uuid())
+  userId          String?
+  tableId         Int?
+  totalAmount     Float
+  status          OrderStatus   @default(PENDING)
+  type            OrderType     @default(DINE_IN)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  note            String?       @db.Text
+  deliveryAddress String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  items           OrderItem[]
+  table           Table?        @relation(fields: [tableId], references: [id])
+  user            User?         @relation(fields: [userId], references: [id])
+  payments        Payment[]
+  vietQr          VietQr?
+  @@index([tableId], map: "orders_tableId_fkey")
+  @@index([userId], map: "orders_userId_fkey")
   @@map("orders")
 }
 
 model OrderItem {
-  id      String @id @default(uuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
+  id        String  @id @default(uuid())
+  orderId   String
   productId String
-  // Defined as generic field, could be relation if strict integrity is needed
-  // product   Product @relation(fields: [productId], references: [id])
+  name      String
+  quantity  Int
+  price     Float
+  variant   String?
+  note      String?
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  name     String
-  quantity Int
-  price    Float
-  variant  String?
-  note     String?
-
+  @@index([orderId], map: "order_items_orderId_fkey")
   @@map("order_items")
 }
 
 model Promotion {
-  id        String   @id @default(uuid())
-  name      String
-  discount  Float
-  until     DateTime
+  id          String   @id @default(uuid())
+  name        String
+  discount    Float
+  until       DateTime
   isActive    Boolean  @default(true)
   code        String?
   minOrder    Float    @default(0)
   image       String?  @db.Text
   description String?  @db.Text
   createdAt   DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt   DateTime @updatedAt
 
   @@map("promotions")
 }
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  COOKING
-  SERVED
-  COMPLETED
-  CANCELLED
-}
-
-enum OrderType {
-  DINE_IN
-  TAKEAWAY
-  DELIVERY
-}
-
-enum PaymentStatus {
-  UNPAID
-  PAID
-  REFUNDED
-}
-
 model Package {
-  id          String   @id @default(uuid())
-  name        String
-  address     String
-  description String?  @db.Text
-  price       Float
-  status      PackageStatus @default(PENDING)
+  id            String        @id @default(uuid())
+  name          String
+  address       String
+  description   String?       @db.Text
+  price         Float
+  status        PackageStatus @default(PENDING)
   paymentMethod String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  userId        String?
+  user          User?         @relation("UserPackages", fields: [userId], references: [id], onDelete: Cascade)
+  vietQr        VietQr?
 
-  userId      String?
-  user        User?    @relation("UserPackages", fields: [userId], references: [id], onDelete: Cascade)
-
+  @@index([userId], map: "packages_userId_fkey")
   @@map("packages")
 }
 
-enum PackageStatus {
-  PENDING
-  CONFIRMED
-}
-
 model Payment {
-  id      String @id @default(uuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id])
-
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
-
+  id            String            @id @default(uuid())
+  orderId       String
+  userId        String?
   amount        Float
   method        PaymentMethod     @default(CASH)
   status        TransactionStatus @default(PENDING)
   transactionId String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  order         Order             @relation(fields: [orderId], references: [id])
+  user          User?             @relation(fields: [userId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  @@index([orderId], map: "payments_orderId_fkey")
+  @@index([userId], map: "payments_userId_fkey")
   @@map("payments")
-}
-
-enum PaymentMethod {
-  CASH
-  CREDIT_CARD
-  BANK_TRANSFER
-  E_WALLET
-}
-
-enum TransactionStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
 }
 
 model Otp {
@@ -301,18 +237,92 @@ model Conversation {
 
 model Message {
   id             String       @id @default(uuid())
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId String
+  senderId       String
+  senderRole     String
+  content        String       @db.Text
+  type           String       @default("TEXT")
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  senderId   String
-  senderRole String // "admin" | "user"
-  content    String @db.Text
-  type       String @default("TEXT")
-  metadata   Json?
-
-  createdAt DateTime @default(now())
-
+  @@index([conversationId], map: "messages_conversationId_fkey")
   @@map("messages")
 }
+
+model VietQr {
+  id            String   @id @default(uuid())
+  orderId       String?  @unique
+  order         Order?   @relation(fields: [orderId], references: [id])
+  packageId     String?  @unique
+  package       Package? @relation(fields: [packageId], references: [id])
+  accountName   String
+  bin           String
+  accountNumber String
+  amount        Float
+  orderInfo     String?  @db.Text
+  qrData        String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("viet_qrs")
+}
+
+enum AddressType {
+  HOME
+  OFFICE
+  OTHER
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COOKING
+  SERVED
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum PackageStatus {
+  PENDING
+  CONFIRMED
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  BANK_TRANSFER
+  E_WALLET
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
 
 

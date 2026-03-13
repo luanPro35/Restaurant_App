@@ -10,7 +10,7 @@ import { PaymentModule } from "./modules/payment/payment.model";
 import { PackageModule } from "./modules/package/package.module";
 import { MilestoneModule } from "./modules/milestone/milestone.module";
 import { ChatModule } from "./modules/chat/chat.module";
-import { MomoModule } from "./momo/momo.module";
+import { VietQrModule } from "./modules/vietQr/vietQr.module";
 
 @Module({
   imports: [
@@ -24,7 +24,8 @@ import { MomoModule } from "./momo/momo.module";
     PackageModule,
     MilestoneModule,
     ChatModule,
-    MomoModule,
+    VietQrModule,
+
     ConfigModule.forRoot({
       isGlobal: true,
     }),

@@ -7,6 +7,7 @@ export interface Package {
   description?: string;
   price: number;
   status: "PENDING" | "CONFIRMED";
+  paymentMethod: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,6 +18,7 @@ export interface CreatePackageDto {
   description?: string;
   price: number;
   status?: "PENDING" | "CONFIRMED";
+  paymentMethod: string;
 }
 
 export const packageApi = {

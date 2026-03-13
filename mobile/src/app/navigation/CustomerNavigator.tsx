@@ -19,13 +19,15 @@ import AddAdress from "../../features/delivery/Header/AddAdress";
 import GamePromotion from "../../features/profile/games/GamePromotion";
 import ChatScreen from "../../features/chat/screens/ChatScreen";
 import QRScannerScreen from "../../features/at_restaurant/screens/QRScannerScreen";
+import VietQrScreen from "../../features/vietQr/screen/vietQr";
+import PaymentSuccessful from "../../features/vietQr/screen/PaymentSuccessful";
 
 export type CustomerStackParamList = {
   Home: undefined;
-  AtRestaurant: { 
-    scannedTableId?: string; 
-    scannedTableName?: string; 
-    initialTab?: "tables" | "order" | "menu" 
+  AtRestaurant: {
+    scannedTableId?: string;
+    scannedTableName?: string;
+    initialTab?: "tables" | "order" | "menu"
   } | undefined;
   Delivery: undefined;
   Menu: undefined;
@@ -43,6 +45,8 @@ export type CustomerStackParamList = {
   GamePromotion: undefined;
   Chat: undefined;
   QRScanner: undefined;
+  VietQr: { packageId: string };
+  PaymentSuccessful: undefined;
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -71,6 +75,8 @@ export default function CustomerNavigator() {
       <Stack.Screen name="GamePromotion" component={GamePromotion} />
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="QRScanner" component={QRScannerScreen} />
+      <Stack.Screen name="VietQr" component={VietQrScreen} />
+      <Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
     </Stack.Navigator>
   );
 }

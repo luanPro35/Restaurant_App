@@ -1,4 +1,6 @@
+import { IP } from "./ip";
+
 export const Config = {
   ENV: "development",
-  API_URL: "http://192.168.1.5:4000",
+  API_URL: `http://${IP}:4000`,
 };
