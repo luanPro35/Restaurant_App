@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id         String          @id @default(uuid())
-  name       String
-  email      String          @unique
-  password   String
-  phone      String?
-  role       Role            @default(USER)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  addresses  Address[]
-  orders     Order[]
-  packages   Package[]       @relation("UserPackages")
-  payments   Payment[]
-  milestones UserMilestone[]
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  phone          String?
+  role           Role            @default(USER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  addresses      Address[]
+  aiInteractions AiInteraction[]
+  orders         Order[]
+  packages       Package[]       @relation("UserPackages")
+  payments       Payment[]
+  milestones     UserMilestone[]
 
   @@map("users")
 }
@@ -129,6 +130,7 @@ model Order {
   user            User?         @relation(fields: [userId], references: [id])
   payments        Payment[]
   vietQr          VietQr?
+
   @@index([tableId], map: "orders_tableId_fkey")
   @@index([userId], map: "orders_userId_fkey")
   @@map("orders")
@@ -177,6 +179,7 @@ model Package {
   updatedAt     DateTime      @updatedAt
   userId        String?
   user          User?         @relation("UserPackages", fields: [userId], references: [id], onDelete: Cascade)
+  payments      Payment[]
   vietQr        VietQr?
 
   @@index([userId], map: "packages_userId_fkey")
@@ -185,7 +188,8 @@ model Package {
 
 model Payment {
   id            String            @id @default(uuid())
-  orderId       String
+  orderId       String?
+  packageId     String?
   userId        String?
   amount        Float
   method        PaymentMethod     @default(CASH)
@@ -193,10 +197,12 @@ model Payment {
   transactionId String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-  order         Order             @relation(fields: [orderId], references: [id])
+  order         Order?            @relation(fields: [orderId], references: [id])
+  package       Package?          @relation(fields: [packageId], references: [id])
   user          User?             @relation(fields: [userId], references: [id])
 
   @@index([orderId], map: "payments_orderId_fkey")
+  @@index([packageId], map: "payments_packageId_fkey")
   @@index([userId], map: "payments_userId_fkey")
   @@map("payments")
 }
@@ -252,10 +258,6 @@ model Message {
 
 model VietQr {
   id            String   @id @default(uuid())
-  orderId       String?  @unique
-  order         Order?   @relation(fields: [orderId], references: [id])
-  packageId     String?  @unique
-  package       Package? @relation(fields: [packageId], references: [id])
   accountName   String
   bin           String
   accountNumber String
@@ -264,8 +266,26 @@ model VietQr {
   qrData        String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  orderId       String?  @unique
+  packageId     String?  @unique
+  order         Order?   @relation(fields: [orderId], references: [id])
+  package       Package? @relation(fields: [packageId], references: [id])
 
   @@map("viet_qrs")
+}
+
+model AiInteraction {
+  id        String   @id @default(uuid())
+  userId    String?
+  query     String   @db.Text
+  response  String   @db.Text
+  type      String?
+  products  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "ai_interactions_userId_fkey")
+  @@map("ai_interactions")
 }
 
 enum AddressType {
@@ -323,6 +343,3 @@ enum TransactionStatus {
   FAILED
   REFUNDED
 }
-
-
-

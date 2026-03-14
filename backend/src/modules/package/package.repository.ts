@@ -50,6 +50,14 @@ export class PackageRepository {
         });
     }
 
+    async findAllPackage() {
+        return (this.prisma as any).package.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+    }
+
     async findById(id: string) {
         return this.prisma.package.findUnique({
             where: { id },

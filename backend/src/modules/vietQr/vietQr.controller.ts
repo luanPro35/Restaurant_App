@@ -16,6 +16,11 @@ export class VietQrController {
         return this.vietQrService.createQrForPackage(packageId);
     }
 
+    @Post('order/:orderId')
+    async createQrForOrder(@Param('orderId') orderId: string) {
+        return this.vietQrService.createQrForOrder(orderId);
+    }
+
     @Get(':id')
     async getVietQrById(@Param('id') id: string) {
         return this.vietQrService.getVietQrById(id);

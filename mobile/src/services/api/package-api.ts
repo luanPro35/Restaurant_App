@@ -55,6 +55,11 @@ export const packageApi = {
     const response = await api.get("/packages/count");
     return response.data;
   },
+
+  findAllPackage: async (): Promise<Package[]> => {
+    const response = await api.get("/packages/people");
+    return response.data;
+  },
 };
 
 export default packageApi;

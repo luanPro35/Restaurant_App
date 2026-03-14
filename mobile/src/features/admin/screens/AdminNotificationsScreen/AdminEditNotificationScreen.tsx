@@ -298,37 +298,30 @@ export default function AdminEditNotificationScreen() {
         </View>
       </ScrollView>
 
-      <View
-        className="absolute bottom-0 left-0 right-0 px-6 pb-8 pt-4 bg-[#FDFCF7]"
-        style={{ borderTopWidth: 1, borderTopColor: "#F3F4F6" }}
-      >
+      <View className="px-6 pb-10 pt-4 bg-[#FDFCF7]">
         <TouchableOpacity
           onPress={handleSubmit}
-          activeOpacity={0.85}
+          className={`py-4 rounded-xl flex-row items-center justify-center ${
+            submitting ? "bg-gray-300" : "bg-[#E07B39]"
+          }`}
+          activeOpacity={0.8}
           disabled={submitting}
+          style={{ elevation: 3 }}
         >
-          <LinearGradient
-            colors={
-              submitting ? ["#D1D5DB", "#9CA3AF"] : ["#E07B39", "#C96A2E"]
-            }
-            className="rounded-2xl py-4 items-center justify-center"
-            style={{ elevation: 4 }}
-          >
-            {submitting ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <View className="flex-row items-center">
-                <MaterialCommunityIcons
-                  name="content-save-outline"
-                  size={20}
-                  color="white"
-                />
-                <Text className="text-white font-black text-base ml-2">
-                  Lưu thay đổi
-                </Text>
-              </View>
-            )}
-          </LinearGradient>
+          {submitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <MaterialCommunityIcons
+                name="content-save-outline"
+                size={20}
+                color="white"
+              />
+              <Text className="text-white font-bold ml-2 text-base">
+                Lưu thay đổi ngay
+              </Text>
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

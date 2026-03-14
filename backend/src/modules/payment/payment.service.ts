@@ -15,32 +15,46 @@ export class PaymentService {
     async create(data: CreatePaymentDto) {
         const validatedData = createPaymentSchema.parse(data);
 
-        const order = await this.prisma.order.findUnique({
-            where: { id: validatedData.orderId }
-        });
+        let userId: string | undefined = undefined;
 
-        if (!order) {
-            throw new NotFoundException("Không tìm thấy đơn hàng để thanh toán");
+        if (validatedData.orderId) {
+            const order = await this.prisma.order.findUnique({
+                where: { id: validatedData.orderId }
+            });
+            if (!order) throw new NotFoundException("Không tìm thấy đơn hàng");
+            userId = order.userId || undefined;
+        } else if (validatedData.packageId) {
+            const pkg = await this.prisma.package.findUnique({
+                where: { id: validatedData.packageId }
+            });
+            if (!pkg) throw new NotFoundException("Không tìm thấy đơn giao hàng");
+            userId = pkg.userId || undefined;
+        } else {
+            throw new NotFoundException("Phải cung cấp orderId hoặc packageId");
         }
 
         return this.prisma.$transaction(async (tx) => {
             const payment = await tx.payment.create({
                 data: {
-                    orderId: validatedData.orderId,
+                    orderId: validatedData.orderId || null,
+                    packageId: validatedData.packageId || null,
                     amount: validatedData.amount,
-                    method: validatedData.method,
+                    method: validatedData.method as any,
                     status: TransactionStatus.COMPLETED,
-                    userId: order.userId,
+                    userId: userId || undefined,
                 },
                 include: {
                     order: true,
+                    package: true,
                 }
             });
 
-            await tx.order.update({
-                where: { id: validatedData.orderId },
-                data: { paymentStatus: PaymentStatus.PAID }
-            });
+            if (validatedData.orderId) {
+                await tx.order.update({
+                    where: { id: validatedData.orderId },
+                    data: { paymentStatus: PaymentStatus.PAID }
+                });
+            }
 
             return payment;
         });
@@ -58,6 +72,15 @@ export class PaymentService {
 
     async findAll(query: any) {
         return this.paymentRepository.findAll(query);
+    }
+
+    async totalAmount() {
+        const totalAmount = await this.prisma.payment.aggregate({
+            _sum: {
+                amount: true,
+            },
+        });
+        return totalAmount;
     }
 }
 

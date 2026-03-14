@@ -154,7 +154,7 @@ export default function AdminDashboardScreen() {
             title="Tài chính"
             icon="wallet"
             colors={["#a1c4fd", "#c2e9fb"]}
-            onPress={() => console.log("Payments")}
+            onPress={() => navigation.navigate("AdminPaymentsScreen" as any)}
           />
           <AdminCard
             title="Thông báo"

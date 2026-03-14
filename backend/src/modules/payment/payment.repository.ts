@@ -8,15 +8,21 @@ export class PaymentRepository {
     constructor(private readonly prisma: PrismaService) { }
 
     async create(data: CreatePaymentDto) {
+        const createData: any = {
+            amount: data.amount,
+            method: data.method,
+            status: TransactionStatus.COMPLETED,
+            userId: data.userId,
+        };
+
+        if (data.orderId) createData.orderId = data.orderId;
+        if (data.packageId) createData.packageId = data.packageId;
+
         return this.prisma.payment.create({
-            data: {
-                orderId: data.orderId,
-                amount: data.amount,
-                method: data.method,
-                status: TransactionStatus.COMPLETED,
-            },
+            data: createData,
             include: {
                 order: true,
+                package: true,
                 user: { select: { id: true, name: true, phone: true } },
             },
         });
@@ -43,6 +49,12 @@ export class PaymentRepository {
         });
     }
 
+    async totalAmount() {
+        return this.prisma.payment.aggregate({
+            _sum: { amount: true },
+        });
+    }
+
     async findAll(query: any) {
         const { status, method, page = 1, limit = 10 } = query;
         const skip = (page - 1) * limit;
@@ -56,6 +68,7 @@ export class PaymentRepository {
                 where,
                 include: {
                     order: { select: { id: true, tableId: true } },
+                    package: { select: { id: true, name: true, address: true } },
                     user: { select: { id: true, name: true } },
                 },
                 orderBy: { createdAt: "desc" },

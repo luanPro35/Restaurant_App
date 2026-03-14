@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdminPromotion } from "../../hooks/useAdminPromotion";
 import { AdminPromotionCard } from "../../components/AdminPromotionCard";
 import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
@@ -40,29 +41,44 @@ export default function AdminPromotionsScreen() {
     }, []),
   );
 
-  const renderHeader = () => (
-    <View className="px-6 pt-14 pb-6 bg-[#FDFCF7]">
-      <View className="flex-row items-center justify-between mb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 bg-white shadow-sm rounded-xl items-center justify-center border border-gray-100"
-        >
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={24}
-            color="#1F2937"
-          />
-        </TouchableOpacity>
-        <Text className="text-xl font-black text-gray-800">
-          Quản lý khuyến mãi
-        </Text>
-        <View className="w-10" />
-      </View>
+  const insets = useSafeAreaInsets();
 
-      <View className="flex-row items-center space-x-3 gap-3">
+  const renderHeader = () => (
+    <View className="bg-[#FDFCF7]">
+      <LinearGradient
+        colors={["#E07B39", "#C96A2E"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        className="pb-10 px-6 shadow-2xl"
+        style={{ 
+          paddingTop: Math.max(insets.top, 20) + 5,
+          borderBottomLeftRadius: 35,
+          borderBottomRightRadius: 35
+        }}
+      >
+        <View className="flex-row items-center justify-between">
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="w-10 h-10 bg-white/20 rounded-full items-center justify-center border border-white/30"
+          >
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={26}
+              color="white"
+            />
+          </TouchableOpacity>
+          <View className="items-center">
+            <Text className="text-white text-xl font-black tracking-tight" style={{ textShadowColor: 'rgba(0, 0, 0, 0.1)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 }}>Quản lý khuyến mãi</Text>
+            <Text className="text-white/80 text-[9px] font-bold uppercase tracking-[2.5px] mt-1">Hệ thống quản trị</Text>
+          </View>
+          <View className="w-10" />
+        </View>
+      </LinearGradient>
+
+      <View className="flex-row items-center space-x-3 gap-3 px-6 py-6">
         <View
-          className="flex-1 flex-row items-center bg-white h-[52px] px-4 rounded-2xl shadow-sm border border-gray-100"
-          style={{ elevation: 2 }}
+          className="flex-1 flex-row items-center bg-white h-[52px] px-4 shadow-sm border border-gray-100"
+          style={{ elevation: 2, borderRadius: 16 }}
         >
           <MaterialCommunityIcons name="magnify" size={22} color="#E07B39" />
           <TextInput
@@ -90,12 +106,19 @@ export default function AdminPromotionsScreen() {
         </View>
         <TouchableOpacity
           onPress={() => navigation.navigate("AdminAddPromotionScreen")}
-          activeOpacity={0.8}
-          className="shadow-lg shadow-orange-200"
+          activeOpacity={0.85}
+          style={{
+            shadowColor: "#E07B39",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.3,
+            shadowRadius: 10,
+            elevation: 8,
+          }}
         >
           <LinearGradient
             colors={["#E07B39", "#C96A2E"]}
-            className="w-[52px] h-[52px] rounded-2xl items-center justify-center"
+            className="w-[52px] h-[52px] items-center justify-center border-t border-white/20"
+            style={{ borderRadius: 16 }}
           >
             <MaterialCommunityIcons name="plus" size={28} color="white" />
           </LinearGradient>

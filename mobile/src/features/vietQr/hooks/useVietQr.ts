@@ -36,11 +36,27 @@ export const useVietQr = () => {
         }
     };
 
+    const createVietQrForOrder = async (orderId: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await paymentApi.createVietQrForOrder(orderId);
+            setVietQr(response);
+            return response;
+        } catch (error: any) {
+            setError(error.message);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
         vietQr,
         loading,
         error,
         createVietQrForPackage,
         getVietQrByOrderId,
+        createVietQrForOrder,
     };
 };

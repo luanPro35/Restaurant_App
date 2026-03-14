@@ -7,12 +7,16 @@ import { useNavigation } from "@react-navigation/native";
 export default function VietQrScreen({ route }: { route: any }) {
     const navigation = useNavigation<any>();
     const { width: windowWidth } = useWindowDimensions();
-    const { packageId } = route.params;
-    const { vietQr, loading, error, createVietQrForPackage } = useVietQr();
+    const { packageId, orderId } = route.params;
+    const { vietQr, loading, error, createVietQrForPackage, createVietQrForOrder } = useVietQr();
 
     useEffect(() => {
-        createVietQrForPackage(packageId);
-    }, [packageId]);
+        if (packageId) {
+            createVietQrForPackage(packageId);
+        } else if (orderId) {
+            createVietQrForOrder(orderId);
+        }
+    }, [packageId, orderId]);
 
 
     if (loading) {

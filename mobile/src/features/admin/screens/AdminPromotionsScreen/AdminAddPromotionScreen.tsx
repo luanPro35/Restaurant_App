@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdminPromotion } from "../../hooks/useAdminPromotion";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -81,11 +82,13 @@ export default function AdminAddPromotionScreen() {
     keyboardType = "default",
     hint,
   }: any) => (
-    <View className="mb-5">
-      <Text className="text-gray-600 font-bold text-sm mb-2">{label}</Text>
+    <View className="mb-6">
+      <View className="flex-row items-center mb-2 ml-1">
+        <Text className="text-gray-800 font-black text-[12px] uppercase tracking-[1px]">{label}</Text>
+      </View>
       <View
-        className="flex-row items-center bg-white rounded-2xl px-4 h-[52px] border border-gray-100"
-        style={{ elevation: 2 }}
+        className="flex-row items-center bg-white px-4 h-14 border border-gray-100 shadow-sm"
+        style={{ borderRadius: 20 }}
       >
         <MaterialCommunityIcons name={icon} size={20} color="#E07B39" />
         <TextInput
@@ -98,34 +101,49 @@ export default function AdminAddPromotionScreen() {
         />
       </View>
       {hint ? (
-        <Text className="text-gray-400 text-xs mt-1 ml-1">{hint}</Text>
+        <Text className="text-gray-400 text-[10px] font-bold mt-1.5 ml-1 lowercase italic italic opacity-70">
+          * {hint}
+        </Text>
       ) : null}
     </View>
   );
+
+  const insets = useSafeAreaInsets();
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       className="flex-1 bg-[#FDFCF7]"
     >
-      <View className="px-6 pt-14 pb-4 bg-[#FDFCF7]">
+      <LinearGradient
+        colors={["#E07B39", "#C96A2E"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        className="pb-16 px-6 shadow-2xl"
+        style={{ 
+          paddingTop: Math.max(insets.top, 20) + 15,
+          borderBottomLeftRadius: 45,
+          borderBottomRightRadius: 45
+        }}
+      >
         <View className="flex-row items-center justify-between">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="w-10 h-10 bg-white shadow-sm rounded-xl items-center justify-center border border-gray-100"
+            className="w-10 h-10 bg-white/20 rounded-full items-center justify-center border border-white/30"
           >
             <MaterialCommunityIcons
               name="chevron-left"
-              size={24}
-              color="#1F2937"
+              size={26}
+              color="white"
             />
           </TouchableOpacity>
-          <Text className="text-xl font-black text-gray-800">
-            Thêm khuyến mãi
-          </Text>
+          <View className="items-center">
+            <Text className="text-white text-xl font-black tracking-tight" style={{ textShadowColor: 'rgba(0, 0, 0, 0.1)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 }}>Thêm Khuyến Mãi</Text>
+            <Text className="text-white/80 text-[9px] font-bold uppercase tracking-[2.5px] mt-1">Hệ thống quản trị</Text>
+          </View>
           <View className="w-10" />
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
@@ -234,35 +252,30 @@ export default function AdminAddPromotionScreen() {
         </View>
       </ScrollView>
 
-      <View
-        className="absolute bottom-0 left-0 right-0 px-6 pb-8 pt-4 bg-[#FDFCF7]"
-        style={{ borderTopWidth: 1, borderTopColor: "#F3F4F6" }}
-      >
+      <View className="px-6 pb-10 pt-4 bg-[#FDFCF7]">
         <TouchableOpacity
           onPress={handleSubmit}
-          activeOpacity={0.85}
+          className={`py-4 rounded-xl flex-row items-center justify-center ${
+            loading ? "bg-gray-300" : "bg-[#E07B39]"
+          }`}
+          activeOpacity={0.8}
           disabled={loading}
+          style={{ elevation: 3 }}
         >
-          <LinearGradient
-            colors={loading ? ["#D1D5DB", "#9CA3AF"] : ["#E07B39", "#C96A2E"]}
-            className="rounded-2xl py-4 items-center justify-center"
-            style={{ elevation: 4 }}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <View className="flex-row items-center">
-                <MaterialCommunityIcons
-                  name="check-circle-outline"
-                  size={20}
-                  color="white"
-                />
-                <Text className="text-white font-black text-base ml-2">
-                  Tạo khuyến mãi
-                </Text>
-              </View>
-            )}
-          </LinearGradient>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <MaterialCommunityIcons
+                name="check-circle-outline"
+                size={20}
+                color="white"
+              />
+              <Text className="text-white font-bold ml-2 text-base">
+                Tạo khuyến mãi ngay
+              </Text>
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

@@ -1,13 +1,16 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Inject, forwardRef } from "@nestjs/common";
 import { VietQrRepository } from "./vietQr.repository";
 import { PackageService } from "../package/package.service";
+import { OrderService } from "../order/order.service";
 import { CreateVietQrDto } from "./dtos/create-vietQr.dto";
 
 @Injectable()
 export class VietQrService {
     constructor(
         private readonly vietQrRepository: VietQrRepository,
-        private readonly packageService: PackageService
+        private readonly packageService: PackageService,
+        @Inject(forwardRef(() => OrderService))
+        private readonly orderService: OrderService
     ) { }
 
     private generateQrUrl(data: { amount: number, orderInfo: string, accountName: string }) {
@@ -51,6 +54,20 @@ export class VietQrService {
             amount: pkg.price,
             orderInfo: `Thanh toan don hang ${pkg.id.substring(0, 8)}`,
             packageId: pkg.id,
+        } as any);
+    }
+
+    async createQrForOrder(orderId: string) {
+        const order = await this.orderService.findById(orderId);
+        if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+
+        return this.createVietQr({
+            accountName: 'LE QUANG LUAN',
+            bin: '970422',
+            accountNumber: '0905622341',
+            amount: order.totalAmount,
+            orderInfo: `Thanh toan don ban ${order.table?.name || ''}`,
+            orderId: order.id,
         } as any);
     }
 

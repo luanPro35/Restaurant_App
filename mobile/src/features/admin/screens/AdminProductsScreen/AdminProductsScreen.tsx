@@ -43,35 +43,43 @@ export default function AdminProductsScreen() {
 
   const renderHeader = () => (
     <View className="px-6 pt-14 pb-6 bg-[#FDFCF7]">
-      <View className="flex-row items-center justify-between mb-6">
+      <View className="flex-row items-center justify-between mb-8">
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          className="w-10 h-10 bg-white shadow-sm rounded-xl items-center justify-center border border-gray-100"
+          className="w-12 h-12 bg-white shadow-sm rounded-2xl items-center justify-center border border-gray-100"
         >
           <MaterialCommunityIcons
             name="chevron-left"
-            size={24}
+            size={28}
             color="#1F2937"
           />
         </TouchableOpacity>
-        <Text className="text-xl font-black text-gray-800">Quản lý món ăn</Text>
-        <TouchableOpacity className="w-10 h-10 bg-white shadow-sm rounded-xl items-center justify-center border border-gray-100">
+
+        <View className="items-center">
+          <Text className="text-xl font-black text-gray-800">Sản Phẩm</Text>
+          <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Quản lý menu</Text>
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          className="w-12 h-12 bg-white shadow-sm rounded-2xl items-center justify-center border border-gray-100"
+        >
           <MaterialCommunityIcons
             name="filter-variant"
-            size={20}
+            size={24}
             color="#1F2937"
           />
         </TouchableOpacity>
       </View>
 
-      <View className="flex-row items-center space-x-3">
+      <View className="flex-row items-center space-x-3 px-2 gap-3">
         <View
-          className="flex-1 flex-row items-center bg-white h-[52px] px-4 rounded-2xl shadow-sm border border-gray-100"
+          className="flex-1 flex-row items-center bg-white h-12 px-4 rounded-2xl shadow-sm border border-gray-100"
           style={{ elevation: 2 }}
         >
-          <MaterialCommunityIcons name="magnify" size={22} color="#E07B39" />
+          <MaterialCommunityIcons name="magnify" size={20} color="#E07B39" />
           <TextInput
-            className="flex-1 ml-3 text-gray-800 font-semibold text-sm"
+            className="flex-1 ml-2 text-gray-800 font-bold text-[13px]"
             placeholder="Tìm tên món, mô tả..."
             placeholderTextColor="#9CA3AF"
             value={search}
@@ -93,6 +101,7 @@ export default function AdminProductsScreen() {
             </TouchableOpacity>
           )}
         </View>
+
         <TouchableOpacity
           onPress={() => navigation.navigate("AdminCreateProduct")}
           activeOpacity={0.8}
@@ -100,9 +109,9 @@ export default function AdminProductsScreen() {
         >
           <LinearGradient
             colors={["#E07B39", "#C96A2E"]}
-            className="w-[52px] h-[52px] rounded-2xl items-center justify-center"
+            className="w-12 h-12 rounded-2xl items-center justify-center"
           >
-            <MaterialCommunityIcons name="plus" size={28} color="white" />
+            <MaterialCommunityIcons name="plus" size={30} color="white" />
           </LinearGradient>
         </TouchableOpacity>
       </View>

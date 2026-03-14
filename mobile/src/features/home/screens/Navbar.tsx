@@ -12,9 +12,9 @@ const List_Navbar = [
   },
   {
     id: 2,
-    name: "Thanh toán",
-    icon: "credit-card-outline",
-    activeIcon: "credit-card",
+    name: "AI",
+    icon: "robot-outline",
+    activeIcon: "robot",
   },
   {
     id: 3,
@@ -30,8 +30,6 @@ const List_Navbar = [
   },
 ];
 
-import { useNavigation } from "@react-navigation/native";
-
 export default function Navbar({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState(1);
   const insets = useSafeAreaInsets();
@@ -41,7 +39,7 @@ export default function Navbar({ navigation }: { navigation: any }) {
     if (id === 1) {
       navigation.navigate("Home");
     } else if (id === 2) {
-      navigation.navigate("Payment");
+      navigation.navigate("AI");
     } else if (id === 3) {
       navigation.navigate("History");
     } else if (id === 4) {
@@ -66,9 +64,8 @@ export default function Navbar({ navigation }: { navigation: any }) {
             activeOpacity={0.7}
           >
             <View
-              className={`p-1.5 rounded-2xl items-center justify-center ${
-                isActive ? "bg-orange-50" : ""
-              }`}
+              className={`p-1.5 rounded-2xl items-center justify-center ${isActive ? "bg-orange-50" : ""
+                }`}
             >
               <MaterialCommunityIcons
                 name={(isActive ? item.activeIcon : item.icon) as any}
@@ -77,9 +74,8 @@ export default function Navbar({ navigation }: { navigation: any }) {
               />
             </View>
             <Text
-              className={`text-[9px] mt-1 font-bold tracking-tight uppercase ${
-                isActive ? "text-[#E07B39]" : "text-gray-400"
-              }`}
+              className={`text-[9px] mt-1 font-bold tracking-tight uppercase ${isActive ? "text-[#E07B39]" : "text-gray-400"
+                }`}
             >
               {item.name}
             </Text>

@@ -8,7 +8,6 @@ import BestSellerScreen from "../../features/sell_well/screens/BestSellerScreen"
 import PromotionScreen from "../../features/promotion/screens/PromotionScreen";
 import HistoryScreen from "../../features/history/screens/HistoryScreen";
 import PackageScreen from "../../features/package/screens/PackageScreen";
-import PaymentScreen from "../../features/payment/screens/PaymentScreen";
 import MessagesScreen from "../../features/messages/screens/MessagesScreen";
 import ProfileScreen from "../../features/profile/screens/ProfileScreen";
 import ChangeProfileScreen from "../../features/profile/components/ChangeProfile";
@@ -21,6 +20,7 @@ import ChatScreen from "../../features/chat/screens/ChatScreen";
 import QRScannerScreen from "../../features/at_restaurant/screens/QRScannerScreen";
 import VietQrScreen from "../../features/vietQr/screen/vietQr";
 import PaymentSuccessful from "../../features/vietQr/screen/PaymentSuccessful";
+import AiChatScreen from "../../features/AI/Screens/AiChatScreen";
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -35,7 +35,6 @@ export type CustomerStackParamList = {
   Promotion: undefined;
   History: undefined;
   Package: undefined;
-  Payment: undefined;
   Messages: undefined;
   Profile: undefined;
   ChangeProfile: { item?: AdminUser | null };
@@ -45,8 +44,9 @@ export type CustomerStackParamList = {
   GamePromotion: undefined;
   Chat: undefined;
   QRScanner: undefined;
-  VietQr: { packageId: string };
+  VietQr: { packageId?: string, orderId?: string };
   PaymentSuccessful: undefined;
+  AI: { product?: string, initialMessage?: string } | undefined;
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -65,7 +65,6 @@ export default function CustomerNavigator() {
       <Stack.Screen name="Promotion" component={PromotionScreen} />
       <Stack.Screen name="History" component={HistoryScreen} />
       <Stack.Screen name="Package" component={PackageScreen} />
-      <Stack.Screen name="Payment" component={PaymentScreen} />
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ChangeProfile" component={ChangeProfileScreen} />
@@ -77,6 +76,7 @@ export default function CustomerNavigator() {
       <Stack.Screen name="QRScanner" component={QRScannerScreen} />
       <Stack.Screen name="VietQr" component={VietQrScreen} />
       <Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
+      <Stack.Screen name="AI" component={AiChatScreen} />
     </Stack.Navigator>
   );
 }

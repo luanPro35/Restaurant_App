@@ -12,9 +12,9 @@ export class PaymentController {
         return this.paymentService.create(createPaymentDto);
     }
 
-    @Get(":id")
-    async getPaymentById(@Param("id") id: string) {
-        return this.paymentService.findById(id);
+    @Get("total-amount")
+    async getTotalAmount() {
+        return this.paymentService.totalAmount();
     }
 
     @Get("order/:orderId")
@@ -25,5 +25,10 @@ export class PaymentController {
     @Get()
     async getAllPayments(@Query() query: any) {
         return this.paymentService.findAll(query);
+    }
+
+    @Get(":id")
+    async getPaymentById(@Param("id") id: string) {
+        return this.paymentService.findById(id);
     }
 }

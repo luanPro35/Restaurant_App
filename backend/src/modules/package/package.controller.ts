@@ -4,10 +4,14 @@ import { CreatePackageDto, UpdatePackageDto } from "./package.dto";
 import { ApiTags, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { Roles } from "../auth/decorators/roles.decorator";
+import { Role } from "../auth/enums/role.enum";
+import { RolesGuard } from "../auth/guards/roles.guard";
+
 
 @ApiTags("Packages")
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("packages")
 export class PackageController {
     constructor(private readonly packageService: PackageService) { }
@@ -16,6 +20,14 @@ export class PackageController {
     @ApiOperation({ summary: "Create a new package" })
     create(@CurrentUser() user: any, @Body() createPackageDto: CreatePackageDto) {
         return this.packageService.create({ ...createPackageDto, userId: user.sub });
+    }
+
+
+    @Get("people")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "Get all packages for admin" })
+    findAllPeople() {
+        return this.packageService.findAllPackage();
     }
 
     @Get()

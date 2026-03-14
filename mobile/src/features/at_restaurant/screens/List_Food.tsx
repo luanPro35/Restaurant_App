@@ -37,8 +37,6 @@ const List_Food = forwardRef(
 
     const getItemLayout = (data: any, index: number) => {
       let offset = 0;
-      let categoryIndex = 0;
-      let itemIndex = 0;
       let globalIndex = 0;
 
       for (let i = 0; i < MENU_SECTIONS.length; i++) {

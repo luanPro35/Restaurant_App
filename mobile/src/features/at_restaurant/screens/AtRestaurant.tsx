@@ -18,9 +18,7 @@ import CurrentOrder from "../components/CurrentOrder";
 import MenuSection from "../components/MenuSection";
 import { useTable } from "../hooks/useTable";
 import { useRestaurantCart } from "../context/RestaurantCartContext";
-import { MenuItem } from "../../menu/types/index";
 import { orderApi } from "../../../services/api/api-order";
-import { QuickActionsProps } from "../components/QuickActions";
 
 type TabType = "tables" | "order" | "menu";
 
@@ -34,9 +32,6 @@ export default function AtRestaurant({ route }: any) {
 
   const {
     tables,
-    loading,
-    refreshing,
-    pagination,
     updateTable,
     fetchTables,
     handleRefresh,
@@ -53,11 +48,10 @@ export default function AtRestaurant({ route }: any) {
   useEffect(() => {
     fetchTables();
 
-    // Nếu có dữ liệu từ QR Scanner truyền qua params
     if (route.params?.scannedTableId) {
-        setCurrentTableId(route.params.scannedTableId);
-        setCurrentTable(route.params.scannedTableName || "Bàn");
-        setActiveTab(route.params.initialTab || "menu");
+      setCurrentTableId(route.params.scannedTableId);
+      setCurrentTable(route.params.scannedTableName || "Bàn");
+      setActiveTab(route.params.initialTab || "menu");
     }
 
     const subscription = DeviceEventEmitter.addListener(
@@ -105,45 +99,55 @@ export default function AtRestaurant({ route }: any) {
   const handleRequestBill = () => {
     Alert.alert(
       "Yêu cầu bill",
-      "Bạn có chắc chắn muốn yêu cầu bill không?",
+      "Chọn phương thức thanh toán",
       [
         {
           text: "Hủy",
-          onPress: () => { },
           style: "cancel",
         },
         {
-          text: "Đồng ý",
-          onPress: async () => {
-            if (!currentTableId) return;
-            try {
-              const activeOrder = await getOrdersByTableId(currentTableId);
-              if (activeOrder && activeOrder.id) {
-                await orderApi.updateOrderStatus(activeOrder.id, "COMPLETED");
-                await updateTable(currentTableId, { status: "AVAILABLE" });
-                setServerOrders([]);
-                clearRestaurantCart();
-                await fetchTables();
-                setActiveTab("tables");
-
-                Alert.alert("Thanh toán thành công", requestBill(activeOrder));
-              } else {
-                await updateTable(currentTableId, { status: "AVAILABLE" });
-                await fetchTables();
-                setActiveTab("tables");
-                Alert.alert("Thông báo", "Bàn đã được đặt lại trạng thái trống.");
-              }
-            } catch (error: any) {
-              console.error("Failed to request bill FULL ERROR:", error.response?.data || error);
-              const errorMessage = error.response?.data?.message
-                ? (Array.isArray(error.response.data.message) ? error.response.data.message.join(", ") : error.response.data.message)
-                : "Không thể xử lý yêu cầu bill.";
-              Alert.alert("Lỗi", errorMessage);
-            }
-          },
+          text: "Tiền mặt",
+          onPress: () => processBillRequest("CASH"),
+        },
+        {
+          text: "Chuyển khoản",
+          onPress: () => processBillRequest("TRANSFER"),
         },
       ]
     );
+  };
+
+  const processBillRequest = async (method: "CASH" | "TRANSFER") => {
+    if (!currentTableId) return;
+    try {
+      const activeOrder = await getOrdersByTableId(currentTableId);
+      if (activeOrder && activeOrder.id) {
+        if (method === "TRANSFER") {
+          navigation.navigate("VietQr", { orderId: activeOrder.id });
+          return;
+        }
+
+        await orderApi.updateOrderStatus(activeOrder.id, "COMPLETED");
+        await updateTable(currentTableId, { status: "AVAILABLE" });
+        setServerOrders([]);
+        clearRestaurantCart();
+        await fetchTables();
+        setActiveTab("tables");
+
+        Alert.alert("Thanh toán thành công", requestBill(activeOrder));
+      } else {
+        await updateTable(currentTableId, { status: "AVAILABLE" });
+        await fetchTables();
+        setActiveTab("tables");
+        Alert.alert("Thông báo", "Bàn đã được đặt lại trạng thái trống.");
+      }
+    } catch (error: any) {
+      console.error("Failed to request bill FULL ERROR:", error.response?.data || error);
+      const errorMessage = error.response?.data?.message
+        ? (Array.isArray(error.response.data.message) ? error.response.data.message.join(", ") : error.response.data.message)
+        : "Không thể xử lý yêu cầu bill.";
+      Alert.alert("Lỗi", errorMessage);
+    }
   };
 
   const mapOrderItems = (order: any) => {
@@ -222,29 +226,29 @@ export default function AtRestaurant({ route }: any) {
       case "tables":
         return (
           <ScrollView className="flex-1 px-4 pt-4">
-          <TouchableOpacity 
-            className="bg-orange-100 rounded-2xl p-4 mb-4 flex-row items-center"
-            onPress={() => navigation.navigate("QRScanner")}
-          >
-            <MaterialCommunityIcons
-              name="qrcode-scan"
-              size={40}
-              color="#E07B39"
-            />
-            <View className="flex-1 ml-3">
-              <Text className="text-gray-800 font-bold text-base">
-                Quét mã QR
-              </Text>
-              <Text className="text-gray-600 text-sm">
-                Quét mã QR trên bàn để check-in
-              </Text>
-            </View>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={24}
-              color="#E07B39"
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              className="bg-orange-100 rounded-2xl p-4 mb-4 flex-row items-center"
+              onPress={() => navigation.navigate("QRScanner")}
+            >
+              <MaterialCommunityIcons
+                name="qrcode-scan"
+                size={40}
+                color="#E07B39"
+              />
+              <View className="flex-1 ml-3">
+                <Text className="text-gray-800 font-bold text-base">
+                  Quét mã QR
+                </Text>
+                <Text className="text-gray-600 text-sm">
+                  Quét mã QR trên bàn để check-in
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={24}
+                color="#E07B39"
+              />
+            </TouchableOpacity>
 
             <Text className="text-xl font-bold text-gray-800 mb-4">
               Chọn bàn

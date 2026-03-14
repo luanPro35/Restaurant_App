@@ -1,10 +1,14 @@
-import { IsNotEmpty, IsString, IsEnum, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsEnum, IsNumber, IsOptional } from "class-validator";
 import { PAYMENT_METHOD } from "./payment.contant";
 
 export class CreatePaymentDto {
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    orderId!: string;
+    orderId?: string;
+
+    @IsOptional()
+    @IsString()
+    packageId?: string;
 
     @IsNotEmpty()
     @IsEnum(PAYMENT_METHOD)
@@ -13,5 +17,13 @@ export class CreatePaymentDto {
     @IsNotEmpty()
     @IsNumber()
     amount!: number;
+
+    @IsOptional()
+    @IsString()
+    userId?: string;
+
+    @IsOptional()
+    @IsString()
+    status?: string;
 }
 

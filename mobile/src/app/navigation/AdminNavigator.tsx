@@ -9,7 +9,6 @@ import AdminTablesScreen from "../../features/admin/screens/AdminTablesScreen";
 import AdminEditTables from "../../features/admin/screens/AdminTablesScreen/AdminEditTables";
 import AdminAddTables from "../../features/admin/screens/AdminTablesScreen/AdminAddTables";
 import AdminOrdersScreen from "../../features/admin/screens/AdminOrdersScreen";
-import AdminDetailOrder from "../../features/admin/screens/AdminOrdersScreen/AdminDetailOrder";
 import AdminUsersScreen from "../../features/admin/screens/AdminUsersScreen";
 import { AdminTable, AdminOrder } from "../../features/admin/types/admin.types";
 import AdminPromotionsScreen from "@/features/admin/screens/AdminPromotionsScreen";
@@ -22,6 +21,8 @@ import AdminEditProduct from "@/features/admin/screens/AdminProductsScreen/Admin
 import DetailProduct from "../../features/menu/screens/DetailProduct";
 import AdminConversationsScreen from "../../features/admin/screens/AdminChatScreen/AdminConversationsScreen";
 import AdminChatDetailScreen from "../../features/admin/screens/AdminChatScreen/AdminChatDetailScreen";
+import AdminPaymentsScreen from "../../features/admin/screens/AdminPaymentsScreen/AdminPaymentsScreen";
+import AdminAnalysisScreen from "../../features/admin/screens/AdminPaymentsScreen/AdminAnalysisScreen";
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
@@ -33,7 +34,6 @@ export type AdminStackParamList = {
   AdminEditTables: { table: AdminTable };
   AdminAddTables: undefined;
   AdminOrdersScreen: undefined;
-  AdminDetailOrder: { order: AdminOrder };
   AdminUsersScreen: undefined;
   AdminPromotionsScreen: undefined;
   AdminAddPromotionScreen: undefined;
@@ -45,6 +45,8 @@ export type AdminStackParamList = {
   DetailProduct: { id: string };
   AdminConversations: undefined;
   AdminChatDetail: { conversationId: string };
+  AdminPaymentsScreen: undefined;
+  AdminAnalysisScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
@@ -64,7 +66,6 @@ export default function AdminNavigator() {
       <Stack.Screen name="AdminEditTables" component={AdminEditTables} />
       <Stack.Screen name="AdminAddTables" component={AdminAddTables} />
       <Stack.Screen name="AdminOrdersScreen" component={AdminOrdersScreen} />
-      <Stack.Screen name="AdminDetailOrder" component={AdminDetailOrder} />
       <Stack.Screen name="AdminUsersScreen" component={AdminUsersScreen} />
       <Stack.Screen
         name="AdminPromotionsScreen"
@@ -94,6 +95,8 @@ export default function AdminNavigator() {
       <Stack.Screen name="DetailProduct" component={DetailProduct} />
       <Stack.Screen name="AdminConversations" component={AdminConversationsScreen} />
       <Stack.Screen name="AdminChatDetail" component={AdminChatDetailScreen} />
+      <Stack.Screen name="AdminPaymentsScreen" component={AdminPaymentsScreen} />
+      <Stack.Screen name="AdminAnalysisScreen" component={AdminAnalysisScreen} />
     </Stack.Navigator>
   );
 }

@@ -37,7 +37,7 @@ export const AdminOrderCard = ({ order, onPress }: AdminOrderCardProps) => {
             <Text
               className={`text-[10px] font-black uppercase ${order.isAvailable ? "text-green-600" : "text-red-600"}`}
             >
-              {order.isAvailable ? "Hoàn thành" : "Đang xử lý"}
+              {order.isAvailable ? "Thành công" : "Đang xử lý"}
             </Text>
           </View>
         </View>
@@ -64,7 +64,7 @@ export const AdminOrderCard = ({ order, onPress }: AdminOrderCardProps) => {
               color="#9CA3AF"
             />
             <Text className="text-gray-500 text-xs ml-2 font-medium">
-              Giao trước: {order.until}
+              Thời gian: {order.until}
             </Text>
           </View>
           <View className="flex-row items-center mt-1">
