@@ -29,7 +29,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ pack }) => {
   });
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       activeOpacity={0.9}
       className="bg-white rounded-[32px] mx-4 mb-5 shadow-sm overflow-hidden border border-gray-100"
     >
@@ -79,16 +79,12 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ pack }) => {
           </View>
         </View>
       </View>
-      
+
       <View className="bg-gray-50/50 px-5 py-3 flex-row justify-between items-center border-t border-gray-50/10">
         <View className="flex-row items-center">
           <MaterialCommunityIcons name="calendar-clock" size={14} color="#9CA3AF" />
           <Text className="text-[#9CA3AF] text-[11px] font-medium ml-1.5">{date}</Text>
         </View>
-        <TouchableOpacity className="flex-row items-center">
-          <Text className="text-[#E07B39] text-[12px] font-bold mr-1">Chi tiết</Text>
-          <MaterialCommunityIcons name="chevron-right" size={16} color="#E07B39" />
-        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -122,8 +118,8 @@ export default function HistoryScreen() {
         </View>
       </View>
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         contentContainerStyle={{ paddingTop: 20, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
       >
@@ -154,7 +150,7 @@ export default function HistoryScreen() {
         ) : (
           <View className="items-center justify-center mt-20 px-10">
             <View className="w-48 h-48 bg-white rounded-full items-center justify-center mb-8 shadow-sm">
-               <Image
+              <Image
                 source={{
                   uri: "https://cdn-icons-png.flaticon.com/512/2038/2038854.png",
                 }}

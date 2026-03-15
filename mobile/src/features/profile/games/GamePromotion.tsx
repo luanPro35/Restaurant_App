@@ -131,15 +131,17 @@ export default function GamePromotion() {
           </View>
 
           <View className="flex-row mb-10">
-            <View 
+            <View
               className="flex-1 mr-2"
               style={{
+                borderRadius: 28,
+                backgroundColor: "#1A1A2E",
                 ...Platform.select({
                   ios: {
                     shadowColor: "#E07B39",
                     shadowOffset: { width: 0, height: 10 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 15,
+                    shadowOpacity: 0.4,
+                    shadowRadius: 12,
                   },
                 })
               }}
@@ -148,8 +150,8 @@ export default function GamePromotion() {
                 colors={["#E07B39", "#E91E63"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                className="p-5 rounded-[28px]"
-                style={Platform.OS === "android" ? { elevation: 8 } : {}}
+                style={{ borderRadius: 28, padding: 20 }}
+                className="flex-1"
               >
                 <View className="w-10 h-10 bg-white/20 rounded-xl items-center justify-center mb-3">
                   <MaterialCommunityIcons name="silverware-variant" size={24} color="white" />
@@ -170,15 +172,17 @@ export default function GamePromotion() {
               </LinearGradient>
             </View>
 
-            <View 
+            <View
               className="flex-1 ml-2"
               style={{
+                borderRadius: 28,
+                backgroundColor: "#1A1A2E",
                 ...Platform.select({
                   ios: {
                     shadowColor: "#4A90E2",
                     shadowOffset: { width: 0, height: 10 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 15,
+                    shadowOpacity: 0.4,
+                    shadowRadius: 12,
                   },
                 })
               }}
@@ -187,8 +191,8 @@ export default function GamePromotion() {
                 colors={["#4A90E2", "#3F51B5"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                className="p-5 rounded-[28px]"
-                style={Platform.OS === "android" ? { elevation: 8 } : {}}
+                style={{ borderRadius: 28, padding: 20 }}
+                className="flex-1"
               >
                 <View className="w-10 h-10 bg-white/20 rounded-xl items-center justify-center mb-3">
                   <MaterialCommunityIcons name="truck-delivery" size={24} color="white" />

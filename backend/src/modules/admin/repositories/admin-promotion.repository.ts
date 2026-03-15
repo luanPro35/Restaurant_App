@@ -15,7 +15,7 @@ export class AdminPromotionRepository {
     const { name } = query;
     const where: any = {};
     if (name) {
-      where.name = { contains: name, mode: "insensitive" };
+      where.name = { contains: name };
     }
     return where;
   }
@@ -27,7 +27,8 @@ export class AdminPromotionRepository {
   }
 
   async getPromotions(query: GetPromotionsDto) {
-    const { limit = 10, page = 1 } = query;
+    const limit = Number(query.limit) || 10;
+    const page = Number(query.page) || 1;
     const skip = (page - 1) * limit;
     const where = this.buildWhereClause(query);
     return this.prisma.promotion.findMany({

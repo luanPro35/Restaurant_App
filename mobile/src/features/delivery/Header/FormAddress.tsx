@@ -7,6 +7,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Alert,
+  Platform,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
@@ -127,30 +128,6 @@ export default function FormAddress() {
               </TouchableOpacity>
             )}
           </View>
-
-          <View className="mt-8 space-y-5">
-            <TouchableOpacity
-              activeOpacity={0.7}
-              className="flex-row items-center"
-            >
-              <View className="w-12 h-12 rounded-2xl bg-orange-50 items-center justify-center mr-4">
-                <MaterialCommunityIcons
-                  name="crosshairs-gps"
-                  size={24}
-                  color="#E07B39"
-                />
-              </View>
-              <View className="flex-1 border-b border-gray-50 pb-4">
-                <Text className="text-[#2D2D2D] font-bold text-[17px]">
-                  Vị trí hiện tại
-                </Text>
-                <Text className="text-gray-400 text-xs mt-0.5">
-                  Định vị địa chỉ của bạn ngay bây giờ
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
-            </TouchableOpacity>
-          </View>
         </View>
 
         <View className="px-5 py-6">
@@ -180,20 +157,18 @@ export default function FormAddress() {
                 <TouchableOpacity
                   key={item.id}
                   activeOpacity={0.8}
-                  className={`bg-white rounded-[32px] p-5 flex-row items-center mb-4 shadow-sm border ${
-                    isSelected
-                      ? "border-[#E07B39] bg-orange-50/30"
-                      : "border-gray-100/50"
-                  }`}
+                  className={`bg-white rounded-[32px] p-5 flex-row items-center mb-4 shadow-sm border ${isSelected
+                    ? "border-[#E07B39] bg-orange-50/30"
+                    : "border-gray-100/50"
+                    }`}
                   onPress={() => {
                     selectAddress(item);
                     navigation.goBack();
                   }}
                 >
                   <View
-                    className={`w-[60px] h-[60px] rounded-3xl items-center justify-center mr-5 ${
-                      isSelected ? "bg-[#E07B39]" : "bg-[#F9F6E7]"
-                    }`}
+                    className={`w-[60px] h-[60px] rounded-3xl items-center justify-center mr-5 ${isSelected ? "bg-[#E07B39]" : "bg-[#F9F6E7]"
+                      }`}
                   >
                     <MaterialCommunityIcons
                       name={getIconForType(item.type) as any}
@@ -275,21 +250,57 @@ export default function FormAddress() {
       </ScrollView>
 
       <View
-        style={{ paddingBottom: Math.max(insets.bottom, 20) }}
-        className="p-5 bg-white border-t border-gray-50"
+        style={{
+          paddingBottom: Math.max(insets.bottom, 24),
+          paddingTop: 12,
+          paddingHorizontal: 28,
+          backgroundColor: "#FFF",
+          borderTopWidth: 1,
+          borderTopColor: "rgba(0,0,0,0.04)",
+        }}
+        className="shadow-2xl"
       >
         <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => navigation.goBack()}
-          className="overflow-hidden rounded-3xl"
+          activeOpacity={selectedAddress ? 0.8 : 0.6}
+          onPress={() => selectedAddress && navigation.goBack()}
+          disabled={!selectedAddress}
+          style={{
+            height: 60,
+            borderRadius: 30,
+            opacity: selectedAddress ? 1 : 0.6,
+            ...Platform.select({
+              ios: {
+                shadowColor: "#E07B39",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.35,
+                shadowRadius: 15,
+              },
+              android: {
+                elevation: 8,
+              },
+            }),
+          }}
         >
           <LinearGradient
-            colors={["#E91E63", "#E07B39"]}
+            colors={["#E07B39", "#C96A2E"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="py-5 items-center justify-center shadow-lg shadow-orange-300"
+            style={{
+              flex: 1,
+              borderRadius: 30,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+            }}
           >
-            <Text className="text-white font-black text-lg tracking-tight uppercase">
+            <MaterialCommunityIcons
+              name="check-circle"
+              size={24}
+              color="white"
+              style={{ marginRight: 10 }}
+            />
+            <Text className="text-white font-black text-lg tracking-wide uppercase">
               Xác nhận địa chỉ
             </Text>
           </LinearGradient>

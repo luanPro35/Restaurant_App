@@ -18,6 +18,16 @@ export const adminApi = {
       return response.data;
     },
 
+    // POST: /api/v1/admin/products/upload
+    uploadImage: async (formData: FormData) => {
+      const response = await api.post("/admin/products/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    },
+
     // POST: /api/v1/admin/products
     create: async (productData: any) => {
       const response = await api.post("/admin/products", productData);

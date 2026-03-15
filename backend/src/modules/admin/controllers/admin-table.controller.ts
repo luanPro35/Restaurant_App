@@ -30,7 +30,7 @@ import { Role } from "../../auth/enums/role.enum";
 @ApiBearerAuth()
 @Controller("admin/tables")
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.STAFF)
 export class AdminTableController {
   constructor(private readonly adminTableService: AdminTableService) {}
 

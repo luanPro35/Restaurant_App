@@ -55,13 +55,14 @@ export class ProductRepository {
   }
 
   async findAll(query: GetProductsDto) {
-    const { sortOrder, page = 1, limit = 10 } = query;
+    const limit = Number(query.limit) || 100;
+    const page = Number(query.page) || 1;
     const where = this.buildWhere(query);
     const skip = (page - 1) * limit;
 
     return this.prisma.product.findMany({
       where,
-      orderBy: sortOrder ? { price: sortOrder as any } : undefined,
+      orderBy: query.sortOrder ? { price: query.sortOrder as any } : undefined,
       skip,
       take: limit,
       include: {

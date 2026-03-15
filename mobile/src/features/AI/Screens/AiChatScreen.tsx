@@ -17,6 +17,70 @@ import { useCart } from "../../../app/context/CartContext";
 import { useAuth } from "../../../app/context/AuthContext";
 import AiChoose from "./AiChoose";
 import { useAiChat } from "../hooks/useAiChat";
+import { Config } from "../../../config";
+
+const ProductCard = ({ product, navigation, addToCart }: any) => {
+  const imageUrl = (() => {
+    const rawImage = product.image || product.images;
+    if (!rawImage) return 'https://via.placeholder.com/400x300/E07B39/ffffff?text=' + encodeURIComponent(product.name);
+
+    let url = rawImage;
+    try {
+      if (typeof rawImage === 'string' && rawImage.startsWith('[')) {
+        const parsed = JSON.parse(rawImage);
+        url = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : rawImage;
+      } else if (typeof rawImage === 'string' && rawImage.includes(',')) {
+        url = rawImage.split(',')[0];
+      }
+    } catch (e) {
+      url = rawImage;
+    }
+
+    if (typeof url === "string" && url.length > 0) {
+      if (url.startsWith("http")) return url;
+      return `${Config.API_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+    }
+    return url;
+  })();
+
+  return (
+    <View
+      className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mr-3"
+      style={{ width: 160, elevation: 4 }}
+    >
+      <Image
+        key={imageUrl}
+        source={{ uri: imageUrl }}
+        className="w-full h-24"
+        resizeMode="cover"
+      />
+      <View className="p-3">
+        <Text className="text-gray-800 font-bold text-xs mb-1" numberOfLines={1}>
+          {product.name}
+        </Text>
+        <Text className="text-[#E07B39] font-black text-sm mb-2">
+          {(product.price || 0).toLocaleString('vi-VN')}đ
+        </Text>
+
+        <View className="flex-row justify-between">
+          <TouchableOpacity
+            onPress={() => navigation?.navigate("DetailProduct", { id: product.id })}
+            className="bg-orange-50 p-2 rounded-lg flex-1 mr-2 items-center"
+          >
+            <MaterialCommunityIcons name="eye" size={16} color="#E07B39" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => addToCart(product)}
+            className="bg-[#E07B39] p-2 rounded-lg flex-1 items-center"
+          >
+            <MaterialCommunityIcons name="cart-plus" size={16} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
 
 const ChatFooter = ({ onSuggestionPress, isTyping }: { onSuggestionPress: any, isTyping: boolean }) => {
   if (isTyping) return null;
@@ -37,7 +101,7 @@ export default function AiChatScreen({ route, navigation }: { route: any, naviga
   }, [navigation]);
 
   const initialMsg = route?.params?.initialMessage || (route?.params?.product ? `Tôi muốn tìm món liên quan đến ${route.params.product}` : null);
-  
+
   const { messages, isTyping, sendMessageWithText } = useAiChat(user, initialMsg);
 
   const onSuggestionPress = (text: string) => {
@@ -90,41 +154,12 @@ export default function AiChatScreen({ route, navigation }: { route: any, naviga
               contentContainerStyle={{ paddingLeft: 4, paddingRight: 16 }}
             >
               {item.recommendedProducts.map((product: any) => (
-                <View
+                <ProductCard
                   key={product.id}
-                  className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mr-3"
-                  style={{ width: 160, elevation: 4 }}
-                >
-                  <Image
-                    source={{ uri: product.image || 'https://via.placeholder.com/150' }}
-                    className="w-full h-24"
-                    resizeMode="cover"
-                  />
-                  <View className="p-3">
-                    <Text className="text-gray-800 font-bold text-xs mb-1" numberOfLines={1}>
-                      {product.name}
-                    </Text>
-                    <Text className="text-[#E07B39] font-black text-sm mb-2">
-                      {(product.price || 0).toLocaleString('vi-VN')}đ
-                    </Text>
-
-                    <View className="flex-row justify-between">
-                      <TouchableOpacity
-                        onPress={() => navigationRef.current?.navigate("DetailProduct", { id: product.id })}
-                        className="bg-orange-50 p-2 rounded-lg flex-1 mr-2 items-center"
-                      >
-                        <MaterialCommunityIcons name="eye" size={16} color="#E07B39" />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => addToCart(product)}
-                        className="bg-[#E07B39] p-2 rounded-lg flex-1 items-center"
-                      >
-                        <MaterialCommunityIcons name="cart-plus" size={16} color="white" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
+                  product={product}
+                  navigation={navigationRef.current}
+                  addToCart={addToCart}
+                />
               ))}
             </RNScrollView>
           </View>

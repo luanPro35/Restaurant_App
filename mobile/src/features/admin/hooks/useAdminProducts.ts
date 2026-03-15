@@ -15,7 +15,7 @@ export const useAdminProducts = () => {
   const [pagination, setPagination] = useState<AdminPagination>({
     total: 0,
     page: 1,
-    limit: 10,
+    limit: 100,
     totalPages: 0,
   });
 

@@ -8,7 +8,10 @@ import {
   Delete,
   Query,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { AdminProductService } from "../services/admin-products.service";
 import {
   CreateProductDto,
@@ -26,15 +29,40 @@ import {
   ApiBody,
   ApiResponse,
   ApiBearerAuth,
+  ApiConsumes,
 } from "@nestjs/swagger";
+import { CloudinaryService } from "../../../cloudinary/cloudinary.service";
 
 @ApiTags("Admin / Products")
 @ApiBearerAuth()
 @Controller("admin/products")
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.STAFF)
 export class AdminProductController {
-  constructor(private readonly adminProductService: AdminProductService) {}
+  constructor(
+    private readonly adminProductService: AdminProductService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
+
+  @Post("upload")
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiConsumes("multipart/form-data")
+  @ApiOperation({ summary: "Upload ảnh sản phẩm lên Cloudinary" })
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        file: {
+          type: "string",
+          format: "binary",
+        },
+      },
+    },
+  })
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    const url = await this.cloudinaryService.uploadFile(file);
+    return { url };
+  }
 
   @Post()
   @ApiOperation({ summary: "Tạo sản phẩm mới" })

@@ -12,6 +12,7 @@ import { MilestoneModule } from "./modules/milestone/milestone.module";
 import { ChatModule } from "./modules/chat/chat.module";
 import { VietQrModule } from "./modules/vietQr/vietQr.module";
 import { AI_Module } from "./modules/ai/Ai.module";
+import { CategoryModule } from "./modules/category/category.module";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AI_Module } from "./modules/ai/Ai.module";
     ChatModule,
     VietQrModule,
     AI_Module,
+    CategoryModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

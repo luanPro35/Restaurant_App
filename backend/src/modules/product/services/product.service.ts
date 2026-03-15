@@ -32,7 +32,7 @@ export class ProductService {
       data: products,
       total,
       page: validatedQuery.page || 1,
-      limit: validatedQuery.limit || 10,
+      limit: validatedQuery.limit || 100,
     };
   }
 

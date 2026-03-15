@@ -23,6 +23,7 @@ import AdminConversationsScreen from "../../features/admin/screens/AdminChatScre
 import AdminChatDetailScreen from "../../features/admin/screens/AdminChatScreen/AdminChatDetailScreen";
 import AdminPaymentsScreen from "../../features/admin/screens/AdminPaymentsScreen/AdminPaymentsScreen";
 import AdminAnalysisScreen from "../../features/admin/screens/AdminPaymentsScreen/AdminAnalysisScreen";
+import AdminStaffScreen from "../../features/admin/screens/AdminStaffScreen/AdminStaffScreen";
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
@@ -35,6 +36,7 @@ export type AdminStackParamList = {
   AdminAddTables: undefined;
   AdminOrdersScreen: undefined;
   AdminUsersScreen: undefined;
+  AdminStaffScreen: undefined;
   AdminPromotionsScreen: undefined;
   AdminAddPromotionScreen: undefined;
   AdminEditPromotionScreen: { promotionId: string };
@@ -67,6 +69,7 @@ export default function AdminNavigator() {
       <Stack.Screen name="AdminAddTables" component={AdminAddTables} />
       <Stack.Screen name="AdminOrdersScreen" component={AdminOrdersScreen} />
       <Stack.Screen name="AdminUsersScreen" component={AdminUsersScreen} />
+      <Stack.Screen name="AdminStaffScreen" component={AdminStaffScreen} />
       <Stack.Screen
         name="AdminPromotionsScreen"
         component={AdminPromotionsScreen}

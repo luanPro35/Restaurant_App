@@ -33,23 +33,26 @@ export class AdminProductRepository {
   }
 
   async findAll(query: GetProductsDto) {
-    const { sortOrder, page = 1, limit = 10, search, category } = query;
+    const limit = Number(query.limit) || 100;
+    const page = Number(query.page) || 1;
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (search) {
+    if (query.search) {
       where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
+        { name: { contains: query.search } },
+        { description: { contains: query.search } },
       ];
     }
-    if (category) {
-      where.categoryId = category;
+    if (query.category) {
+      where.categoryId = query.category;
     }
 
     return this.prisma.product.findMany({
       where,
-      orderBy: sortOrder ? { price: sortOrder as any } : { createdAt: "desc" },
+      orderBy: query.sortOrder
+        ? { price: query.sortOrder as any }
+        : { createdAt: "desc" },
       skip,
       take: limit,
       include: {

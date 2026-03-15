@@ -24,7 +24,7 @@ export class PackageController {
 
 
     @Get("people")
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.STAFF)
     @ApiOperation({ summary: "Get all packages for admin" })
     findAllPeople() {
         return this.packageService.findAllPackage();

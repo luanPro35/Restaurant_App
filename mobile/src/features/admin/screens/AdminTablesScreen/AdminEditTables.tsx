@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,18 +21,33 @@ const AdminEditTables = () => {
   const navigation = useNavigation();
   const route = useRoute<AdminEditTablesRouteProp>();
   const { table } = route.params;
-  const { updateTable } = useAdminTable();
+  const { updateTable, getActiveOrderForTable, loadingOrder } = useAdminTable();
 
   const [name, setName] = useState(table.name);
   const [capacity, setCapacity] = useState(table.capacity.toString());
-  const [listFoods, setListFoods] = useState(table.listFoods?.join(", "));
-  const [price, setPrice] = useState(table.price?.toString());
+  const [listFoods, setListFoods] = useState(table.listFoods?.join(", ") || "");
+  const [price, setPrice] = useState(table.price?.toString() || "0");
+
+  useEffect(() => {
+    const fetchActiveOrder = async () => {
+      const activeOrder = await getActiveOrderForTable(table.id);
+      if (activeOrder) {
+        setPrice(activeOrder.totalAmount.toString());
+        const foodNames = activeOrder.items
+          .map((item: any) => `${item.name} (x${item.quantity})`)
+          .join(", ");
+        setListFoods(foodNames);
+      }
+    };
+
+    fetchActiveOrder();
+  }, [table.id, getActiveOrderForTable]);
 
   const handleUpdateTable = () => {
     updateTable(table.id, {
       name,
       capacity: parseInt(capacity),
-      listFoods: listFoods?.split(", "),
+      listFoods: listFoods?.split(", ").filter((f) => f.length > 0),
       price: parseInt(price),
     });
   };
@@ -137,19 +153,25 @@ const AdminEditTables = () => {
                 color="#E07B39"
                 style={{ marginTop: 15 }}
               />
-              <TextInput
-                className="flex-1 p-4 font-semibold text-gray-800"
-                value={listFoods}
-                onChangeText={(text) => setListFoods(text)}
-                multiline
-                placeholder="Chưa có món ăn..."
-              />
+              {loadingOrder ? (
+                <View className="flex-1 p-4 justify-center items-start">
+                  <ActivityIndicator size="small" color="#E07B39" />
+                </View>
+              ) : (
+                <TextInput
+                  className="flex-1 p-4 font-semibold text-gray-800"
+                  value={listFoods}
+                  onChangeText={(text) => setListFoods(text)}
+                  multiline
+                  placeholder="Chưa có món ăn..."
+                />
+              )}
             </View>
           </View>
 
           <View className="mb-2">
             <Text className="text-gray-500 font-bold mb-2 ml-1 text-xs">
-              Tổng giá tiền
+              Tổng giá tiền (Từ đơn hàng hiện tại)
             </Text>
             <View className="flex-row items-center bg-gray-50 rounded-2xl border border-gray-100 px-4">
               <MaterialCommunityIcons
@@ -157,13 +179,19 @@ const AdminEditTables = () => {
                 size={20}
                 color="#E07B39"
               />
-              <TextInput
-                className="flex-1 p-4 font-semibold text-gray-800 text-lg"
-                value={price}
-                onChangeText={(text) => setPrice(text)}
-                keyboardType="numeric"
-                placeholder="0"
-              />
+              {loadingOrder ? (
+                <View className="flex-1 p-4 justify-center items-start">
+                  <ActivityIndicator size="small" color="#E07B39" />
+                </View>
+              ) : (
+                <TextInput
+                  className="flex-1 p-4 font-semibold text-gray-800 text-lg"
+                  value={price}
+                  onChangeText={(text) => setPrice(text)}
+                  keyboardType="numeric"
+                  placeholder="0"
+                />
+              )}
               <Text className="font-bold text-gray-400">VNĐ</Text>
             </View>
           </View>

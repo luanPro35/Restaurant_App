@@ -22,6 +22,7 @@ interface UserModalProps {
   onClose: () => void;
   onSubmit: (data: CreateAdminUserDto | UpdateAdminUserDto) => void;
   user?: AdminUser | null;
+  defaultRole?: UserRole;
 }
 
 export const UserModal = ({
@@ -29,11 +30,12 @@ export const UserModal = ({
   onClose,
   onSubmit,
   user,
+  defaultRole = UserRole.USER,
 }: UserModalProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>(UserRole.USER);
+  const [role, setRole] = useState<UserRole>(defaultRole);
 
   useEffect(() => {
     if (user) {
@@ -44,10 +46,10 @@ export const UserModal = ({
     } else {
       setName("");
       setEmail("");
-      setRole(UserRole.USER);
+      setRole(defaultRole);
       setPassword("");
     }
-  }, [user, visible]);
+  }, [user, visible, defaultRole]);
 
   const handleSubit = () => {
     if (user) {
@@ -69,7 +71,7 @@ export const UserModal = ({
         } items-center justify-center`}
       >
         <Text
-          className={`font-bold text-xs ${isSelected ? "text-orange-600" : "text-gray-500"}`}
+          className={`font-bold text-[10px] ${isSelected ? "text-orange-600" : "text-gray-500"}`}
         >
           {label}
         </Text>
@@ -87,7 +89,7 @@ export const UserModal = ({
           <View className="bg-[#FDFCF7] rounded-t-[40px] p-6 max-h-[90%]">
             <View className="flex-row justify-between items-center mb-6">
               <Text className="text-xl font-bold text-gray-900">
-                {user ? "Chỉnh sửa" : "Thêm mới"} người dùng
+                {user ? "Chỉnh sửa" : "Thêm mới"} {defaultRole === UserRole.STAFF ? "Nhân viên" : "Người dùng"}
               </Text>
               <TouchableOpacity
                 onPress={onClose}
@@ -149,8 +151,9 @@ export const UserModal = ({
                 <Text className="text-gray-600 font-bold text-sm mb-3 ml-1">
                   Vai trò
                 </Text>
-                <View className="flex-row space-x-3 gap-x-2">
-                  {renderRoleButton(UserRole.USER, "Người dùng")}
+                <View className="flex-row space-x-2 gap-x-2">
+                  {renderRoleButton(UserRole.USER, "Khách")}
+                  {renderRoleButton(UserRole.STAFF, "Nhân viên")}
                   {renderRoleButton(UserRole.ADMIN, "Quản trị")}
                 </View>
               </View>

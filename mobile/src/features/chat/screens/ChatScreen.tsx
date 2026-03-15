@@ -72,9 +72,6 @@ export default function ChatScreen({ navigation }: { navigation: any }) {
           <Text className="text-lg font-black text-gray-800">Tư vấn trực tiếp</Text>
           <Text className="text-xs text-green-500 font-medium">Nhân viên đang online</Text>
         </View>
-        <TouchableOpacity className="p-2">
-          <MaterialCommunityIcons name="phone" size={24} color="#E07B39" />
-        </TouchableOpacity>
       </View>
 
       <FlatList

@@ -4,12 +4,14 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AuthNavigator from "./AuthNavigator";
 import AdminNavigator from "./AdminNavigator";
 import CustomerNavigator from "./CustomerNavigator";
+import StaffNavigator from "./StaffNavigator";
 import { useAuth } from "../context/AuthContext";
 
 export type RootStackParamList = {
   Auth: undefined;
   Admin: undefined;
   Customer: undefined;
+  Staff: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,6 +33,8 @@ export default function RootNavigator() {
         <Stack.Screen name="Auth" component={AuthNavigator} />
       ) : user?.role === "ADMIN" ? (
         <Stack.Screen name="Admin" component={AdminNavigator} />
+      ) : user?.role === "STAFF" ? (
+        <Stack.Screen name="Staff" component={StaffNavigator} />
       ) : (
         <Stack.Screen name="Customer" component={CustomerNavigator} />
       )}

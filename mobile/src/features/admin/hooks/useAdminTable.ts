@@ -6,10 +6,12 @@ import {
   AdminPagination,
   AdminTableResponse,
 } from "../types/admin.types";
+import { orderApi } from "../../../services/api/api-order";
 
 export const useAdminTable = () => {
   const [tables, setTables] = useState<AdminTable[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingOrder, setLoadingOrder] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [pagination, setPagination] = useState<AdminPagination>({
     total: 0,
@@ -66,6 +68,19 @@ export const useAdminTable = () => {
       setLoading(false);
     }
   };
+
+  const getActiveOrderForTable = useCallback(async (tableId: number) => {
+    setLoadingOrder(true);
+    try {
+      const activeOrder = await orderApi.getOrdersByTableId(tableId);
+      return activeOrder;
+    } catch (error) {
+      console.log("No active order for this table or error fetching.");
+      return null;
+    } finally {
+      setLoadingOrder(false);
+    }
+  }, []);
 
   const toggleTableStatus = async (id: number, isActive: boolean) => {
     try {
@@ -131,6 +146,7 @@ export const useAdminTable = () => {
   return {
     tables,
     loading,
+    loadingOrder,
     refreshing,
     pagination,
     fetchTables,
@@ -141,5 +157,6 @@ export const useAdminTable = () => {
     updateTable,
     getTableById,
     getTables,
+    getActiveOrderForTable,
   };
 };

@@ -26,14 +26,14 @@ export const updateProductSchema = createProductSchema.partial();
 export const getProductsSchema = z.object({
   search: z.string().optional(),
   category: z.string().optional(),
-  minPrice: z.number().optional(),
-  maxPrice: z.number().optional(),
+  minPrice: z.coerce.number().optional(),
+  maxPrice: z.coerce.number().optional(),
   unit: z.enum(PRODUCT_UNITS as [string, ...string[]]).optional(),
-  isAvailable: z.boolean().optional(),
-  isBestSeller: z.boolean().optional(),
+  isAvailable: z.coerce.boolean().optional(),
+  isBestSeller: z.coerce.boolean().optional(),
   sortOrder: z.nativeEnum(SortOrder).optional(),
-  page: z.number().optional(),
-  limit: z.number().optional(),
+  page: z.coerce.number().optional(),
+  limit: z.coerce.number().optional(),
 });
 
 export const getProductByIdSchema = z.object({

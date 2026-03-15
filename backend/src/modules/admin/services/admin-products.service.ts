@@ -50,8 +50,8 @@ export class AdminProductService {
         pagination: {
           total,
           page: Number(validatedQuery.page) || 1,
-          limit: Number(validatedQuery.limit) || 10,
-          totalPages: Math.ceil(total / (Number(validatedQuery.limit) || 10)),
+          limit: Number(validatedQuery.limit) || 100,
+          totalPages: Math.ceil(total / (Number(validatedQuery.limit) || 100)),
         },
       };
     } catch (error) {

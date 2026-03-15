@@ -297,6 +297,7 @@ enum AddressType {
 enum Role {
   USER
   ADMIN
+  STAFF
 }
 
 enum TableStatus {

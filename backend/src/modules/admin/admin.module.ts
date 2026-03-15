@@ -16,13 +16,15 @@ import { AdminNotificationService } from "./services/admin-notification.service"
 import { AdminNotificationRepository } from "./repositories/admin-notification.repository";
 import { AddressController } from "./controllers/admin-address.controller";
 import { AdminTableController } from "./controllers/admin-table.controller";
+import { AdminStaffController } from "./controllers/admin-staff.controller";
+import { CloudinaryModule } from "../../cloudinary/cloudinary.module";
 import { AdminAddressService } from "./services/admin-address.service";
 import { AdminAddressRepository } from "./repositories/admin-address.repository";
 import { AdminTableService } from "./services/admin-table.service";
 import { AdminTableRepository } from "./repositories/admin-table.repository";
 
 @Module({
-  imports: [ProductModule, AuthModule],
+  imports: [ProductModule, AuthModule, CloudinaryModule],
   controllers: [
     AdminProductController,
     AdminManageUserController,
@@ -31,6 +33,7 @@ import { AdminTableRepository } from "./repositories/admin-table.repository";
     NotificationController,
     AddressController,
     AdminTableController,
+    AdminStaffController,
   ],
   providers: [
     AdminProductService,

@@ -34,7 +34,7 @@ import { Role } from "../../auth/enums/role.enum";
 @ApiBearerAuth()
 @Controller("admin/notifications")
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.STAFF)
 export class AdminNotificationController {
   constructor(private readonly service: AdminNotificationService) {}
 

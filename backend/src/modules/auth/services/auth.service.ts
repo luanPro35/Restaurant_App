@@ -165,8 +165,8 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    if (user.role !== "ADMIN") {
-      throw new UnauthorizedException("Invalid credentials");
+    if (user.role !== "ADMIN" && user.role !== "STAFF") {
+      throw new UnauthorizedException("Insufficient permissions to access admin area");
     }
     const payload = {
       sub: user.id,

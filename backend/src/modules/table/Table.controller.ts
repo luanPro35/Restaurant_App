@@ -1,5 +1,6 @@
 import { AdminTableService } from "../admin/services/admin-table.service";
-import { Controller, Get, Param, Query, Patch, Body } from "@nestjs/common";
+import { Controller, Get, Param, Query, Patch, Body, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import {
   ApiTags,
   ApiOperation,
@@ -12,7 +13,7 @@ import { UpdateTableDto } from "../admin/dtos/admin-table.dto";
 @ApiTags("Tables")
 @Controller("tables")
 export class TableController {
-  constructor(private readonly adminTableService: AdminTableService) {}
+  constructor(private readonly adminTableService: AdminTableService) { }
 
   @Get()
   @ApiOperation({ summary: "Lấy danh sách tất cả các bàn" })
@@ -40,7 +41,8 @@ export class TableController {
   }
 
   @Patch(":id")
-  @ApiOperation({ summary: "Cập nhật trạng thái bàn (Dành cho khách)" })
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Cập nhật trạng thái bàn (Nhân viên/Admin)" })
   @ApiParam({ name: "id", description: "ID của bàn" })
   @ApiBody({ type: UpdateTableDto })
   @ApiResponse({ status: 200, description: "Cập nhật thành công" })

@@ -145,6 +145,12 @@ export default function AdminDashboardScreen() {
             onPress={() => navigation.navigate("AdminUsersScreen")}
           />
           <AdminCard
+            title="Nhân viên"
+            icon="account-tie-outline"
+            colors={["#4facfe", "#00f2fe"]}
+            onPress={() => navigation.navigate("AdminStaffScreen")}
+          />
+          <AdminCard
             title="Khuyến mãi"
             icon="ticket-percent"
             colors={["#ff9a9e", "#fecfef"]}

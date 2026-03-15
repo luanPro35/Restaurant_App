@@ -16,13 +16,13 @@ export class AdminManageUserRepository {
     const where: any = {};
 
     if (name) {
-      where.name = { contains: name, mode: "insensitive" };
+      where.name = { contains: name };
     }
     if (email) {
-      where.email = { contains: email, mode: "insensitive" };
+      where.email = { contains: email };
     }
     if (query.phone) {
-      where.phone = { contains: query.phone, mode: "insensitive" };
+      where.phone = { contains: query.phone };
     }
     if (role) {
       where.role = role;
@@ -32,7 +32,8 @@ export class AdminManageUserRepository {
   }
 
   async findAll(query: GetUsersDto) {
-    const { limit = 10, page = 1 } = query;
+    const limit = Number(query.limit) || 10;
+    const page = Number(query.page) || 1;
     const skip = (page - 1) * limit;
     const where = this.buildWhereClause(query);
 
@@ -52,7 +53,7 @@ export class AdminManageUserRepository {
 
   async create(data: CreateUserDto) {
     return this.prisma.user.create({
-      data,
+      data: data as any,
     });
   }
 
@@ -60,7 +61,7 @@ export class AdminManageUserRepository {
     const { id, ...rest } = data;
     return this.prisma.user.update({
       where: { id },
-      data: rest,
+      data: rest as any,
     });
   }
 
