@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
 import { PrismaModule } from "./prisma/prisma.module";
 import { AuthModule } from "./modules/auth/modules/auth.module";
 import { ProductModule } from "./modules/product/product.module";
@@ -13,6 +13,8 @@ import { ChatModule } from "./modules/chat/chat.module";
 import { VietQrModule } from "./modules/vietQr/vietQr.module";
 import { AI_Module } from "./modules/ai/Ai.module";
 import { CategoryModule } from "./modules/category/category.module";
+import { RedisModule } from "./modules/redis/redis.module";
+import authLimiter from "./middlewares/rate-limit.middleware";
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { CategoryModule } from "./modules/category/category.module";
     VietQrModule,
     AI_Module,
     CategoryModule,
+    RedisModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -36,4 +39,10 @@ import { CategoryModule } from "./modules/category/category.module";
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(authLimiter)
+      .forRoutes("auth");
+  }
+}

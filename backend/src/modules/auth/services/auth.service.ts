@@ -47,8 +47,6 @@ export class AuthService {
       throw new BadGatewayException("User not created");
     }
 
-    await this.prisma.otp.delete({ where: { email } });
-
     return user;
   }
 

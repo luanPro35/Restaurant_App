@@ -14,6 +14,16 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix("api/v1");
 
+  // Rate Limiting
+  const rateLimit = require("express-rate-limit");
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      message: "Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau 15 phút.",
+    }),
+  );
+
   // Validation
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 

@@ -3,60 +3,49 @@ import {
   UnauthorizedException,
   BadRequestException,
 } from "@nestjs/common";
-import { PrismaService } from "../../../prisma/prisma.service";
+import { RedisService } from "../../redis/redis.service";
 import { sendEmail } from "../../../jobs/email.job";
 
 @Injectable()
 export class OtpService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly redisService: RedisService) { }
 
   async generateOtp(email: string) {
     if (!email) {
       throw new BadRequestException("Email is required");
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-    const otpRecord = await this.prisma.otp.upsert({
-      where: { email: email },
-      update: { otp: otp, expiresAt: expiresAt },
-      create: { email: email, otp: otp, expiresAt: expiresAt },
-    });
-
+    const redisKey = `otp:${email}`;
+    await this.redisService.set(redisKey, otp, 300);
     try {
       await sendEmail(
         email,
         "Mã xác thực (OTP) của bạn",
         `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
       );
-      console.log(`✅ OTP email sent successfully to: ${email}`);
+      console.log(`OTP email sent successfully to: ${email}`);
     } catch (error: any) {
-      console.error("❌ Failed to send OTP email:", error?.message || error);
+      console.error("Failed to send OTP email:", error?.message || error);
       throw new BadRequestException(
         `Không thể gửi email OTP đến ${email}. Lỗi: ${error?.message || "Unknown error"}`,
       );
     }
 
-    return otpRecord;
+    return { email, message: "OTP sent successfully" };
   }
 
   async verifyOtp(email: string, otp: string) {
-    const record = await this.prisma.otp.findUnique({
-      where: { email },
-    });
+    const redisKey = `otp:${email}`;
+    const storedOtp = await this.redisService.get(redisKey);
 
-    if (!record) {
-      throw new BadRequestException("OTP not found for this email");
+    if (!storedOtp) {
+      throw new BadRequestException("OTP has expired or does not exist");
     }
 
-    if (record.otp !== otp) {
+    if (storedOtp !== otp) {
       throw new UnauthorizedException("Invalid OTP");
     }
-
-    if (record.expiresAt < new Date()) {
-      throw new UnauthorizedException("OTP has expired");
-    }
-
-    return record;
+    await this.redisService.del(redisKey);
+    return { email, verified: true };
   }
 }
