@@ -1,3 +1,0 @@
-import bcrypt from "bcryptjs"; // Ensure you install @types/bcryptjs but since they are not in package.json yet I might skip details. Actually I put them in devDependencies earlier implicitly by asking for backend folder.
-
-// export const hashPassword = ...

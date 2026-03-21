@@ -4,6 +4,7 @@ import { CreatePaymentDto } from "./payment.dto";
 import { TransactionStatus, PaymentStatus } from "@prisma/client";
 import { createPaymentSchema } from "./payment.validation";
 import { PrismaService } from "../../prisma/prisma.service";
+import { sendTelegramMessage } from "../../utils/telegram";
 
 @Injectable()
 export class PaymentService {
@@ -33,8 +34,8 @@ export class PaymentService {
             throw new NotFoundException("Phải cung cấp orderId hoặc packageId");
         }
 
-        return this.prisma.$transaction(async (tx) => {
-            const payment = await tx.payment.create({
+        const payment = await this.prisma.$transaction(async (tx) => {
+            const p = await tx.payment.create({
                 data: {
                     orderId: validatedData.orderId || null,
                     packageId: validatedData.packageId || null,
@@ -56,8 +57,15 @@ export class PaymentService {
                 });
             }
 
-            return payment;
+            return p;
         });
+
+        const message = `<b>🔔 Thông báo thanh toán mới!</b>\n\n` +
+            `💰 <b>Số tiền:</b> ${payment.amount.toLocaleString('vi-VN')} VNĐ\n`;
+
+        sendTelegramMessage(message).catch(err => console.error("Telegram Error:", err));
+
+        return payment;
     }
 
     async findById(id: string) {
