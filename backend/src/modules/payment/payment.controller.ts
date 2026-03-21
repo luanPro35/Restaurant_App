@@ -31,4 +31,14 @@ export class PaymentController {
     async getPaymentById(@Param("id") id: string) {
         return this.paymentService.findById(id);
     }
-}
+
+    @Get("total-amount-today")
+    async getTotalAmountToday() {
+        return this.paymentService.totalAmountToday();
+    }
+
+    @Get("total-package-today")
+    async getTotalPackageToday() {
+        return this.paymentService.totalPackageToday();
+    }
+}

@@ -13,11 +13,13 @@ import { ChatModule } from "./modules/chat/chat.module";
 import { VietQrModule } from "./modules/vietQr/vietQr.module";
 import { AI_Module } from "./modules/ai/Ai.module";
 import { CategoryModule } from "./modules/category/category.module";
+import { ScheduleModule } from "@nestjs/schedule";
 import { RedisModule } from "./modules/redis/redis.module";
 import authLimiter from "./middlewares/rate-limit.middleware";
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
     ProductModule,
