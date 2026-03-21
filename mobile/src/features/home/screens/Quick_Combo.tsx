@@ -8,13 +8,36 @@ import { seededShuffle, getDailySeed } from "../../../utils/random";
 import { formatCurrency } from "../../../shared/utils";
 import { useCart } from "../../../app/context/CartContext";
 import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
+import { IP } from "../../../config/ip";
 
 const SimpleProductCard = ({ item, navigation }: { item: any, navigation: any }) => {
   const { addToCart } = useCart();
   
-  const imageUrl = (item.images || item.image) && ((item.images || item.image).startsWith('http') || (item.images || item.image).startsWith('data:'))
-    ? (item.images || item.image)
-    : "https://res.cloudinary.com/dt9v7896q/image/upload/v1710502127/placeholder_food.png";
+  const getImageUrl = (item: any) => {
+    const imageInput = item.image || item.images;
+    if (!imageInput) return "https://via.placeholder.com/400";
+    let url = "";
+    if (Array.isArray(imageInput)) {
+      url = imageInput[0];
+    } else if (typeof imageInput === 'string') {
+      if (imageInput.startsWith('http') || imageInput.startsWith('data:')) {
+        url = imageInput;
+      } else {
+        try {
+          const parsed = JSON.parse(imageInput);
+          url = Array.isArray(parsed) ? parsed[0] : (typeof parsed === 'string' ? parsed : "");
+        } catch {
+          url = imageInput;
+        }
+      }
+    } else {
+      url = String(imageInput);
+    }
+    if (!url || typeof url !== 'string') return "https://via.placeholder.com/400";
+    return url.replace('localhost', IP);
+  };
+
+  const imageUrl = getImageUrl(item);
 
   return (
     <View className="mr-5 bg-white rounded-[32px] shadow-sm w-[180px] my-3 overflow-hidden border border-gray-100/50">

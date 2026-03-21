@@ -16,6 +16,7 @@ import { useMenu } from "../hooks/useMenu";
 import { MenuItem, CartItem } from "../types";
 import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { useCart } from "../../../app/context/CartContext";
+import { IP } from "../../../config/ip";
 
 export default function MenuScreen() {
   const navigation =
@@ -56,34 +57,36 @@ export default function MenuScreen() {
   };
 
   const menuItems: MenuItem[] = menu.map((item: any) => {
-    let imageUrl =
-      "https://via.placeholder.com/400x300/E07B39/ffffff?text=" +
-      encodeURIComponent(item.name);
-
-    if (item.image) {
-      imageUrl = item.image;
-    } else if (item.images) {
-      if (Array.isArray(item.images) && item.images.length > 0) {
-        imageUrl = item.images[0];
-      } else if (typeof item.images === "string") {
-        try {
-          const parsed = JSON.parse(item.images);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            imageUrl = parsed[0];
-          } else {
-            imageUrl = item.images;
+    const getImageUrl = (imageInput: any) => {
+      if (!imageInput) return "https://via.placeholder.com/400";
+      let url = "";
+      if (Array.isArray(imageInput)) {
+        url = imageInput[0];
+      } else if (typeof imageInput === 'string') {
+        if (imageInput.startsWith('http') || imageInput.startsWith('data:')) {
+          url = imageInput;
+        } else {
+          try {
+            const parsed = JSON.parse(imageInput);
+            url = Array.isArray(parsed) ? parsed[0] : parsed;
+          } catch {
+            url = imageInput;
           }
-        } catch (e) {
-          imageUrl = item.images;
         }
+      } else {
+        url = String(imageInput);
       }
-    }
+      if (typeof url !== 'string') return "https://via.placeholder.com/400";
+      return url.replace('localhost', IP);
+    };
+
+    const finalImageUrl = getImageUrl(item.image || item.images);
 
     return {
       id: item.id,
       name: item.name,
       price: item.price,
-      image: imageUrl,
+      image: finalImageUrl,
       description: item.description || "",
       category: item.category?.name || "Khác",
     };

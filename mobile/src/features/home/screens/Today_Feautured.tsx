@@ -8,17 +8,43 @@ import { seededShuffle, getDailySeed } from "../../../utils/random";
 import { formatCurrency } from "../../../shared/utils";
 import { useCart } from "../../../app/context/CartContext";
 import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
+import { IP } from "../../../config/ip";
 
 const SimpleProductCard = ({ item, navigation }: { item: any, navigation: any }) => {
   const { addToCart } = useCart();
-  
-  const imageUrl = (item.images || item.image) && ((item.images || item.image).startsWith('http') || (item.images || item.image).startsWith('data:'))
-    ? (item.images || item.image)
-    : "https://res.cloudinary.com/dt9v7896q/image/upload/v1710502127/placeholder_food.png";
+
+  const getImageUrl = (item: any) => {
+    let url = "";
+
+    if (Array.isArray(item.images) && item.images.length > 0) {
+      url = item.images[0];
+    } else if (typeof item.images === 'string' && item.images.trim().length > 0) {
+      try {
+        const parsed = JSON.parse(item.images);
+        url = Array.isArray(parsed) ? parsed[0] : (typeof parsed === 'string' ? parsed : item.images);
+      } catch {
+        url = item.images;
+      }
+    }
+
+    if (!url || typeof url !== 'string' || url.length < 5) {
+      if (typeof item.image === 'string' && item.image.trim().length > 5) {
+        url = item.image;
+      }
+    }
+
+    if (!url || typeof url !== 'string' || url.length < 5) {
+      return "https://via.placeholder.com/400x400/E07B39/FFFFFF?text=Product";
+    }
+
+    return url.replace('localhost', IP);
+  };
+
+  const imageUrl = getImageUrl(item);
 
   return (
     <View className="mr-5 bg-white rounded-[32px] shadow-sm w-[180px] my-3 overflow-hidden border border-gray-100/50">
-      <TouchableOpacity 
+      <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => navigation.navigate("DetailProduct", { id: item.id.toString() })}
       >
@@ -49,8 +75,8 @@ const SimpleProductCard = ({ item, navigation }: { item: any, navigation: any })
               {typeof item.price === "number" ? formatCurrency(item.price) : item.price}
             </Text>
           </View>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             className="bg-[#E07B39] w-10 h-10 rounded-2xl items-center justify-center shadow-lg shadow-orange-200 active:scale-90"
             onPress={() => addToCart(item)}
             activeOpacity={0.7}
@@ -72,7 +98,7 @@ export default function Today_Feautured({ navigation }: { navigation: any }) {
       try {
         const response = await productApi.getAll({ limit: 1000 });
         const allProducts = Array.isArray(response) ? response : response.data || [];
-        
+
         if (allProducts.length > 0) {
           const shuffled = seededShuffle(allProducts, getDailySeed() + "_featured");
           setDishes(shuffled.slice(0, 10));
