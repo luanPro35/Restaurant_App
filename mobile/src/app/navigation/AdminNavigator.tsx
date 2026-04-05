@@ -24,6 +24,9 @@ import AdminChatDetailScreen from "../../features/admin/screens/AdminChatScreen/
 import AdminPaymentsScreen from "../../features/admin/screens/AdminPaymentsScreen/AdminPaymentsScreen";
 import AdminAnalysisScreen from "../../features/admin/screens/AdminPaymentsScreen/AdminAnalysisScreen";
 import AdminStaffScreen from "../../features/admin/screens/AdminStaffScreen/AdminStaffScreen";
+import VietQrScreen from "../../features/vietQr/screen/vietQr";
+import UploadImagePayment from "../../features/vietQr/screen/UploadImagePayment";
+import PaymentSuccessful from "../../features/vietQr/screen/PaymentSuccessful";
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
@@ -49,6 +52,9 @@ export type AdminStackParamList = {
   AdminChatDetail: { conversationId: string };
   AdminPaymentsScreen: undefined;
   AdminAnalysisScreen: undefined;
+  VietQr: { packageId?: string, orderId?: string };
+  UploadImagePayment: { packageId?: string, orderId?: string };
+  PaymentSuccessful: undefined;
 };
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
@@ -100,6 +106,9 @@ export default function AdminNavigator() {
       <Stack.Screen name="AdminChatDetail" component={AdminChatDetailScreen} />
       <Stack.Screen name="AdminPaymentsScreen" component={AdminPaymentsScreen} />
       <Stack.Screen name="AdminAnalysisScreen" component={AdminAnalysisScreen} />
+      <Stack.Screen name="VietQr" component={VietQrScreen} />
+      <Stack.Screen name="UploadImagePayment" component={UploadImagePayment} />
+      <Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
     </Stack.Navigator>
   );
 }

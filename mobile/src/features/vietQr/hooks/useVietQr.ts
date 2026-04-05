@@ -51,6 +51,20 @@ export const useVietQr = () => {
         }
     };
 
+    const uploadReceipt = async (formData: FormData) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await paymentApi.uploadReceipt(formData);
+            return response;
+        } catch (error: any) {
+            setError(error.message);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
         vietQr,
         loading,
@@ -58,5 +72,6 @@ export const useVietQr = () => {
         createVietQrForPackage,
         getVietQrByOrderId,
         createVietQrForOrder,
+        uploadReceipt,
     };
 };

@@ -21,6 +21,7 @@ import QRScannerScreen from "../../features/at_restaurant/screens/QRScannerScree
 import VietQrScreen from "../../features/vietQr/screen/vietQr";
 import PaymentSuccessful from "../../features/vietQr/screen/PaymentSuccessful";
 import AiChatScreen from "../../features/AI/Screens/AiChatScreen";
+import UploadImagePayment from "../../features/vietQr/screen/UploadImagePayment";
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -47,6 +48,7 @@ export type CustomerStackParamList = {
   VietQr: { packageId?: string, orderId?: string };
   PaymentSuccessful: undefined;
   AI: { product?: string, initialMessage?: string } | undefined;
+  UploadImagePayment: { packageId?: string, orderId?: string };
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -77,6 +79,7 @@ export default function CustomerNavigator() {
       <Stack.Screen name="VietQr" component={VietQrScreen} />
       <Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
       <Stack.Screen name="AI" component={AiChatScreen} />
+      <Stack.Screen name="UploadImagePayment" component={UploadImagePayment} />
     </Stack.Navigator>
   );
 }

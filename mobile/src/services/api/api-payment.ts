@@ -33,6 +33,14 @@ export const paymentApi = {
         const response = await api.get(`/payments/total-amount`);
         return response.data?._sum?.amount || 0;
     },
+    uploadReceipt: async (formData: FormData): Promise<any> => {
+        const response = await api.post(`/payments/upload-receipt`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
 };
 
 export default paymentApi;

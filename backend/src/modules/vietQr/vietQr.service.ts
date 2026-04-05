@@ -21,6 +21,14 @@ export class VietQrService {
         return `${baseUrl}?amount=${data.amount}&addInfo=${description}&accountName=${name}`;
     }
 
+    private generateDeeplinkUrl(data: { amount: number, orderInfo: string }) {
+        const bankBin = '970422';
+        const accountNumber = '0905622341';
+        const description = data.orderInfo || '';
+        const amount = data.amount.toString();
+        return `mbbank://pay?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountNumber=${accountNumber}&bankCode=${bankBin}`;
+    }
+
     async createVietQr(data: CreateVietQrDto) {
         const accountName = 'LE QUANG LUAN';
         const bin = '970422';
@@ -32,12 +40,18 @@ export class VietQrService {
             accountName
         });
 
+        const deeplink = this.generateDeeplinkUrl({
+            amount: data.amount,
+            orderInfo: data.orderInfo || '',
+        });
+
         const body = {
             ...data,
             accountName,
             bin,
             accountNumber,
             qrData,
+            deeplink,
         };
 
         return this.vietQrRepository.createVietQr(body);

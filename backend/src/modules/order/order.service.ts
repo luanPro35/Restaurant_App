@@ -9,6 +9,7 @@ import {
 import { OrderRepository } from "./order.repository";
 import { CreateOrderDto } from "./order.dto";
 import { PaymentService } from "../payment/payment.service";
+import { sendTelegramMessage } from "../../utils/telegram";
 
 @Injectable()
 export class OrderService {
@@ -16,7 +17,7 @@ export class OrderService {
     private readonly orderRepository: OrderRepository,
     private readonly prisma: PrismaService,
     private readonly paymentService: PaymentService,
-  ) {}
+  ) { }
 
   async create(createOrderDto: CreateOrderDto) {
     const { tableId, items, type, notes } = createOrderDto;
@@ -77,15 +78,47 @@ export class OrderService {
 
   async updateStatus(id: string, status: string) {
     const updatedOrder = await this.orderRepository.updateStatus(id, status as OrderStatus);
-    
+
     if (status === OrderStatus.COMPLETED) {
-      await this.paymentService.create({
-        orderId: id,
-        amount: updatedOrder.totalAmount,
-        method: "CASH" as any,
+      const existingPayment = await this.prisma.payment.findFirst({
+        where: { orderId: id },
+        include: { user: true }
       });
+
+      if (!existingPayment) {
+        await this.paymentService.create({
+          orderId: id,
+          amount: updatedOrder.totalAmount,
+          method: "CASH" as any,
+        });
+      }
+
+      const order = await this.prisma.order.findUnique({
+        where: { id },
+        include: {
+          table: true,
+          user: true,
+          payments: true
+        }
+      });
+
+      if (order) {
+        const payment = order.payments[0];
+        let typeInfo = order.table ? `📍 <b>Bàn:</b> ${order.table.name}` : `🆔 <b>Mã đơn:</b> #${order.id.slice(0, 8)}`;
+
+        const message = `<b>✅ ĐƠN HÀNG ĐÃ HOÀN TẤT</b>\n\n` +
+          `👤 <b>Khách hàng:</b> ${order.user?.name || 'Ẩn danh'}\n` +
+          `💰 <b>Số tiền:</b> <code>${order.totalAmount.toLocaleString('vi-VN')}</code> VNĐ\n` +
+          `💳 <b>Phương thức:</b> ${payment?.method || 'N/A'}\n` +
+          `👤 <b>Địa chỉ giao:</b> ${order.deliveryAddress || 'Tại nhà hàng'}\n` +
+          `${typeInfo}\n` +
+          (payment?.receiptUrl ? `🖼 <b>Ảnh minh chứng:</b> <a href="${payment.receiptUrl}">Xem tại đây</a>\n` : '') +
+          `⏰ <b>Thời gian:</b> ${new Date().toLocaleString('vi-VN')}`;
+
+        sendTelegramMessage(message).catch(err => console.error("Telegram Error:", err));
+      }
     }
-    
+
     return updatedOrder;
   }
 

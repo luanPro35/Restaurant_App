@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, useWindowDimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, useWindowDimensions, Linking, Alert } from "react-native";
 import { useEffect } from "react";
 import { useVietQr } from "../hooks/useVietQr";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -17,6 +17,22 @@ export default function VietQrScreen({ route }: { route: any }) {
             createVietQrForOrder(orderId);
         }
     }, [packageId, orderId]);
+
+    const handleOpenBankingApp = async () => {
+        console.log("Deeplink URL:", vietQr?.deeplink);
+        if (vietQr?.deeplink) {
+            Linking.openURL(vietQr.deeplink).catch(err => {
+                console.log("Lỗi mở app:", err);
+                Alert.alert(
+                    "Thông báo",
+                    "Không tìm thấy ứng dụng ngân hàng tương ứng. Bạn vui lòng quét mã QR thủ công.",
+                    [{ text: "OK" }]
+                );
+            });
+        } else {
+            Alert.alert("Lỗi", "Không tìm thấy thông tin chuyển khoản (Deeplink trống). Hãy thử tạo đơn hàng mới.");
+        }
+    };
 
 
     if (loading) {
@@ -52,7 +68,7 @@ export default function VietQrScreen({ route }: { route: any }) {
                 <View className="items-center mb-6">
                     <Text className="text-2xl font-black text-slate-800">Thanh toán VietQR</Text>
                     <Text className="text-slate-500 mt-1 text-center">
-                        Vui lòng quét mã bên dưới để hoàn tất thanh toán
+                        Vui lòng quét mã hoặc nhấn nút bên dưới để thanh toán
                     </Text>
                 </View>
 
@@ -66,15 +82,26 @@ export default function VietQrScreen({ route }: { route: any }) {
                             />
                         </View>
                     )}
+
+                    {vietQr?.deeplink && (
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={handleOpenBankingApp}
+                            className="bg-blue-50 flex-row items-center justify-center py-4 px-6 rounded-2xl w-full border border-blue-100"
+                        >
+                            <MaterialCommunityIcons name="bank" size={24} color="#2563EB" />
+                            <Text className="text-blue-700 font-bold ml-2">Mở App Ngân hàng</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View className="mt-8 gap-4">
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => navigation.navigate("PaymentSuccessful")}
+                        onPress={() => navigation.navigate("UploadImagePayment", { orderId, packageId })}
                         className="bg-blue-600 py-4 rounded-2xl items-center shadow-lg shadow-blue-200"
                     >
-                        <Text className="text-white font-black text-lg">Tôi đã thanh toán</Text>
+                        <Text className="text-white font-black text-lg">Hình ảnh chuyển khoản</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity

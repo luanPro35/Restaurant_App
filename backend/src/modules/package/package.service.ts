@@ -3,12 +3,16 @@ import { PackageRepository } from "./package.repository";
 import { CreatePackageDto, UpdatePackageDto } from "./package.dto";
 import { createPackageSchema, updatePackageSchema } from "./package.validation";
 import { PaymentService } from "../payment/payment.service";
+import { sendTelegramMessage } from "../../utils/telegram";
+import { PackageStatus } from "@prisma/client";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class PackageService {
     constructor(
         private readonly packageRepository: PackageRepository,
-        private readonly paymentService: PaymentService
+        private readonly paymentService: PaymentService,
+        private readonly prisma: PrismaService,
     ) { }
 
     async create(data: CreatePackageDto) {
@@ -28,7 +32,6 @@ export class PackageService {
                 amount: pkg.price,
                 method: method as any,
                 userId: pkg.userId || undefined,
-                status: "COMPLETED"
             });
         } catch (error) {
             console.error("Failed to record payment for package:", error);
@@ -56,7 +59,27 @@ export class PackageService {
     async update(id: string, data: UpdatePackageDto) {
         await this.findOne(id);
         const validatedData = updatePackageSchema.parse(data);
-        return this.packageRepository.update(id, validatedData as UpdatePackageDto);
+        const updatedPkg = await this.packageRepository.update(id, validatedData as UpdatePackageDto);
+
+        if (validatedData.status === PackageStatus.CONFIRMED) {
+            const payment = await this.prisma.payment.findFirst({
+                where: { packageId: id },
+                include: { user: true }
+            });
+
+            const message = `<b>✅ GÓI GIAO HÀNG ĐÃ HOÀN TẤT</b>\n\n` +
+                `👤 <b>Khách hàng:</b> ${payment?.user?.name || 'Ẩn danh'}\n` +
+                `💰 <b>Số tiền:</b> <code>${updatedPkg.price.toLocaleString('vi-VN')}</code> VNĐ\n` +
+                `💳 <b>Phương thức:</b> ${payment?.method || 'N/A'}\n` +
+                `👤 <b>Địa chỉ giao:</b> ${updatedPkg.address || 'N/A'}\n` +
+                `📦 <b>Gói:</b> ${updatedPkg.name}\n` +
+                (payment?.receiptUrl ? `🖼 <b>Ảnh minh chứng:</b> <a href="${payment.receiptUrl}">Xem tại đây</a>\n` : '') +
+                `⏰ <b>Thời gian:</b> ${new Date().toLocaleString('vi-VN')}`;
+
+            sendTelegramMessage(message).catch(err => console.error("Telegram Error:", err));
+        }
+
+        return updatedPkg;
     }
 
     async delete(id: string) {

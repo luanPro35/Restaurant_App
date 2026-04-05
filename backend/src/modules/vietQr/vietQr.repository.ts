@@ -10,7 +10,7 @@ export class VietQrRepository {
     }
 
     async createVietQr(data: any) {
-        const { accountName, bin, accountNumber, amount, orderInfo, qrData, orderId, packageId } = data;
+        const { accountName, bin, accountNumber, amount, orderInfo, qrData, deeplink, orderId, packageId } = data;
         return this.prisma.vietQr.create({
             data: {
                 accountName,
@@ -19,6 +19,7 @@ export class VietQrRepository {
                 amount,
                 orderInfo,
                 qrData,
+                deeplink,
                 orderId,
                 packageId,
             },

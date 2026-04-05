@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, Param, Patch, HttpCode, HttpStatus, Query, Delete } from "@nestjs/common";
+import { Controller, Post, Body, Get, Param, Patch, HttpCode, HttpStatus, Query, Delete, UseInterceptors, UploadedFile } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
 import { CreatePaymentDto } from "./payment.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("payments")
 export class PaymentController {
@@ -10,6 +11,16 @@ export class PaymentController {
     @HttpCode(HttpStatus.CREATED)
     async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
         return this.paymentService.create(createPaymentDto);
+    }
+
+    @Post("upload-receipt")
+    @UseInterceptors(FileInterceptor("file"))
+    async uploadReceipt(
+        @UploadedFile() file: Express.Multer.File,
+        @Body("orderId") orderId?: string,
+        @Body("packageId") packageId?: string
+    ) {
+        return this.paymentService.uploadReceipt(file, orderId, packageId);
     }
 
     @Get("total-amount")
@@ -41,4 +52,4 @@ export class PaymentController {
     async getTotalPackageToday() {
         return this.paymentService.totalPackageToday();
     }
-}
+}

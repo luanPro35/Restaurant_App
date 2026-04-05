@@ -6,12 +6,14 @@ import { TransactionStatus, PaymentStatus } from "@prisma/client";
 import { createPaymentSchema } from "./payment.validation";
 import { PrismaService } from "../../prisma/prisma.service";
 import { sendTelegramMessage } from "../../utils/telegram";
+import { CloudinaryService } from "../../cloudinary/cloudinary.service";
 
 @Injectable()
 export class PaymentService {
     constructor(
         private readonly paymentRepository: PaymentRepository,
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService
     ) { }
 
     async create(data: CreatePaymentDto) {
@@ -35,88 +37,38 @@ export class PaymentService {
             throw new NotFoundException("Phải cung cấp orderId hoặc packageId");
         }
 
-        const payment = await this.prisma.$transaction(async (tx) => {
-            const p = await tx.payment.create({
-                data: {
-                    orderId: validatedData.orderId || null,
-                    packageId: validatedData.packageId || null,
-                    amount: validatedData.amount,
-                    method: validatedData.method as any,
-                    status: TransactionStatus.COMPLETED,
-                    userId: userId || undefined,
-                },
-                include: {
-                    order: {
-                        include: {
-                            table: true
-                        }
-                    },
-                    package: true,
-                }
-            });
-
-            if (validatedData.orderId) {
-                await tx.order.update({
-                    where: { id: validatedData.orderId },
-                    data: { paymentStatus: PaymentStatus.PAID }
-                });
+        const payment = await this.prisma.payment.create({
+            data: {
+                orderId: validatedData.orderId || null,
+                packageId: validatedData.packageId || null,
+                amount: validatedData.amount,
+                method: validatedData.method as any,
+                status: validatedData.method === 'CASH' ? TransactionStatus.COMPLETED : TransactionStatus.PENDING,
+                userId: userId || undefined,
             }
-
-            return p;
         });
-
-        let typeInfo = "";
-        let paymentType = "Đơn hàng";
-
-        if (payment.order) {
-            if (payment.order.table) {
-                paymentType = "Thanh toán tại bàn 🍽";
-                typeInfo = `📍 <b>Bàn:</b> ${payment.order.table.name}\n`;
-            } else {
-                paymentType = `Đơn hàng ${payment.order.type === 'TAKEAWAY' ? 'Mang về 🛍' : 'Giao hàng 🛵'}`;
-                typeInfo = `🆔 <b>Mã đơn:</b> #${payment.order.id.slice(0, 8)}\n`;
-            }
-        } else if (payment.package) {
-            paymentType = "Gói giao hàng 📦";
-            typeInfo = `📦 <b>Tên gói:</b> ${payment.package.name}\n`;
-        }
-
-        const methodMap: Record<string, string> = {
-            'CASH': 'Tiền mặt 💵',
-            'BANK_TRANSFER': 'Chuyển khoản 💳',
-            'CREDIT_CARD': 'Thẻ tín dụng 💳',
-            'E_WALLET': 'Ví điện tử 📱'
-        };
-
-        const paymentMethod = methodMap[payment.method] || payment.method;
-
-        const message = `<b>🔔 THÔNG BÁO THANH TOÁN MỚI</b>\n\n` +
-            `📝 <b>Loại hình:</b> ${paymentType}\n` +
-            `💰 <b>Số tiền:</b> <code>${payment.amount.toLocaleString('vi-VN')}</code> VNĐ\n` +
-            `💳 <b>Phương thức:</b> ${paymentMethod}\n` +
-            typeInfo +
-            `⏰ <b>Thời gian:</b> ${new Date().toLocaleString('vi-VN')}`;
-
-        sendTelegramMessage(message).catch(err => console.error("Telegram Notification Error:", err));
 
         return payment;
     }
 
     @Cron('30 10 * * *')
     async handleDailyReport() {
-        const amountToday = await this.totalAmountToday();
-        const orderToday = await this.totalOrderToday();
-        const pkgToday = await this.totalPackageToday();
+        const amountTodayData = await this.totalAmountToday();
+        const orderTodayData = await this.totalOrderToday();
+        const pkgTodayData = await this.totalPackageToday();
 
-        const message = `📊 <b>BÁO CÁO TỔNG KẾT NGÀY</b>\n\n` +
-            `📦 <b>Tổng đơn hàng:</b> <code>${(orderToday._sum.amount || 0).toLocaleString('vi-VN')}</code> VNĐ\n` +
-            `🚚 <b>Gói giao hàng:</b> <code>${(pkgToday._sum.amount || 0).toLocaleString('vi-VN')}</code> VNĐ\n` +
+        const amountToday = Number((amountTodayData as any)._sum?.amount || 0);
+        const orderToday = Number((orderTodayData as any)._sum?.amount || 0);
+        const pkgToday = Number((pkgTodayData as any)._sum?.amount || 0);
+
+        const message = `📊 <b>BÁO CÁO DOANH THU HẰNG NGÀY</b>\n\n` +
+            `🛒 <b>Từ Đơn hàng:</b> <code>${orderToday.toLocaleString('vi-VN')}</code> VNĐ\n` +
+            `📦 <b>Từ Gói giao dịch:</b> <code>${pkgToday.toLocaleString('vi-VN')}</code> VNĐ\n` +
             `--------------------------------------------\n` +
-            `💰 <b>Tổng doanh thu:</b> <code>${(amountToday._sum.amount || 0).toLocaleString('vi-VN')}</code> VNĐ\n` +
-            `⏰ <i>Hệ thống tự động gửi lúc ${new Date().toLocaleTimeString('vi-VN')}</i>`;
+            `💰 <b>TỔNG DOANH THU:</b> <code>${amountToday.toLocaleString('vi-VN')}</code> VNĐ\n\n` +
+            `⏰ <i>Hệ thống tự động tổng kết ngày ${new Date().toLocaleDateString('vi-VN')}</i>`;
 
         await sendTelegramMessage(message);
-        console.log("Daily Report sent to Telegram successfully!");
     }
 
     async findById(id: string) {
@@ -134,61 +86,74 @@ export class PaymentService {
     }
 
     async totalAmount() {
-        const totalAmount = await this.prisma.payment.aggregate({
-            _sum: {
-                amount: true,
-            },
+        return this.prisma.payment.aggregate({
+            _sum: { amount: true },
+            where: { status: TransactionStatus.COMPLETED }
         });
-        return totalAmount;
     }
 
     async totalAmountToday() {
-        const totalAmount = await this.prisma.payment.aggregate({
-            _sum: {
-                amount: true,
-            },
+        return this.prisma.payment.aggregate({
+            _sum: { amount: true },
             where: {
+                status: TransactionStatus.COMPLETED,
                 createdAt: {
                     gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 },
             },
         });
-        return totalAmount;
     }
 
     async totalPackageToday() {
-        const totalAmount = await this.prisma.payment.aggregate({
-            _sum: {
-                amount: true,
-            },
+        return this.prisma.payment.aggregate({
+            _sum: { amount: true },
             where: {
+                status: TransactionStatus.COMPLETED,
+                packageId: { not: null },
                 createdAt: {
                     gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 },
-                packageId: {
-                    not: null,
-                },
             },
         });
-        return totalAmount;
     }
 
     async totalOrderToday() {
-        const totalAmount = await this.prisma.payment.aggregate({
-            _sum: {
-                amount: true,
-            },
+        return this.prisma.payment.aggregate({
+            _sum: { amount: true },
             where: {
+                status: TransactionStatus.COMPLETED,
+                orderId: { not: null },
                 createdAt: {
                     gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 },
-                orderId: {
-                    not: null,
-                },
             },
         });
-        return totalAmount;
     }
 
-}
+    async uploadReceipt(file: Express.Multer.File, orderId?: string, packageId?: string) {
+        const receiptUrl = await this.cloudinaryService.uploadFile(file);
 
+        let query: any = {};
+        if (orderId) query.orderId = orderId;
+        if (packageId) query.packageId = packageId;
+
+        if (!orderId && !packageId) {
+            throw new NotFoundException("Phải cung cấp orderId hoặc packageId");
+        }
+
+        const payment = await this.prisma.payment.findFirst({
+            where: query
+        });
+
+        if (!payment) {
+            throw new NotFoundException("Không tìm thấy thông tin thanh toán cho đơn hàng này");
+        }
+
+        const updatedPayment = await this.prisma.payment.update({
+            where: { id: payment.id },
+            data: { receiptUrl }
+        });
+
+        return updatedPayment;
+    }
+}

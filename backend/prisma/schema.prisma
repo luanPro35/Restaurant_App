@@ -195,6 +195,7 @@ model Payment {
   method        PaymentMethod     @default(CASH)
   status        TransactionStatus @default(PENDING)
   transactionId String?
+  receiptUrl    String?           @db.Text
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   order         Order?            @relation(fields: [orderId], references: [id])
@@ -264,6 +265,7 @@ model VietQr {
   amount        Float
   orderInfo     String?  @db.Text
   qrData        String?  @db.Text
+  deeplink      String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   orderId       String?  @unique
