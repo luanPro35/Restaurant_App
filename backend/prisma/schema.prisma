@@ -22,6 +22,7 @@ model User {
   packages       Package[]       @relation("UserPackages")
   payments       Payment[]
   milestones     UserMilestone[]
+  comments       Comment[]
 
   @@map("users")
 }
@@ -288,6 +289,19 @@ model AiInteraction {
 
   @@index([userId], map: "ai_interactions_userId_fkey")
   @@map("ai_interactions")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String?
+  content   String   @db.Text
+  imageUrl  String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "comments_userId_fkey")
+  @@map("comments")
 }
 
 enum AddressType {

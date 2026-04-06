@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { AI_Service } from "./AI.service";
+import { AI_Service } from "./Ai.service";
 
 @Controller("ai")
 export class AI_Controller {
@@ -9,7 +9,7 @@ export class AI_Controller {
 
     @Get("chat")
     async chat(@Query("message") message: string, @Query("userId") userId?: string) {
-        return this.aiService.chatRecommend(message, userId);
+        return this.aiService.chatWithOllama(message, userId);
     }
 
     @Get("history")

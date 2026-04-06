@@ -12,6 +12,13 @@ export class AiRepository {
         return products.map(p => p.name);
     }
 
+    async getAllProductsForAI() {
+        return this.prisma.product.findMany({
+            where: { isAvailable: true },
+            include: { category: true }
+        });
+    }
+
     async getProductByName(name: string) {
         return this.prisma.product.findFirst({
             where: { name }

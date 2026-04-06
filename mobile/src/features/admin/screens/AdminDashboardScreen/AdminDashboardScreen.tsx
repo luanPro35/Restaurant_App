@@ -175,6 +175,12 @@ export default function AdminDashboardScreen() {
             onPress={() => navigation.navigate("AdminConversations" as any)}
           />
           <AdminCard
+            title="Bình luận"
+            icon="comment-multiple-outline"
+            colors={["#FF9A9E", "#FAD0C4"]}
+            onPress={() => navigation.navigate("AdminComment")}
+          />
+          <AdminCard
             title="Cài đặt"
             icon="tune"
             colors={["#6a11cb", "#2575fc"]}

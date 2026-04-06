@@ -43,6 +43,13 @@ export default function StaffHomeScreen() {
       description: "Xem các yêu cầu từ khách hàng",
       onPress: () => navigation.navigate("AdminNotificationsScreen"),
     },
+    {
+      title: "Kiểm duyệt Bình luận",
+      icon: "message-draw",
+      colors: ["#EC4899", "#BE185D"],
+      description: "Quản lý và xóa các bình luận cộng đồng",
+      onPress: () => navigation.navigate("AdminCommentManagement"),
+    },
   ];
 
   return (

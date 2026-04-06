@@ -18,9 +18,9 @@ const List_Navbar = [
   },
   {
     id: 3,
-    name: "Hoạt động",
-    icon: "history",
-    activeIcon: "history",
+    name: "Bình luận",
+    icon: "comment-outline",
+    activeIcon: "comment",
   },
   {
     id: 4,
@@ -41,7 +41,7 @@ export default function Navbar({ navigation }: { navigation: any }) {
     } else if (id === 2) {
       navigation.navigate("AI");
     } else if (id === 3) {
-      navigation.navigate("History");
+      navigation.navigate("Comment");
     } else if (id === 4) {
       navigation.navigate("Messages");
     }

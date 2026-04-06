@@ -22,6 +22,10 @@ import VietQrScreen from "../../features/vietQr/screen/vietQr";
 import PaymentSuccessful from "../../features/vietQr/screen/PaymentSuccessful";
 import AiChatScreen from "../../features/AI/Screens/AiChatScreen";
 import UploadImagePayment from "../../features/vietQr/screen/UploadImagePayment";
+import UploadComment from "../../features/comment/screen/UploadComment";
+import SeeImage from "../../features/comment/screen/SeeImage";
+import SeeYourImage from "../../features/comment/screen/SeeYourImage";
+import EditCommentScreen from "../../features/comment/screen/EditCommentScreen";
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -49,6 +53,10 @@ export type CustomerStackParamList = {
   PaymentSuccessful: undefined;
   AI: { product?: string, initialMessage?: string } | undefined;
   UploadImagePayment: { packageId?: string, orderId?: string };
+  Comment: undefined;
+  SeeImage: { imageUrl?: string };
+  SeeYourImage: undefined;
+  EditComment: { comment: any };
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -80,6 +88,10 @@ export default function CustomerNavigator() {
       <Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
       <Stack.Screen name="AI" component={AiChatScreen} />
       <Stack.Screen name="UploadImagePayment" component={UploadImagePayment} />
+      <Stack.Screen name="Comment" component={UploadComment} />
+      <Stack.Screen name="SeeImage" component={SeeImage} />
+      <Stack.Screen name="SeeYourImage" component={SeeYourImage} />
+      <Stack.Screen name="EditComment" component={EditCommentScreen} />
     </Stack.Navigator>
   );
 }

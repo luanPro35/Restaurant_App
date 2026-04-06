@@ -1,6 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import StaffHomeScreen from "../../features/staff/screens/StaffHomeScreen";
+import AdminCommentManagement from "../../features/admin/screens/AdminCommentScreen/AdminCommentManagement";
 import AdminOrdersScreen from "../../features/admin/screens/AdminOrdersScreen";
 import AdminTablesScreen from "../../features/admin/screens/AdminTablesScreen";
 import AdminEditTables from "../../features/admin/screens/AdminTablesScreen/AdminEditTables";
@@ -12,6 +13,7 @@ import { AdminTable } from "../../features/admin/types/admin.types";
 
 export type StaffStackParamList = {
   StaffHome: undefined;
+  AdminCommentManagement: undefined;
   AdminOrdersScreen: undefined;
   AdminTablesScreen: undefined;
   AdminEditTables: { table: AdminTable };
@@ -31,6 +33,7 @@ export default function StaffNavigator() {
       }}
     >
       <Stack.Screen name="StaffHome" component={StaffHomeScreen} />
+      <Stack.Screen name="AdminCommentManagement" component={AdminCommentManagement} />
       <Stack.Screen name="AdminOrdersScreen" component={AdminOrdersScreen} />
       <Stack.Screen name="AdminTablesScreen" component={AdminTablesScreen} />
       <Stack.Screen name="AdminEditTables" component={AdminEditTables} />

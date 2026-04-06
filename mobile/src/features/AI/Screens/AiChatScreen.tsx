@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Platform,
   ActivityIndicator,
   Image,
+  TextInput,
   ScrollView as RNScrollView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -82,18 +83,17 @@ const ProductCard = ({ product, navigation, addToCart }: any) => {
   );
 };
 
-const ChatFooter = ({ onSuggestionPress, isTyping }: { onSuggestionPress: any, isTyping: boolean }) => {
+const ChatFooter = ({ isTyping }: { isTyping: boolean }) => {
   if (isTyping) return null;
   return (
-    <View className="mt-4 mb-24">
-      <AiChoose onSuggestionPress={onSuggestionPress} />
-    </View>
+    <View className="mt-4 mb-2" />
   );
 };
 
 export default function AiChatScreen({ route, navigation }: { route: any, navigation: any }) {
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const [inputText, setInputText] = useState("");
   const navigationRef = useRef(navigation);
 
   useEffect(() => {
@@ -104,8 +104,11 @@ export default function AiChatScreen({ route, navigation }: { route: any, naviga
 
   const { messages, isTyping, sendMessageWithText } = useAiChat(user, initialMsg);
 
-  const onSuggestionPress = (text: string) => {
-    sendMessageWithText(text);
+  const handleSend = () => {
+    if (inputText.trim()) {
+      sendMessageWithText(inputText.trim());
+      setInputText("");
+    }
   };
 
   const insets = useSafeAreaInsets();
@@ -172,6 +175,7 @@ export default function AiChatScreen({ route, navigation }: { route: any, naviga
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#F9F6E7" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
       <View
         className="bg-white px-4 py-4 flex-row items-center border-b border-gray-100 shadow-sm z-10"
@@ -204,9 +208,9 @@ export default function AiChatScreen({ route, navigation }: { route: any, naviga
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderMessage}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={<ChatFooter onSuggestionPress={onSuggestionPress} isTyping={isTyping} />}
+        ListFooterComponent={<ChatFooter isTyping={isTyping} />}
         onContentSizeChange={() => {
           requestAnimationFrame(() => {
             flatListRef.current?.scrollToEnd({ animated: true });
@@ -214,17 +218,36 @@ export default function AiChatScreen({ route, navigation }: { route: any, naviga
         }}
       />
 
-      {isTyping && (
-        <View className="px-6 pb-4">
-          <View className="flex-row items-center bg-white/50 self-start px-4 py-2 rounded-full border border-gray-100">
-            <ActivityIndicator size="small" color="#E07B39" />
-            <Text className="ml-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-              AI đang phân tích yêu cầu...
-            </Text>
+      <View className="bg-white/80 border-t border-gray-100 px-4 py-3 pb-8">
+        {isTyping && (
+          <View className="mb-3">
+            <View className="flex-row items-center bg-white/50 self-start px-4 py-2 rounded-full border border-gray-100">
+              <ActivityIndicator size="small" color="#E07B39" />
+              <Text className="ml-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                AI đang phân tích yêu cầu...
+              </Text>
+            </View>
           </View>
+        )}
+        
+        <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 py-1">
+          <TextInput
+            multiline
+            placeholder="Bạn muốn ăn món gì hôm nay?"
+            className="flex-1 text-gray-800 text-sm py-2"
+            value={inputText}
+            onChangeText={setInputText}
+            style={{ maxHeight: 100 }}
+          />
+          <TouchableOpacity 
+            onPress={handleSend}
+            disabled={!inputText.trim()}
+            className={`p-2 rounded-full ${inputText.trim() ? "bg-[#E07B39]" : "bg-gray-300"}`}
+          >
+            <MaterialCommunityIcons name="send" size={20} color="white" />
+          </TouchableOpacity>
         </View>
-      )}
-      <View style={{ height: Math.max(insets.bottom, 16) }} />
+      </View>
     </KeyboardAvoidingView>
   );
 }

@@ -119,7 +119,7 @@ export const useAiChat = (user: any, initialMsg: string | null) => {
                         }
                     }
                 } catch (error) {
-                    console.error("Error fetching AI history:", error);
+                    // Fail silently for history
                 } finally {
                     if (componentIsMounted.current) {
                         setIsTyping(false);

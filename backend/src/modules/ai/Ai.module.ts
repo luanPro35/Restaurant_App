@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AI_Controller } from "./Ai.controller";
-import { AI_Service } from "./AI.service";
+import { AI_Service } from "./Ai.service";
 import { PrismaModule } from "../../prisma/prisma.module";
 import { AiRepository } from "./Ai.repository";
 

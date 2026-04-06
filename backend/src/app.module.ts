@@ -15,6 +15,7 @@ import { AI_Module } from "./modules/ai/Ai.module";
 import { CategoryModule } from "./modules/category/category.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { RedisModule } from "./modules/redis/redis.module";
+import { CommentModule } from "./modules/comments/comment.module";
 import authLimiter from "./middlewares/rate-limit.middleware";
 
 @Module({
@@ -34,6 +35,7 @@ import authLimiter from "./middlewares/rate-limit.middleware";
     AI_Module,
     CategoryModule,
     RedisModule,
+    CommentModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

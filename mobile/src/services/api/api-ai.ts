@@ -10,6 +10,7 @@ export interface Message {
     type?: string;
     recommendedProducts?: any[];
 }
+
 export const aiApi = {
     chat: async (message: string, userId?: string) => {
         try {
@@ -21,7 +22,6 @@ export const aiApi = {
             });
             return response.data;
         } catch (error) {
-            console.error("Error AI Chat:", error);
             throw error;
         }
     },
@@ -32,10 +32,10 @@ export const aiApi = {
             });
             return response.data;
         } catch (error) {
-            console.error("Error fetching AI chat history:", error);
             throw error;
         }
     }
 };
 
 export default aiApi;
+
