@@ -91,7 +91,8 @@ const SeeImage: React.FC = () => {
               </Text>
 
               {comment.imageUrl && (
-                <View
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("WatchImage", { imageUrl: comment.imageUrl })}
                   className="rounded-2xl overflow-hidden bg-gray-100"
                 >
                   <Image
@@ -99,7 +100,7 @@ const SeeImage: React.FC = () => {
                     style={{ width: IMAGE_WIDTH - 32, height: (IMAGE_WIDTH - 32) * 0.75 }}
                     resizeMode="cover"
                   />
-                </View>
+                </TouchableOpacity>
               )}
 
             </View>

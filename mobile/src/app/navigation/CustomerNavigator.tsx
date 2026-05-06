@@ -26,6 +26,7 @@ import UploadComment from "../../features/comment/screen/UploadComment";
 import SeeImage from "../../features/comment/screen/SeeImage";
 import SeeYourImage from "../../features/comment/screen/SeeYourImage";
 import EditCommentScreen from "../../features/comment/screen/EditCommentScreen";
+import WatchImage from "../../features/comment/screen/WatchImage";
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -57,6 +58,8 @@ export type CustomerStackParamList = {
   SeeImage: { imageUrl?: string };
   SeeYourImage: undefined;
   EditComment: { comment: any };
+  WatchImage: { imageUrl: string };
+
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -92,6 +95,7 @@ export default function CustomerNavigator() {
       <Stack.Screen name="SeeImage" component={SeeImage} />
       <Stack.Screen name="SeeYourImage" component={SeeYourImage} />
       <Stack.Screen name="EditComment" component={EditCommentScreen} />
+      <Stack.Screen name="WatchImage" component={WatchImage} />
     </Stack.Navigator>
   );
 }

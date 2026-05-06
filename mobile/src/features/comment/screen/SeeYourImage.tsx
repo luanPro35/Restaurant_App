@@ -96,12 +96,17 @@ const SeeYourImage: React.FC<{ showHeader?: boolean }> = ({ showHeader = true })
                 style={{ width: COLUMN_SIZE, height: COLUMN_SIZE }}
               >
                 {comment.imageUrl ? (
-                <Image
-                  source={{ uri: comment.imageUrl }}
-                  className="w-full h-full"
-                  resizeMode="cover"
-                />
-              ) : (
+                  <TouchableOpacity
+                    className="w-full h-full"
+                    onPress={() => navigation.navigate("WatchImage", { imageUrl: comment.imageUrl })}
+                  >
+                    <Image
+                      source={{ uri: comment.imageUrl }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                    />
+                  </TouchableOpacity>
+                ) : (
                 <View className="w-full h-full bg-gray-100 items-center justify-center">
                   <Ionicons name="document-text-outline" size={32} color="#ccc" />
                 </View>

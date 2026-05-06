@@ -4,31 +4,26 @@ import { AiRepository } from "./Ai.repository";
 @Injectable()
 export class AI_Service {
     private readonly OLLAMA_URL = "http://localhost:11434/api/chat";
-    private readonly MODEL_NAME = "llama3.2:1b";
+    private readonly MODEL_NAME = "gemma3:4b";
 
     constructor(private aiRepository: AiRepository) { }
 
-    /**
-     * Huấn luyện AI thông qua Context (RAG)
-     * Lấy toàn bộ thực đơn và danh mục để AI biết về nhà hàng
-     */
     private async buildRestaurantContext(): Promise<string> {
         try {
-            // Lấy tất cả sản phẩm từ DB thông qua Repository
             const products = await this.aiRepository.getAllProductsForAI();
 
-            let context = "Bạn là trợ lý ảo thông minh của nhà hàng 'Luan Pro Restaurant'. ";
-            context += "Dưới đây là thực đơn hiện tại của nhà hàng:\n\n";
+            let context = `Bạn là 'Luan Pro Assistant', chuyên gia tư vấn món ăn tại nhà hàng Luan Pro Restaurant.
+Hãy sử dụng danh sách thực đơn dưới đây để trả lời khách hàng:
 
-            products.forEach(p => {
-                context += `- Món: ${p.name}, Giá: ${p.price.toLocaleString('vi-VN')}đ, Mô tả: ${p.description || 'Ngon miệng'}, Danh mục: ${p.category?.name}\n`;
-            });
+${products.map(p => `- ${p.name}: ${p.price.toLocaleString('vi-VN')}đ (${p.category?.name || 'Khác'}) - ${p.description || 'Ngon miệng'}`).join('\n')}
 
-            context += "\nNhiệm vụ của bạn là:\n";
-            context += "1. Tư vấn món ăn dựa trên sở thích của khách.\n";
-            context += "2. Nếu khách hỏi về món không có trong thực đơn, hãy lịch sự từ chối và gợi ý món tương tự.\n";
-            context += "3. Trả lời ngắn gọn, thân thiện bằng tiếng Việt.\n";
-            context += "4. Luôn khuyến khích khách đặt bàn ngay trên ứng dụng.";
+Nguyên tắc trả lời:
+1. Luôn thân thiện, lịch sự và sử dụng tiếng Việt.
+2. Trả lời ngắn gọn, tập trung vào việc tư vấn món ăn.
+3. Nếu khách hỏi món không có, hãy gợi ý món tương tự trong thực đơn.
+4. LUÔN nhắc tên món ăn CHÍNH XÁC như trong danh sách để hệ thống có thể nhận diện.
+5. Khuyến khích khách đặt bàn hoặc đặt món trực tiếp trên app.
+6. Kết thúc câu trả lời bằng một lời mời hấp dẫn.`;
 
             return context;
         } catch (error) {
@@ -51,6 +46,11 @@ export class AI_Service {
                         { role: 'user', content: message }
                     ],
                     stream: false,
+                    options: {
+                        temperature: 0.7,
+                        top_p: 0.9,
+                        num_predict: 200, // Giới hạn độ dài câu trả lời để tránh lan man
+                    }
                 }),
             });
 
@@ -62,11 +62,9 @@ export class AI_Service {
             const result: any = await response.json();
             const aiText = result.message.content;
 
-            // Xử lý gợi ý sản phẩm dựa trên câu trả lời của AI (NLP đơn giản)
             const recommendedProducts = await this.detectProductsInText(aiText);
 
-            // Lưu log tương tác
-            await this.logInteraction(userId, message, aiText, "OLLAMA", recommendedProducts);
+            this.logInteraction(userId, message, aiText, "OLLAMA", recommendedProducts);
 
             return {
                 text: aiText,
@@ -96,7 +94,7 @@ export class AI_Service {
         return this.aiRepository.getChatHistory(userId);
     }
 
-    private async logInteraction(userId: string, query: string, response: string, type: string, products: any[]) {
+    private async logInteraction(userId: string | undefined, query: string, response: string, type: string, products: any[]) {
         try {
             await this.aiRepository.logInteraction({
                 userId: userId || null,
