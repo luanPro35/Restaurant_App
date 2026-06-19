@@ -13,6 +13,32 @@ import { useChangeProfile } from "../hooks/useChangeProfile";
 import { useEffect } from "react";
 import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 
+const InputField = ({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  icon,
+  keyboardType = "default",
+}: any) => (
+  <View className="mb-5">
+    <Text className="text-gray-500 text-sm font-medium mb-2 ml-1">
+      {label}
+    </Text>
+    <View className="flex-row items-center bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3.5 shadow-sm">
+      <Ionicons name={icon} size={20} color="#94a3b8" />
+      <TextInput
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType}
+        className="flex-1 ml-3 text-gray-800 text-base"
+        placeholderTextColor="#94a3b8"
+      />
+    </View>
+  </View>
+);
+
 export default function ChangeProfile() {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<CustomerStackParamList, "ChangeProfile">>();
@@ -39,32 +65,6 @@ export default function ChangeProfile() {
       console.error("Update failed:", err);
     }
   };
-
-  const InputField = ({
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    icon,
-    keyboardType = "default",
-  }: any) => (
-    <View className="mb-5">
-      <Text className="text-gray-500 text-sm font-medium mb-2 ml-1">
-        {label}
-      </Text>
-      <View className="flex-row items-center bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3.5 shadow-sm">
-        <Ionicons name={icon} size={20} color="#94a3b8" />
-        <TextInput
-          placeholder={placeholder}
-          value={value}
-          onChangeText={onChangeText}
-          keyboardType={keyboardType}
-          className="flex-1 ml-3 text-gray-800 text-base"
-          placeholderTextColor="#94a3b8"
-        />
-      </View>
-    </View>
-  );
 
   return (
     <ScrollView className="flex-1 mt-10" showsVerticalScrollIndicator={false}>

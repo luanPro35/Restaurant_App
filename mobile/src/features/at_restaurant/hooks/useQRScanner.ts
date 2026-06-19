@@ -21,9 +21,14 @@ export const useQRScanner = () => {
       let tableIdentifier = null;
 
       const urlMatch = scannedText.match(/table\/([a-zA-Z0-9-]+)/i);
+      const dataMatch = scannedText.match(/[?&]data=([a-zA-Z0-9-]+)/i);
+      
       if (urlMatch && urlMatch[1]) {
         tableIdentifier = urlMatch[1];
       } 
+      else if (dataMatch && dataMatch[1]) {
+        tableIdentifier = dataMatch[1];
+      }
       else if (/^\d+$/.test(scannedText)) {
         tableIdentifier = scannedText;
       }

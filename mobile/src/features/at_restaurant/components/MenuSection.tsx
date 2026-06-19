@@ -56,7 +56,7 @@ export default function MenuSection({ onAddItem }: MenuSectionProps) {
         const firstImage = Array.isArray(parsed) ? parsed[0] : parsed;
 
         if (typeof firstImage === "string" && firstImage.length > 0) {
-          if (firstImage.startsWith("http")) {
+          if (firstImage.startsWith("http") || firstImage.startsWith("data:image")) {
             imageUrl = firstImage;
           } else {
             imageUrl = `${Config.API_URL}${firstImage.startsWith("/") ? "" : "/"}${firstImage}`;

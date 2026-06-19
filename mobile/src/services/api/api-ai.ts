@@ -18,7 +18,8 @@ export const aiApi = {
                 params: {
                     message: message,
                     userId: userId
-                }
+                },
+                timeout: 60000
             });
             return response.data;
         } catch (error) {

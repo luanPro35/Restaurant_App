@@ -30,7 +30,7 @@ const ProductCard = ({ product, navigation, addToCart }: any) => {
       if (typeof rawImage === 'string' && rawImage.startsWith('[')) {
         const parsed = JSON.parse(rawImage);
         url = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : rawImage;
-      } else if (typeof rawImage === 'string' && rawImage.includes(',')) {
+      } else if (typeof rawImage === 'string' && rawImage.includes(',') && !rawImage.startsWith('data:image')) {
         url = rawImage.split(',')[0];
       }
     } catch (e) {
@@ -38,7 +38,7 @@ const ProductCard = ({ product, navigation, addToCart }: any) => {
     }
 
     if (typeof url === "string" && url.length > 0) {
-      if (url.startsWith("http")) return url;
+      if (url.startsWith("http") || url.startsWith("data:image")) return url;
       return `${Config.API_URL}${url.startsWith("/") ? "" : "/"}${url}`;
     }
     return url;

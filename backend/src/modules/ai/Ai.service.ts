@@ -105,7 +105,7 @@ Nguyên tắc trả lời:
                     id: p.id,
                     name: p.name,
                     price: p.price,
-                    image: p.image || (p.images ? p.images.split(',')[0] : null)
+                    image: p.image || (p.images ? (p.images.startsWith('data:image') ? p.images : p.images.split(',')[0]) : null)
                 })) : null
             });
         } catch (error) {
