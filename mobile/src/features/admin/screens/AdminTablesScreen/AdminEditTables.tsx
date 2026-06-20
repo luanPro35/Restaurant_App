@@ -47,7 +47,7 @@ const AdminEditTables = () => {
     updateTable(table.id, {
       name,
       capacity: parseInt(capacity),
-      listFoods: listFoods?.split(", ").filter((f) => f.length > 0),
+      listFoods: listFoods?.split(", ").filter((f: any) => f.length > 0),
       price: parseInt(price),
     });
   };

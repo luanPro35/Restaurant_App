@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker';
 import adminApi from "../../admin-api";
+import { Config } from "../../../../config";
 
 const InputField = ({
   label,
@@ -79,8 +80,9 @@ export const AdminCreateProduct = () => {
 
     setLoading(true);
     try {
+      const { isNew, ...submitForm } = form;
       await adminApi.products.create({
-        ...form,
+        ...submitForm,
         price: Number(form.price),
       });
       Alert.alert("Thành công", "Đã thêm món ăn mới vào Menu", [
@@ -143,6 +145,20 @@ export const AdminCreateProduct = () => {
       setLoading(false);
     }
   };
+
+  const displayImageUrl = React.useMemo(() => {
+    if (!form.image) return "";
+    let img = form.image.trim();
+    if (img.startsWith("http") || img.startsWith("data:image")) return img;
+    
+    const cleaned = img.replace(/\s+/g, '');
+    // Check if it's a valid base64 string (only base64 chars and long enough)
+    if (cleaned.length > 100 && /^[A-Za-z0-9+/=]+$/.test(cleaned)) {
+      return `data:image/jpeg;base64,${cleaned}`;
+    }
+    
+    return `${Config.API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
+  }, [form.image]);
 
   return (
     <KeyboardAvoidingView
@@ -260,7 +276,7 @@ export const AdminCreateProduct = () => {
             {form.image ? (
               <View className="relative">
                 <Image 
-                  source={{ uri: form.image }} 
+                  source={{ uri: displayImageUrl }} 
                   className="w-full h-48 rounded-[28px] border border-gray-100"
                 />
                 <TouchableOpacity 

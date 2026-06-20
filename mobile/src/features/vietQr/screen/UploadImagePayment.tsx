@@ -65,9 +65,7 @@ export default function UploadImagePayment({ route }: { route: any }) {
             const response = await uploadReceipt(formData);
 
             if (response) {
-                Alert.alert('Thành công', 'Minh chứng đã được gửi. Chúng tôi sẽ xác nhận sớm nhất.', [
-                    { text: 'OK', onPress: () => navigation.navigate('Home') }
-                ]);
+                navigation.navigate('PaymentSuccessful');
             }
         } catch (error) {
             console.error('Upload error:', error);

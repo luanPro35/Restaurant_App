@@ -12,7 +12,7 @@ export class AI_Service {
         try {
             const products = await this.aiRepository.getAllProductsForAI();
 
-            let context = `Bạn là 'Luan Pro Assistant', chuyên gia tư vấn món ăn tại nhà hàng Luan Pro Restaurant.
+            let context = `Bạn là 'DOLIN Assistant', chuyên gia tư vấn món ăn tại nhà hàng DOLIN.
 Hãy sử dụng danh sách thực đơn dưới đây để trả lời khách hàng:
 
 ${products.map(p => `- ${p.name}: ${p.price.toLocaleString('vi-VN')}đ (${p.category?.name || 'Khác'}) - ${p.description || 'Ngon miệng'}`).join('\n')}
@@ -28,7 +28,7 @@ Nguyên tắc trả lời:
             return context;
         } catch (error) {
             console.error("Context Building Error:", error);
-            return "Bạn là trợ lý ảo của nhà hàng Luan Pro Restaurant.";
+            return "Bạn là trợ lý ảo của nhà hàng DOLIN.";
         }
     }
 

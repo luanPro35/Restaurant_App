@@ -64,8 +64,19 @@ export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
 
   const isAdminScreen = currentRoute?.startsWith("Admin");
   const isAuthScreen = ["Login", "Register", "Welcome", "Forgot"].includes(currentRoute || "");
+  const isHiddenScreen = [
+    "AI",
+    "Comment",
+    "SeeImage",
+    "SeeYourImage",
+    "EditComment",
+    "WatchImage",
+    "Messages",
+    "Chat",
+    "DetailProduct"
+  ].includes(currentRoute || "");
 
-  if (isAdminScreen || isAuthScreen) return null;
+  if (isAdminScreen || isAuthScreen || isHiddenScreen) return null;
   if (cartItems.length === 0 && !isCartVisible) return null;
 
   return (

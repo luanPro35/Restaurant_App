@@ -14,6 +14,7 @@ import AdminNotificationsScreen from "@/features/admin/screens/AdminNotification
 import AdminAddNotificationsScreen from "@/features/admin/screens/AdminNotificationsScreen/AdminAddNotificationsScreen";
 import AdminEditNotificationScreen from "@/features/admin/screens/AdminNotificationsScreen/AdminEditNotificationScreen";
 import AdminEditProduct from "@/features/admin/screens/AdminProductsScreen/AdminEditProduct";
+import AdminCreateProduct from "@/features/admin/screens/AdminProductsScreen/AdminCreateProduct";
 import DetailProduct from "../../features/menu/screens/DetailProduct";
 import AdminCommentManagement from "../../features/admin/screens/AdminCommentScreen/AdminCommentManagement";
 import AdminConversationsScreen from "../../features/admin/screens/AdminChatScreen/AdminConversationsScreen";
@@ -26,6 +27,8 @@ import UploadImagePayment from "../../features/vietQr/screen/UploadImagePayment"
 import PaymentSuccessful from "../../features/vietQr/screen/PaymentSuccessful";
 import AiChatScreen from "../../features/AI/Screens/AiChatScreen";
 import AdminSettingsScreen from "../../features/admin/screens/AdminSettingsScreen";
+import AdminAddTables from "../../features/admin/screens/AdminTablesScreen/AdminAddTables";
+import AdminEditTables from "../../features/admin/screens/AdminTablesScreen/AdminEditTables";
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
@@ -41,6 +44,7 @@ export type AdminStackParamList = {
   AdminAddNotificationsScreen: undefined;
   AdminEditNotificationScreen: { notificationId: string };
   AdminEditProduct: { productId: string };
+  AdminCreateProduct: undefined;
   DetailProduct: { id: string };
   AdminConversations: undefined;
   AdminChatDetail: { conversationId: string; userName: string };
@@ -53,6 +57,8 @@ export type AdminStackParamList = {
   AI: { product?: string, initialMessage?: string } | undefined;
   AdminComment: undefined;
   AdminSettings: undefined;
+  AdminAddTables: undefined;
+  AdminEditTables: { table: any };
 };
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
@@ -75,6 +81,7 @@ export default function AdminNavigator() {
       <Stack.Screen name="AdminNotificationsScreen" component={AdminNotificationsScreen} />
       <Stack.Screen name="AdminAddNotificationsScreen" component={AdminAddNotificationsScreen} />
       <Stack.Screen name="AdminEditNotificationScreen" component={AdminEditNotificationScreen} />
+      <Stack.Screen name="AdminCreateProduct" component={AdminCreateProduct} />
       <Stack.Screen name="AdminEditProduct" component={AdminEditProduct} />
       <Stack.Screen name="DetailProduct" component={DetailProduct} />
       <Stack.Screen name="AdminConversations" component={AdminConversationsScreen} />
@@ -88,6 +95,8 @@ export default function AdminNavigator() {
       <Stack.Screen name="AI" component={AiChatScreen} />
       <Stack.Screen name="AdminComment" component={AdminCommentManagement} />
       <Stack.Screen name="AdminSettings" component={AdminSettingsScreen} />
+      <Stack.Screen name="AdminAddTables" component={AdminAddTables} />
+      <Stack.Screen name="AdminEditTables" component={AdminEditTables} />
     </Stack.Navigator>
   );
 }

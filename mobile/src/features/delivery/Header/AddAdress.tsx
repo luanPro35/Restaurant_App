@@ -217,29 +217,6 @@ const AddAdress = () => {
               </View>
             </View>
           </View>
-
-          <TouchableOpacity
-            activeOpacity={0.7}
-            className="mx-5 my-4 bg-white rounded-3xl p-5 flex-row items-center border border-gray-100/50"
-          >
-            <View className="w-14 h-14 rounded-2xl bg-[#F9F6E7] items-center justify-center mr-4">
-              <MaterialCommunityIcons
-                name="map-marker-radius"
-                size={28}
-                color="#E07B39"
-              />
-            </View>
-            <View className="flex-1">
-              <Text className="text-[16px] font-bold text-[#2D2D2D]">
-                Chọn trên bản đồ
-              </Text>
-              <Text className="text-gray-400 text-xs mt-1 font-medium">
-                Ghim vị trí chính xác trên bản đồ
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
-          </TouchableOpacity>
-
           <View style={{ height: 20 }} />
         </ScrollView>
       </KeyboardAvoidingView>

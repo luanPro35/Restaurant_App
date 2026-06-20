@@ -4,7 +4,7 @@ import tokenManager from "./token.manager";
 
 const api = axios.create({
   baseURL: `${Config.API_URL}/api/v1`,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },

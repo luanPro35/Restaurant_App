@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
 import adminApi from "../../admin-api";
 import { useAdminProducts } from "../../hooks/useAdminProducts";
+import { Config } from "../../../../config";
 
 const InputField = ({
   label,
@@ -158,6 +159,20 @@ export default function AdminEditProduct() {
     }
   };
 
+  const displayImageUrl = React.useMemo(() => {
+    if (!form.image) return "";
+    let img = form.image.trim();
+    if (img.startsWith("http") || img.startsWith("data:image")) return img;
+    
+    const cleaned = img.replace(/\s+/g, '');
+    // Check if it's a valid base64 string (only base64 chars and long enough)
+    if (cleaned.length > 100 && /^[A-Za-z0-9+/=]+$/.test(cleaned)) {
+      return `data:image/jpeg;base64,${cleaned}`;
+    }
+    
+    return `${Config.API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
+  }, [form.image]);
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-[#FDFCF7]">
@@ -284,10 +299,10 @@ export default function AdminEditProduct() {
             {form.image ? (
               <View className="relative">
                 <Image 
-                  source={{ uri: form.image }} 
+                  source={{ uri: displayImageUrl }} 
                   className="w-full h-48 rounded-[28px] border border-gray-100"
                 />
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => setForm({...form, image: ""})}
                   className="absolute top-3 right-3 w-8 h-8 bg-red-500 rounded-full items-center justify-center shadow-md"
                 >

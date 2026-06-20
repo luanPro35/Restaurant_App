@@ -79,6 +79,15 @@ export class OrderService {
   async updateStatus(id: string, status: string) {
     const updatedOrder = await this.orderRepository.updateStatus(id, status as OrderStatus);
 
+    if (status === OrderStatus.COMPLETED || status === OrderStatus.CANCELLED) {
+      if (updatedOrder.tableId) {
+        await this.prisma.table.update({
+          where: { id: updatedOrder.tableId },
+          data: { status: TableStatus.AVAILABLE }
+        });
+      }
+    }
+
     if (status === OrderStatus.COMPLETED) {
       const existingPayment = await this.prisma.payment.findFirst({
         where: { orderId: id },

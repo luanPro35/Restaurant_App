@@ -59,7 +59,7 @@ const AdminCommentManagement: React.FC = () => {
           <Text className="text-xl font-bold text-gray-800">Kiểm duyệt Cộng đồng</Text>
           <Text className="text-gray-400 text-xs uppercase tracking-widest font-bold">Quản trị viên</Text>
         </View>
-        <TouchableOpacity onPress={getComments} className="p-1">
+        <TouchableOpacity onPress={() => getComments()} className="p-1">
           <Ionicons name="refresh" size={24} color={brandColor} />
         </TouchableOpacity>
       </View>

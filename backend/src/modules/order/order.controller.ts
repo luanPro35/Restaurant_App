@@ -56,8 +56,9 @@ export class OrderController {
     return this.orderService.findActiveOrderByTable(Number(tableId), user?.sub);
   }
 
+  @Public()
   @Patch(":id/status")
-  @ApiOperation({ summary: "Update order status (Admin/Staff only)" })
+  @ApiOperation({ summary: "Update order status" })
   async updateOrderStatus(
     @Param("id") id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,

@@ -141,18 +141,93 @@ export class PaymentService {
             throw new NotFoundException("Phải cung cấp orderId hoặc packageId");
         }
 
-        const payment = await this.prisma.payment.findFirst({
+        let payment = await this.prisma.payment.findFirst({
             where: query
         });
 
         if (!payment) {
-            throw new NotFoundException("Không tìm thấy thông tin thanh toán cho đơn hàng này");
+            let amount = 0;
+            let userId = undefined;
+            if (orderId) {
+                const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+                if (!order) throw new NotFoundException("Không tìm thấy đơn hàng");
+                amount = order.totalAmount;
+                userId = order.userId || undefined;
+            } else if (packageId) {
+                const pkg = await this.prisma.package.findUnique({ where: { id: packageId } });
+                if (!pkg) throw new NotFoundException("Không tìm thấy gói giao hàng");
+                amount = pkg.price;
+                userId = pkg.userId || undefined;
+            }
+
+            const newPayment = await this.prisma.payment.create({
+                data: {
+                    orderId: orderId || null,
+                    packageId: packageId || null,
+                    amount,
+                    method: "BANK_TRANSFER" as any,
+                    status: TransactionStatus.COMPLETED,
+                    userId,
+                    receiptUrl,
+                }
+            });
+
+            if (orderId) {
+                const order = await this.prisma.order.update({
+                    where: { id: orderId },
+                    data: { status: "COMPLETED" as any },
+                    include: { table: true, user: true }
+                });
+                if (order.tableId) {
+                    await this.prisma.table.update({
+                        where: { id: order.tableId },
+                        data: { status: "AVAILABLE" as any }
+                    });
+                }
+
+                const message = `<b>✅ ĐƠN HÀNG ĐÃ ĐƯỢC THANH TOÁN (VIETQR)</b>\n\n` +
+                  `👤 <b>Khách hàng:</b> ${order.user?.name || 'Ẩn danh'}\n` +
+                  `💰 <b>Số tiền:</b> <code>${order.totalAmount.toLocaleString('vi-VN')}</code> VNĐ\n` +
+                  `💳 <b>Phương thức:</b> BANK_TRANSFER\n` +
+                  (order.table ? `📍 <b>Bàn:</b> ${order.table.name}\n` : '') +
+                  `🖼 <b>Ảnh minh chứng:</b> <a href="${receiptUrl}">Xem tại đây</a>\n` +
+                  `⏰ <b>Thời gian:</b> ${new Date().toLocaleString('vi-VN')}`;
+                sendTelegramMessage(message).catch(err => console.error("Telegram Error:", err));
+            }
+
+            return newPayment;
         }
 
         const updatedPayment = await this.prisma.payment.update({
             where: { id: payment.id },
-            data: { receiptUrl }
+            data: { 
+                receiptUrl,
+                status: TransactionStatus.COMPLETED
+            }
         });
+
+        if (orderId) {
+            const order = await this.prisma.order.update({
+                where: { id: orderId },
+                data: { status: "COMPLETED" as any },
+                include: { table: true, user: true }
+            });
+            if (order.tableId) {
+                await this.prisma.table.update({
+                    where: { id: order.tableId },
+                    data: { status: "AVAILABLE" as any }
+                });
+            }
+
+            const message = `<b>✅ ĐƠN HÀNG ĐÃ ĐƯỢC THANH TOÁN (VIETQR)</b>\n\n` +
+              `👤 <b>Khách hàng:</b> ${order.user?.name || 'Ẩn danh'}\n` +
+              `💰 <b>Số tiền:</b> <code>${order.totalAmount.toLocaleString('vi-VN')}</code> VNĐ\n` +
+              `💳 <b>Phương thức:</b> BANK_TRANSFER\n` +
+              (order.table ? `📍 <b>Bàn:</b> ${order.table.name}\n` : '') +
+              `🖼 <b>Ảnh minh chứng:</b> <a href="${receiptUrl}">Xem tại đây</a>\n` +
+              `⏰ <b>Thời gian:</b> ${new Date().toLocaleString('vi-VN')}`;
+            sendTelegramMessage(message).catch(err => console.error("Telegram Error:", err));
+        }
 
         return updatedPayment;
     }

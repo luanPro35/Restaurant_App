@@ -1,6 +1,7 @@
 import { AdminTableService } from "../admin/services/admin-table.service";
 import { Controller, Get, Param, Query, Patch, Body, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { Public } from "../auth/decorators/public.decorator";
 import {
   ApiTags,
   ApiOperation,
@@ -40,8 +41,8 @@ export class TableController {
     return this.adminTableService.findTableByNumber(tableNumber);
   }
 
+  @Public()
   @Patch(":id")
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: "Cập nhật trạng thái bàn (Nhân viên/Admin)" })
   @ApiParam({ name: "id", description: "ID của bàn" })
   @ApiBody({ type: UpdateTableDto })

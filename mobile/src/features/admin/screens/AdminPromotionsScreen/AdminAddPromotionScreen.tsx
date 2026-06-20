@@ -19,6 +19,41 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdminPromotion } from "../../hooks/useAdminPromotion";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+const InputField = ({
+  label,
+  icon,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType = "default",
+  hint,
+}: any) => (
+  <View className="mb-6">
+    <View className="flex-row items-center mb-2 ml-1">
+      <Text className="text-gray-800 font-black text-[12px] uppercase tracking-[1px]">{label}</Text>
+    </View>
+    <View
+      className="flex-row items-center bg-white px-4 h-14 border border-gray-100 shadow-sm"
+      style={{ borderRadius: 20 }}
+    >
+      <MaterialCommunityIcons name={icon} size={20} color="#E07B39" />
+      <TextInput
+        className="flex-1 ml-3 text-gray-800 font-semibold text-sm"
+        placeholder={placeholder}
+        placeholderTextColor="#9CA3AF"
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType}
+      />
+    </View>
+    {hint ? (
+      <Text className="text-gray-400 text-[10px] font-bold mt-1.5 ml-1 lowercase italic opacity-70">
+        * {hint}
+      </Text>
+    ) : null}
+  </View>
+);
+
 export default function AdminAddPromotionScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<AdminStackParamList>>();
@@ -72,41 +107,6 @@ export default function AdminAddPromotionScreen() {
       setLoading(false);
     }
   };
-
-  const InputField = ({
-    label,
-    icon,
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = "default",
-    hint,
-  }: any) => (
-    <View className="mb-6">
-      <View className="flex-row items-center mb-2 ml-1">
-        <Text className="text-gray-800 font-black text-[12px] uppercase tracking-[1px]">{label}</Text>
-      </View>
-      <View
-        className="flex-row items-center bg-white px-4 h-14 border border-gray-100 shadow-sm"
-        style={{ borderRadius: 20 }}
-      >
-        <MaterialCommunityIcons name={icon} size={20} color="#E07B39" />
-        <TextInput
-          className="flex-1 ml-3 text-gray-800 font-semibold text-sm"
-          placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
-          value={value}
-          onChangeText={onChangeText}
-          keyboardType={keyboardType}
-        />
-      </View>
-      {hint ? (
-        <Text className="text-gray-400 text-[10px] font-bold mt-1.5 ml-1 lowercase italic italic opacity-70">
-          * {hint}
-        </Text>
-      ) : null}
-    </View>
-  );
 
   const insets = useSafeAreaInsets();
 
