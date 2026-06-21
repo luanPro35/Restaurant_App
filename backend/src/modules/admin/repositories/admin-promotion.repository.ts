@@ -12,10 +12,13 @@ export class AdminPromotionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   private buildWhereClause(query: GetPromotionsDto) {
-    const { name } = query;
+    const { name, isActive } = query;
     const where: any = {};
     if (name) {
       where.name = { contains: name };
+    }
+    if (isActive !== undefined) {
+      where.isActive = isActive;
     }
     return where;
   }

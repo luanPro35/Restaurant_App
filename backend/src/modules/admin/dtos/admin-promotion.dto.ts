@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsNumber, IsBoolean } from "class-validator";
-import { Type } from "class-transformer";
+import { Type, Transform } from "class-transformer";
 
 export class GetPromotionsDto {
   @IsString()
@@ -19,6 +19,15 @@ export class GetPromotionsDto {
   @IsNumber()
   @IsOptional()
   page?: number;
+
+  @Transform(({ value }) => {
+    if (value === "true" || value === true) return true;
+    if (value === "false" || value === false) return false;
+    return undefined;
+  })
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }
 
 export class CreatePromotionDto {

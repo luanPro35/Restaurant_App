@@ -17,7 +17,7 @@ export const usePromotion = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await promotionService.fetchPromotions(query);
+      const response = await promotionService.fetchPromotions({ isActive: true, ...query });
       setPromotions(response.data);
       setPagination(response.pagination);
     } catch (err: any) {

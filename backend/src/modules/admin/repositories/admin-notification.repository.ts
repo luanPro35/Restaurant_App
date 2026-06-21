@@ -18,6 +18,9 @@ export class AdminNotificationRepository {
         { content: { contains: query.search } },
       ];
     }
+    if (query.isActive !== undefined) {
+      where.isActive = query.isActive;
+    }
     return where;
   }
 

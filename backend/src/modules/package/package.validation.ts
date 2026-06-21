@@ -6,7 +6,7 @@ export const createPackageSchema = z.object({
     address: z.string(),
     description: z.string(),
     price: z.number(),
-    status: z.enum([PackageStatus.PENDING, PackageStatus.CONFIRMED]),
+    status: z.enum([PackageStatus.PENDING, PackageStatus.CONFIRMED, PackageStatus.CANCELED]),
     paymentMethod: z.string(),
 });
 

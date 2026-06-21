@@ -345,6 +345,7 @@ enum PaymentStatus {
 enum PackageStatus {
   PENDING
   CONFIRMED
+  CANCELED
 }
 
 enum PaymentMethod {

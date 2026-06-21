@@ -6,9 +6,11 @@ import {
   StatusBar,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useCallback } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import MenuItemCard from "../components/MenuItemCard";
 import Search_Dish from "../../delivery/Header/Search_Dish";
@@ -17,6 +19,7 @@ import { MenuItem, CartItem } from "../types";
 import { CustomerStackParamList } from "../../../app/navigation/CustomerNavigator";
 import { useCart } from "../../../app/context/CartContext";
 import { IP } from "../../../config/ip";
+import { resolveImageUrl } from "../../../shared/utils";
 
 export default function MenuScreen() {
   const navigation =
@@ -24,10 +27,19 @@ export default function MenuScreen() {
   const { menu, loading, fetchMenu, filter, setFilter } = useMenu();
   const { addToCart, setIsCartVisible } = useCart();
   const [isCartVisibleLocal, setIsCartVisibleLocal] = useState(false); // Just in case, but actually let's use the global one
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchMenu();
+    setRefreshing(false);
+  }, [fetchMenu]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMenu();
+    }, [])
+  );
   const handleSearch = (query: string) => {
     setFilter((prev: any) => ({ ...prev, search: query }));
     fetchMenu({ ...filter, search: query });
@@ -56,37 +68,14 @@ export default function MenuScreen() {
     fetchMenu(newFilter);
   };
 
-  const menuItems: MenuItem[] = menu.map((item: any) => {
-    const getImageUrl = (imageInput: any) => {
-      if (!imageInput) return "https://via.placeholder.com/400";
-      let url = "";
-      if (Array.isArray(imageInput)) {
-        url = imageInput[0];
-      } else if (typeof imageInput === 'string') {
-        if (imageInput.startsWith('http') || imageInput.startsWith('data:')) {
-          url = imageInput;
-        } else {
-          try {
-            const parsed = JSON.parse(imageInput);
-            url = Array.isArray(parsed) ? parsed[0] : parsed;
-          } catch {
-            url = imageInput;
-          }
-        }
-      } else {
-        url = String(imageInput);
-      }
-      if (typeof url !== 'string') return "https://via.placeholder.com/400";
-      return url.replace('localhost', IP);
-    };
-
-    const finalImageUrl = getImageUrl(item.image || item.images);
-
+  const menuItems: MenuItem[] = menu
+    .filter((item: any) => item.isAvailable !== false)
+    .map((item: any) => {
     return {
       id: item.id,
       name: item.name,
       price: item.price,
-      image: finalImageUrl,
+      image: resolveImageUrl(item.image || item.images),
       description: item.description || "",
       category: item.category?.name || "Khác",
     };
@@ -192,8 +181,9 @@ export default function MenuScreen() {
         className="flex-1 px-4 pt-4"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#E07B39"]} tintColor="#E07B39" />}
       >
-        {loading && menuItems.length === 0 ? (
+        {loading && !refreshing && menuItems.length === 0 ? (
           <View className="py-20">
             <ActivityIndicator size="large" color="#E07B39" />
           </View>

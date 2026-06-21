@@ -7,6 +7,7 @@ export interface Message {
   text: string;
   senderId: string;
   createdAt: string;
+  type?: "TEXT" | "IMAGE";
 }
 
 export const useChatMessages = (user: any, conversationId: string) => {
@@ -23,6 +24,7 @@ export const useChatMessages = (user: any, conversationId: string) => {
         text: msg.content,
         senderId: msg.senderId,
         createdAt: msg.createdAt,
+        type: msg.type || "TEXT",
       }));
       setMessages(history);
     } catch (error) {
@@ -52,6 +54,7 @@ export const useChatMessages = (user: any, conversationId: string) => {
               text: msg.content,
               senderId: msg.senderId,
               createdAt: msg.createdAt,
+              type: msg.type || "TEXT",
             };
             return [...prev, formattedMsg];
           });
@@ -79,10 +82,51 @@ export const useChatMessages = (user: any, conversationId: string) => {
     socket.emit("send-message", newMessageData);
   };
 
+  const sendImageMessage = async (imageUri: string) => {
+    if (!user?.id) return;
+    setIsLoading(true);
+
+    try {
+      const filename = imageUri.split("/").pop() || "image.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      const formData = new FormData();
+      formData.append("file", {
+        uri: imageUri,
+        name: filename,
+        type,
+      } as any);
+
+      const response = await api.post("/comments/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const imageUrl = response.data;
+
+      const newMessageData = {
+        conversationId: conversationId,
+        senderId: user.id,
+        senderRole: "user",
+        content: imageUrl,
+        type: "IMAGE",
+      };
+
+      socket.emit("send-message", newMessageData);
+    } catch (error) {
+      console.error("Failed to upload and send image:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     messages,
     isLoading,
     sendMessage,
+    sendImageMessage,
     setMessages
   };
 };

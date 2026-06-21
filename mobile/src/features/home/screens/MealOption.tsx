@@ -10,7 +10,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { productApi } from "../../../services/api/apiProducts";
 import { seededShuffle, getDailySeed } from "../../../utils/random";
-import { formatCurrency } from "../../../shared/utils";
+import { formatCurrency, resolveImageUrl } from "../../../shared/utils";
 import { useCart } from "../../../app/context/CartContext";
 
 const MealProductCard = ({
@@ -22,12 +22,7 @@ const MealProductCard = ({
 }) => {
   const { addToCart } = useCart();
 
-  const imageUrl =
-    (item.images || item.image) &&
-    ((item.images || item.image).startsWith("http") ||
-      (item.images || item.image).startsWith("data:"))
-      ? item.images || item.image
-      : "https://res.cloudinary.com/dt9v7896q/image/upload/v1710502127/placeholder_food.png";
+  const imageUrl = resolveImageUrl(item.images || item.image);
 
   const handlePress = () => {
     if (navigation && navigation.navigate) {

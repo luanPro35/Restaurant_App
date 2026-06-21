@@ -20,6 +20,7 @@ interface HistoryCardProps {
 
 const HistoryCard: React.FC<HistoryCardProps> = ({ pack }) => {
   const isConfirmed = pack.status === "CONFIRMED";
+  const isCanceled = pack.status === "CANCELED";
   const date = new Date(pack.createdAt).toLocaleDateString("vi-VN", {
     day: "2-digit",
     month: "2-digit",
@@ -44,9 +45,9 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ pack }) => {
               <Text className="text-[#2D2D2D] font-black text-sm">#{pack.id.slice(0, 8).toUpperCase()}</Text>
             </View>
           </View>
-          <View className={`px-4 py-1.5 rounded-full ${isConfirmed ? 'bg-green-50' : 'bg-orange-50'}`}>
-            <Text className={`text-[11px] font-bold ${isConfirmed ? 'text-green-600' : 'text-orange-600'}`}>
-              {isConfirmed ? "ĐÃ GIAO" : "ĐANG XỬ LÝ"}
+          <View className={`px-4 py-1.5 rounded-full ${isConfirmed ? 'bg-green-50' : isCanceled ? 'bg-gray-100' : 'bg-orange-50'}`}>
+            <Text className={`text-[11px] font-bold ${isConfirmed ? 'text-green-600' : isCanceled ? 'text-gray-500' : 'text-orange-600'}`}>
+              {isConfirmed ? "ĐÃ GIAO" : isCanceled ? "ĐÃ HỦY" : "ĐANG XỬ LÝ"}
             </Text>
           </View>
         </View>

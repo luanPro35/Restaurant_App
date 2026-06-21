@@ -13,7 +13,7 @@ interface PackageItemProps {
 
 const STEPS = [
   { id: "PENDING", title: "Đang trên đường", icon: "clock-outline" },
-  { id: "CONFIRMED", title: "Đã giao hàng", icon: "package-variant" }
+  { id: "CONFIRMED", title: "Đã giao hàng", icon: "package-variant" },
 ];
 
 export default function PackageItem({
@@ -37,6 +37,7 @@ export default function PackageItem({
   };
 
   const isConfirmed = pack.status === "CONFIRMED";
+  const isCanceled = pack.status === "CANCELED";
   const currentStepIndex = isConfirmed ? 1 : 0;
 
   return (
@@ -101,12 +102,12 @@ export default function PackageItem({
 
       <TouchableOpacity
         onPress={handleComplete}
-        disabled={isConfirmed || loading}
+        disabled={isConfirmed || isCanceled || loading}
         activeOpacity={0.8}
         className="mx-4 mb-4 overflow-hidden rounded-2xl"
       >
         <LinearGradient
-          colors={isConfirmed ? ["#10B981", "#059669"] : ["#E91E63", "#E07B39"]}
+          colors={isCanceled ? ["#9CA3AF", "#6B7280"] : isConfirmed ? ["#10B981", "#059669"] : ["#E91E63", "#E07B39"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={{ height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 }}
@@ -114,12 +115,15 @@ export default function PackageItem({
           {isConfirmed && (
             <MaterialCommunityIcons name="check-decagram" size={20} color="white" style={{ marginRight: 8 }} />
           )}
+          {isCanceled && (
+            <MaterialCommunityIcons name="close-circle" size={20} color="white" style={{ marginRight: 8 }} />
+          )}
           <Text
             style={{ color: 'white', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}
             numberOfLines={1}
             adjustsFontSizeToFit
           >
-            {loading ? "Đang xử lý..." : isConfirmed ? "Giao hàng thành công" : "Xác nhận đã nhận hàng"}
+            {loading ? "Đang xử lý..." : isCanceled ? "Đơn hàng đã hủy" : isConfirmed ? "Giao hàng thành công" : "Xác nhận đã nhận hàng"}
           </Text>
         </LinearGradient>
       </TouchableOpacity>

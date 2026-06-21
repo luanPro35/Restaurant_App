@@ -13,7 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import apiProducts from "@/services/api/apiProducts";
 import { MenuItem } from "../types";
-import { formatCurrency } from "../../../shared/utils";
+import { formatCurrency, resolveImageUrl } from "../../../shared/utils";
 import { useCart } from "@/app/context/CartContext";
 import { IP } from "../../../config/ip";
 
@@ -78,25 +78,12 @@ export default function DetailProduct() {
     );
   }
 
-  const getImageUrl = (imageInput: any) => {
-    if (!imageInput) return "https://via.placeholder.com/400";
-    let url = "";
-    try {
-      const parsed = JSON.parse(imageInput);
-      url = Array.isArray(parsed) ? parsed[0] : parsed;
-    } catch {
-      url = imageInput;
-    }
-    if (typeof url !== 'string') return "https://via.placeholder.com/400";
-    return url.replace('localhost', IP);
-  };
-
   return (
     <View className="flex-1 bg-white">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="relative h-[420px]">
           <Image
-            source={{ uri: getImageUrl(product.image || (product as any).images) }}
+            source={{ uri: resolveImageUrl(product.image || (product as any).images) }}
             className="w-full h-full"
             resizeMode="cover"
           />

@@ -5,6 +5,7 @@ import {
   Logger,
 } from "@nestjs/common";
 import { AdminProductRepository } from "../repositories/admin-products.repository";
+import { RedisService } from "../../redis/redis.service";
 import {
   createProductSchema,
   updateProductSchema,
@@ -20,12 +21,28 @@ export class AdminProductService {
 
   constructor(
     private readonly adminProductRepository: AdminProductRepository,
+    private readonly redisService: RedisService,
   ) {}
+
+  private async clearProductCache() {
+    try {
+      const client = this.redisService.getClient();
+      const keys = await client.keys('products:list:*');
+      if (keys.length > 0) {
+        await client.del(keys);
+        this.logger.log(`Cleared ${keys.length} product list cache keys`);
+      }
+    } catch (error) {
+      this.logger.error("Failed to clear product cache:", error);
+    }
+  }
 
   async createProduct(data: any) {
     try {
       const validatedData = createProductSchema.parse(data);
-      return await this.adminProductRepository.create(validatedData as any);
+      const product = await this.adminProductRepository.create(validatedData as any);
+      await this.clearProductCache();
+      return product;
     } catch (error) {
       this.logger.error("Validation failed for creating product:", error);
       if (error instanceof Error && "issues" in error) {
@@ -73,7 +90,9 @@ export class AdminProductService {
     try {
       await this.getProductById(id);
       const validatedData = updateProductSchema.parse(data);
-      return await this.adminProductRepository.update(id, validatedData as any);
+      const product = await this.adminProductRepository.update(id, validatedData as any);
+      await this.clearProductCache();
+      return product;
     } catch (error) {
       this.logger.error("Validation failed for updating product:", error);
       throw error;
@@ -83,15 +102,19 @@ export class AdminProductService {
   async deleteProduct(id: string) {
     deleteProductSchema.parse({ id });
     await this.getProductById(id);
-    return this.adminProductRepository.delete(id);
+    const result = await this.adminProductRepository.delete(id);
+    await this.clearProductCache();
+    return result;
   }
 
   async toggleAvailability(id: string, isAvailable: boolean) {
     const validated = toggleAvailabilitySchema.parse({ id, isAvailable });
     await this.getProductById(validated.id);
-    return this.adminProductRepository.updateAvailability(
+    const result = await this.adminProductRepository.updateAvailability(
       validated.id,
       validated.isAvailable,
     );
+    await this.clearProductCache();
+    return result;
   }
 }

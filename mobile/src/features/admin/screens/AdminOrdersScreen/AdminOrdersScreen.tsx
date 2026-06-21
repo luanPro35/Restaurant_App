@@ -1,11 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl, Alert } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAdminPackage } from "../../hooks/useAdminPackage";
+import packageApi from "../../../../services/api/package-api";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function AdminOrdersScreen() {
@@ -119,11 +120,39 @@ export default function AdminOrdersScreen() {
                       </Text>
                     </View>
                   </View>
-                  <View className={`px-3 py-1 rounded-full ${pkg.status === "CONFIRMED" ? "bg-green-50" : "bg-red-50"}`}>
-                    <Text className={`text-[10px] font-black uppercase ${pkg.status === "CONFIRMED" ? "text-green-600" : "text-red-600"}`}>
-                      {pkg.status === "CONFIRMED" ? "Hoàn thành" : "Đang chờ"}
+                  <View className={`px-3 py-1 rounded-full ${pkg.status === "CONFIRMED" ? "bg-green-50" : pkg.status === "CANCELED" ? "bg-gray-100" : "bg-red-50"}`}>
+                    <Text className={`text-[10px] font-black uppercase ${pkg.status === "CONFIRMED" ? "text-green-600" : pkg.status === "CANCELED" ? "text-gray-500" : "text-red-600"}`}>
+                      {pkg.status === "CONFIRMED" ? "Hoàn thành" : pkg.status === "CANCELED" ? "Đã hủy" : "Đang chờ"}
                     </Text>
                   </View>
+                  {pkg.status === "PENDING" && pkg.paymentMethod === "Cash" && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        Alert.alert(
+                          "Xác nhận",
+                          "Bạn có chắc chắn muốn hủy đơn hàng này không?",
+                          [
+                            { text: "Không", style: "cancel" },
+                            { 
+                              text: "Hủy đơn", 
+                              style: "destructive",
+                              onPress: async () => {
+                                try {
+                                  await packageApi.update(pkg.id, { status: "CANCELED" });
+                                  refresh();
+                                } catch (error) {
+                                  Alert.alert("Lỗi", "Không thể hủy đơn hàng");
+                                }
+                              }
+                            }
+                          ]
+                        );
+                      }}
+                      className="bg-red-50 px-4 py-2 rounded-full ml-2"
+                    >
+                      <Text className="text-red-500 font-bold text-xs uppercase">Hủy đơn</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 <View className="h-[1px] bg-gray-50 mb-4" />

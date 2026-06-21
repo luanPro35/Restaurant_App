@@ -22,7 +22,7 @@ export class NotificationController {
   @ApiOperation({ summary: "Lấy danh sách thông báo cho người dùng" })
   @ApiResponse({ status: 200, description: "Thành công" })
   getNotifications(@Query() query: GetNotificationsDto) {
-    return this.service.getNotifications(query);
+    return this.service.getNotifications({ ...query, isActive: true });
   }
 
   @Get(":id")

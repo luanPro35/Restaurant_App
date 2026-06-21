@@ -26,4 +26,5 @@ export interface PromotionQuery {
   name?: string;
   page?: number;
   limit?: number;
+  isActive?: boolean;
 }

@@ -5,6 +5,9 @@ export const GetNotificationsSchema = z.object({
   title: z.string().optional(),
   limit: z.number().optional(),
   page: z.number().optional(),
+  search: z.string().optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
+  isActive: z.boolean().optional(),
 });
 
 export const CreateNotificationSchema = z.object({

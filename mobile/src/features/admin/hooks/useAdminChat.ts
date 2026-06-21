@@ -34,7 +34,8 @@ export const useAdminConversations = () => {
 export const useAdminChatDetail = (conversationId: string) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const adminId = "admin-1"; // HACK: Should get from context/auth
+  const [isSendingImage, setIsSendingImage] = useState(false);
+  const adminId = "admin-1"; 
 
   const fetchHistory = useCallback(async () => {
     if (!conversationId) return;
@@ -82,5 +83,39 @@ export const useAdminChatDetail = (conversationId: string) => {
     });
   }, [conversationId]);
 
-  return { messages, loading, sendMessage, fetchHistory };
+  const sendImageMessage = useCallback(async (imageUri: string) => {
+    setIsSendingImage(true);
+    try {
+      const filename = imageUri.split("/").pop() || "image.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      const formData = new FormData();
+      formData.append("file", {
+        uri: imageUri,
+        name: filename,
+        type,
+      } as any);
+
+      const response = await api.post("/comments/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      socket.emit("send-message", {
+        conversationId,
+        senderId: adminId,
+        senderRole: "admin",
+        content: response.data,
+        type: "IMAGE",
+      });
+    } catch (error) {
+      console.error("Failed to upload and send image:", error);
+    } finally {
+      setIsSendingImage(false);
+    }
+  }, [conversationId]);
+
+  return { messages, loading, isSendingImage, sendMessage, sendImageMessage, fetchHistory };
 };

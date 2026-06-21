@@ -9,6 +9,7 @@ import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
 import adminApi from "../../admin-api";
 import { useAdminProducts } from "../../hooks/useAdminProducts";
 import { Config } from "../../../../config";
+import { resolveImageUrl } from "../../../../shared/utils";
 
 const InputField = ({
   label,
@@ -160,17 +161,7 @@ export default function AdminEditProduct() {
   };
 
   const displayImageUrl = React.useMemo(() => {
-    if (!form.image) return "";
-    let img = form.image.trim();
-    if (img.startsWith("http") || img.startsWith("data:image")) return img;
-    
-    const cleaned = img.replace(/\s+/g, '');
-    // Check if it's a valid base64 string (only base64 chars and long enough)
-    if (cleaned.length > 100 && /^[A-Za-z0-9+/=]+$/.test(cleaned)) {
-      return `data:image/jpeg;base64,${cleaned}`;
-    }
-    
-    return `${Config.API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
+    return resolveImageUrl(form.image);
   }, [form.image]);
 
   if (loading) {

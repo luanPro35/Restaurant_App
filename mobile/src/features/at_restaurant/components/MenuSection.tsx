@@ -6,13 +6,16 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Search_Dish from "../../delivery/Header/Search_Dish";
 import { useMenu } from "../../menu/hooks/useMenu";
 import { Config } from "../../../config";
 import { useRestaurantCart } from "../context/RestaurantCartContext";
-import { formatCurrency } from "../../../shared/utils";
+import { formatCurrency, resolveImageUrl } from "../../../shared/utils";
 
 interface MenuItem {
   id: string;
@@ -32,10 +35,19 @@ export default function MenuSection({ onAddItem }: MenuSectionProps) {
   const { menu, loading, error, filter, fetchMenu, setFilter } = useMenu();
   const { addToRestaurantCart } = useRestaurantCart();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchMenu();
+    setRefreshing(false);
+  }, [fetchMenu]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMenu();
+    }, [])
+  );
 
   const handleSearch = (query: string) => {
     setFilter((prev: any) => ({ ...prev, search: query }));
@@ -43,30 +55,6 @@ export default function MenuSection({ onAddItem }: MenuSectionProps) {
   };
 
   const convertToMenuItem = (item: any): MenuItem => {
-    let imageUrl = "https://via.placeholder.com/150";
-    const rawImages = item.images || item.image;
-
-    if (rawImages) {
-      try {
-        const parsed =
-          typeof rawImages === "string" && rawImages.startsWith("[")
-            ? JSON.parse(rawImages)
-            : rawImages;
-
-        const firstImage = Array.isArray(parsed) ? parsed[0] : parsed;
-
-        if (typeof firstImage === "string" && firstImage.length > 0) {
-          if (firstImage.startsWith("http") || firstImage.startsWith("data:image")) {
-            imageUrl = firstImage;
-          } else {
-            imageUrl = `${Config.API_URL}${firstImage.startsWith("/") ? "" : "/"}${firstImage}`;
-          }
-        }
-      } catch (e) {
-        console.warn("Parse image error:", e);
-      }
-    }
-
     return {
       id: item._id || item.id?.toString(),
       name: item.name,
@@ -75,13 +63,14 @@ export default function MenuSection({ onAddItem }: MenuSectionProps) {
           ? `${item.price.toLocaleString()}đ`
           : item.price,
       rawPrice: typeof item.price === "number" ? item.price : 0,
-      image: imageUrl,
+      image: resolveImageUrl(item.images || item.image),
       description: item.description || "",
       category: item.category?.name || "Khác",
     };
   };
 
   const menuItems = (Array.isArray(menu) ? menu : [])
+    .filter((item) => item.isAvailable !== false)
     .filter((item) => {
       if (selectedCategory === null) return true;
       return item.categoryId === selectedCategory;
@@ -114,12 +103,16 @@ export default function MenuSection({ onAddItem }: MenuSectionProps) {
           </View>
         </View>
 
-        {loading ? (
+        {loading && !refreshing ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#f97316" />
           </View>
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+          <ScrollView 
+            showsVerticalScrollIndicator={false} 
+            className="flex-1"
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#f97316"]} tintColor="#f97316" />}
+          >
             {menuItems.length > 0 ? (
               menuItems.map((item) => (
                 <View

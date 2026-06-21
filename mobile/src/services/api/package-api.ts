@@ -6,7 +6,7 @@ export interface Package {
   address: string;
   description?: string;
   price: number;
-  status: "PENDING" | "CONFIRMED";
+  status: "PENDING" | "CONFIRMED" | "CANCELED";
   paymentMethod: string;
   createdAt: string;
   updatedAt: string;
@@ -17,7 +17,7 @@ export interface CreatePackageDto {
   address: string;
   description?: string;
   price: number;
-  status?: "PENDING" | "CONFIRMED";
+  status?: "PENDING" | "CONFIRMED" | "CANCELED";
   paymentMethod: string;
 }
 

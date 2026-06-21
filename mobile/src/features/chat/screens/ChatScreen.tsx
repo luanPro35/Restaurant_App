@@ -9,7 +9,10 @@ import {
   Platform,
   ActivityIndicator,
   Keyboard,
+  Image,
+  Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../../app/context/AuthContext";
@@ -22,7 +25,25 @@ export default function ChatScreen({ navigation }: { navigation: any }) {
   const { user } = useAuth();
   const conversationId = user?.id || "default_room";
 
-  const { messages, isLoading, sendMessage: sendChatMessage } = useChatMessages(user, conversationId);
+  const { messages, isLoading, sendMessage: sendChatMessage, sendImageMessage } = useChatMessages(user, conversationId);
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert("Lỗi", "Cần quyền truy cập thư viện ảnh để gửi ảnh.");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      await sendImageMessage(result.assets[0].uri);
+    }
+  };
 
   const sendMessage = () => {
     if (!inputText.trim()) return;
@@ -40,14 +61,22 @@ export default function ChatScreen({ navigation }: { navigation: any }) {
           }`}
       >
         <View
-          className={`px-4 py-3 rounded-2xl ${isMe
+          className={`px-3 py-2 rounded-2xl ${isMe
             ? "bg-[#E07B39] rounded-br-sm"
             : "bg-white rounded-bl-sm shadow-sm"
-            }`}
+            } ${item.type === "IMAGE" ? "p-1" : ""}`}
         >
-          <Text className={`text-base ${isMe ? "text-white" : "text-gray-800"}`}>
-            {item.text}
-          </Text>
+          {item.type === "IMAGE" ? (
+            <Image 
+              source={{ uri: item.text }} 
+              style={{ width: 200, height: 200, borderRadius: 12 }} 
+              resizeMode="cover" 
+            />
+          ) : (
+            <Text className={`text-base px-1 ${isMe ? "text-white" : "text-gray-800"}`}>
+              {item.text}
+            </Text>
+          )}
         </View>
       </View>
     );
@@ -95,6 +124,14 @@ export default function ChatScreen({ navigation }: { navigation: any }) {
         className="bg-white px-4 py-3 border-t border-gray-100 flex-row items-end"
         style={{ paddingBottom: Math.max(insets.bottom, 12) }}
       >
+        <TouchableOpacity
+          onPress={pickImage}
+          className="p-3 mr-2 bg-gray-100 rounded-full items-center justify-center"
+          style={{ height: 44, width: 44 }}
+        >
+          <MaterialCommunityIcons name="image-outline" size={24} color="#9CA3AF" />
+        </TouchableOpacity>
+
         <View className="flex-1 bg-gray-100 rounded-3xl px-4 py-2 min-h-[44px] max-h-[120px] justify-center">
           <TextInput
             value={inputText}
@@ -120,6 +157,13 @@ export default function ChatScreen({ navigation }: { navigation: any }) {
           />
         </TouchableOpacity>
       </View>
+
+      {isLoading && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center', zIndex: 100 }}>
+          <ActivityIndicator size="large" color="#E07B39" />
+          <Text className="text-white mt-2 font-bold">Đang gửi ảnh...</Text>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
