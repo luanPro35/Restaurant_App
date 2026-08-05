@@ -23,6 +23,7 @@ model User {
   payments       Payment[]
   milestones     UserMilestone[]
   comments       Comment[]
+  mealRecommendations MealRecommendation[]
 
   @@map("users")
 }
@@ -361,3 +362,23 @@ enum TransactionStatus {
   FAILED
   REFUNDED
 }
+
+model MealRecommendation {
+  id                String   @id @default(uuid())
+  userId            String?
+  height            Float?
+  weight            Float?
+  bmi               Float?
+  bmiStatus         String?
+  suggestedCalories Int?
+  budget            Float?
+  mealType          String?
+  keyword           String?
+  recommendedData   Json?
+  createdAt         DateTime @default(now())
+  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "meal_recommendations_userId_fkey")
+  @@map("meal_recommendations")
+}
+

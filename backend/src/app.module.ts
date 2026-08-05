@@ -17,7 +17,8 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { RedisModule } from "./modules/redis/redis.module";
 import { CommentModule } from "./modules/comments/comment.module";
 import authLimiter from "./middlewares/rate-limit.middleware";
-
+import { MealFoodModule } from "./modules/ai/meal_food/meal_food.module";
+import { AiFoodRecognitionModule } from "./modules/ai/ai_food_recognition/ai_food_recognition.module";
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -36,6 +37,8 @@ import authLimiter from "./middlewares/rate-limit.middleware";
     CategoryModule,
     RedisModule,
     CommentModule,
+    MealFoodModule,
+    AiFoodRecognitionModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

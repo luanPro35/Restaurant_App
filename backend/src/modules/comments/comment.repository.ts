@@ -104,4 +104,27 @@ export class CommentRepository {
             where,
         });
     }
+
+    async sendFeedback(data: CreateCommentDto) {
+        return this.prisma.comment.create({
+            data: {
+                userId: data.userId,
+                content: data.content!,
+            },
+        });
+    }
+
+    async getWeeklyComments() {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        return this.prisma.comment.findMany({
+            where: {
+                createdAt: {
+                    gte: sevenDaysAgo,
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
 }

@@ -11,6 +11,17 @@ export interface Message {
     recommendedProducts?: any[];
 }
 
+export interface MealFoodSearchParams {
+    userId?: string;
+    height?: number;
+    weight?: number;
+    calorieGoal?: number;
+    budget?: number;
+    mealType?: "BREAKFAST" | "LUNCH" | "DINNER" | "ALL" | string;
+    keyword?: string;
+    limit?: number;
+}
+
 export const aiApi = {
     chat: async (message: string, userId?: string) => {
         try {
@@ -35,8 +46,17 @@ export const aiApi = {
         } catch (error) {
             throw error;
         }
+    },
+    searchMealFood: async (params: MealFoodSearchParams) => {
+        try {
+            const response = await api.get(`/ai/meal-food/search`, {
+                params
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 };
 
 export default aiApi;
-

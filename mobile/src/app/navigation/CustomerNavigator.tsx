@@ -27,6 +27,8 @@ import SeeImage from "../../features/comment/screen/SeeImage";
 import SeeYourImage from "../../features/comment/screen/SeeYourImage";
 import EditCommentScreen from "../../features/comment/screen/EditCommentScreen";
 import WatchImage from "../../features/comment/screen/WatchImage";
+import MealFoodScreen from "../../features/meal_food/screens/MealFoodScreen";
+import AI_FoodScreen from "../../features/ai_food_recognition/AI_FoodScreen";
 
 export type CustomerStackParamList = {
   Home: undefined;
@@ -59,7 +61,8 @@ export type CustomerStackParamList = {
   SeeYourImage: undefined;
   EditComment: { comment: any };
   WatchImage: { imageUrl: string };
-
+  MealFood: undefined;
+  AIFoodRecognition: undefined;
 };
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -96,6 +99,8 @@ export default function CustomerNavigator() {
       <Stack.Screen name="SeeYourImage" component={SeeYourImage} />
       <Stack.Screen name="EditComment" component={EditCommentScreen} />
       <Stack.Screen name="WatchImage" component={WatchImage} />
+      <Stack.Screen name="MealFood" component={MealFoodScreen} />
+      <Stack.Screen name="AIFoodRecognition" component={AI_FoodScreen} />
     </Stack.Navigator>
   );
 }

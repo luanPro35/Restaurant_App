@@ -79,4 +79,8 @@ export class AiRepository {
             orderBy: { createdAt: "asc" }
         });
     }
+
+    async getAllCategories() {
+        return this.prisma.category.findMany();
+    }
 }

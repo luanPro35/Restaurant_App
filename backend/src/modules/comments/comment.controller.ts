@@ -63,4 +63,12 @@ export class CommentController {
         return this.commentService.uploadImage(file);
     }
 
+    @Post('send-telegram-notification')
+    @UseGuards(JwtAuthGuard)
+    async sendTelegramNotification(@Body() data: CreateCommentDto, @Request() req) {
+        if (req.user && req.user.sub) {
+            data.userId = req.user.sub;
+        }
+        return this.commentService.sendFeedback(data);
+    }
 }

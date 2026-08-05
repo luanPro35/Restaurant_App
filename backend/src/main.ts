@@ -4,9 +4,14 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import express from "express";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Tăng giới hạn Payload size cho phép tải ảnh Base64 lớn (50MB)
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   // Enable CORS
   app.enableCors();

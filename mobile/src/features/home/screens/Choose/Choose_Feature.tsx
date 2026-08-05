@@ -53,10 +53,10 @@ const List_Feature = (
       onPress: () => navigation.navigate("History"),
     },
     {
-      name: "Tư vấn",
-      icon: "chat",
+      name: "Xem thêm",
+      icon: "menu",
       color: "#9C27B0",
-      onPress: () => navigation.navigate("Chat"),
+      onPress: onOpenModal,
     },
   ];
 

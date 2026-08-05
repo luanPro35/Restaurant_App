@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -42,6 +43,24 @@ const FEATURE_ITEMS = [
     icon: "ticket-percent",
     color: "#E91E63",
     route: "Promotion",
+  },
+  {
+    name: "AI Thực đơn",
+    icon: "robot-happy",
+    color: "#E07B39",
+    route: "MealFood",
+  },
+  {
+    name: "AI Quét Ảnh",
+    icon: "camera-iris",
+    color: "#00BCD4",
+    route: "AIFoodRecognition",
+  },
+  {
+    name: "Tư vấn AI",
+    icon: "chat",
+    color: "#9C27B0",
+    route: "Chat",
   },
   {
     name: "Đơn hàng",
@@ -117,20 +136,21 @@ export default function FeaturesModal({
       <TouchableWithoutFeedback onPress={() => closeWithAnimation()}>
         <Animated.View
           style={{ opacity: fadeAnim }}
-          className="flex-1 justify-end"
+          className="flex-1 justify-end bg-black/40"
         >
           <TouchableWithoutFeedback>
             <Animated.View
               style={{
                 transform: [{ translateY: slideAnim }],
+                maxHeight: height * 0.85,
               }}
-              className="bg-white rounded-t-[32px] overflow-hidden shadow-2xl"
+              className="bg-[#FFFFFF] rounded-t-[32px] overflow-hidden shadow-2xl"
             >
               <View className="items-center pt-3 pb-2">
                 <View className="w-12 h-1.5 bg-gray-300 rounded-full" />
               </View>
 
-              <View className="px-6 pb-8 pt-2">
+              <ScrollView className="px-6 pb-8 pt-2" showsVerticalScrollIndicator={false}>
                 <Text className="text-xl font-bold text-[#2D2D2D] mb-4 text-center">
                   Tất cả tính năng
                 </Text>
@@ -168,11 +188,11 @@ export default function FeaturesModal({
                 </View>
                 <TouchableOpacity
                   onPress={() => closeWithAnimation()}
-                  className="mt-4 bg-gray-100 py-3 rounded-full items-center"
+                  className="mt-2 mb-6 bg-gray-100 py-3 rounded-full items-center"
                 >
                   <Text className="font-bold text-gray-500">Đóng</Text>
                 </TouchableOpacity>
-              </View>
+              </ScrollView>
             </Animated.View>
           </TouchableWithoutFeedback>
         </Animated.View>
