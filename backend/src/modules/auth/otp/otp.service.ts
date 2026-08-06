@@ -38,20 +38,19 @@ export class OtpService {
       // Ignore redis error
     }
 
-    // 3. Gửi Email OTP (chạy bất đồng bộ ngầm để phản hồi API ngay lập tức, tránh timeout)
-    sendEmail(
-      email,
-      "Mã xác thực (OTP) của bạn",
-      `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
-    )
-      .then(() =>
-        this.logger.log(`OTP email sent successfully to: ${email}`),
-      )
-      .catch((error: any) =>
-        this.logger.warn(
-          `Could not send email to ${email}: ${error?.message}. Generated OTP: ${otp}`,
-        ),
+    // 3. Gửi Email OTP
+    try {
+      await sendEmail(
+        email,
+        "Mã xác thực (OTP) của bạn",
+        `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
       );
+      this.logger.log(`OTP email sent successfully to: ${email}`);
+    } catch (error: any) {
+      this.logger.warn(
+        `Could not send email to ${email}: ${error?.message}. Generated OTP: ${otp}`,
+      );
+    }
 
     return { email, message: "OTP sent successfully", otp };
   }
