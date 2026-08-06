@@ -13,6 +13,9 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
           },
+          tls: {
+            rejectUnauthorized: false,
+          },
         }
       : {
           host: process.env.EMAIL_HOST || "smtp.gmail.com",
@@ -21,6 +24,9 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
           auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
+          },
+          tls: {
+            rejectUnauthorized: false,
           },
         },
   );
