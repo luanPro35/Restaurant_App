@@ -16,8 +16,9 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors();
 
-  // Global prefix
-  app.setGlobalPrefix("api/v1");
+  // Trust Proxy for Render / Cloud deployment
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set("trust proxy", 1);
 
   // Rate Limiting
   const rateLimit = require("express-rate-limit");
