@@ -6,16 +6,20 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
   if (process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const data = await resend.emails.send({
+      const { data, error } = await resend.emails.send({
         from: "Restaurant Booking <onboarding@resend.dev>",
         to: [to],
         subject,
         text,
       });
-      console.log("📧 Email sent via Resend API:", data.id);
+      if (error) {
+        console.error("❌ Resend API Error:", error);
+      } else {
+        console.log("📧 Email sent via Resend API:", data?.id);
+      }
       return data;
     } catch (resendErr) {
-      console.error("❌ Resend API Error:", resendErr);
+      console.error("❌ Resend Exception:", resendErr);
     }
   }
 
