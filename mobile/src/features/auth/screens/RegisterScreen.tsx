@@ -22,6 +22,7 @@ export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
@@ -116,10 +117,17 @@ export default function RegisterScreen() {
               placeholder="Password"
               className="flex-1 ml-3 text-base text-[#2D2D2D]"
               placeholderTextColor="#999"
-              secureTextEntry
+              secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
             />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="p-1">
+              <Ionicons
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                size={22}
+                color="#6B4423"
+              />
+            </TouchableOpacity>
           </View>
 
           <View className="w-full flex-row items-center mb-6">

@@ -23,6 +23,7 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const onLoginPress = async () => {
@@ -54,7 +55,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView className="pt-10 flex-1 bg-[#F9F6E7]">
-      <View className="flex-1 bg-[#F9F6E7] ">
+      <View className="flex-1 bg-[#F9F6E7]">
         <View className="items-center pt-16 pb-8">
           <Image
             source={require("../../../../assets/Logo.png")}
@@ -87,10 +88,17 @@ export default function LoginScreen() {
               placeholder="Password"
               className="flex-1 ml-3 text-base text-[#2D2D2D]"
               placeholderTextColor="#999"
-              secureTextEntry
+              secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
             />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="p-1">
+              <Ionicons
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                size={22}
+                color="#6B4423"
+              />
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity
