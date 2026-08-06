@@ -13,10 +13,9 @@ export class MealFoodController {
     @Query("calorieGoal") calorieGoal?: string,
     @Query("budget") budget?: string,
     @Query("mealType") mealType?: string,
-    @Query("keyword") keyword?: string,
-    @Query("limit") limit?: string
+    @Query("keyword") keyword?: string
   ) {
-    const result = await this.mealFoodService.search({
+    const result = await this.mealFoodService.getMealRecommendations({
       userId,
       height: height ? Number(height) : undefined,
       weight: weight ? Number(weight) : undefined,
@@ -24,7 +23,6 @@ export class MealFoodController {
       budget: budget ? Number(budget) : undefined,
       mealType,
       keyword,
-      limit: limit ? Number(limit) : undefined,
     });
     return result;
   }
