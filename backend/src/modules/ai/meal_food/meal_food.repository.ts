@@ -70,7 +70,7 @@ export class MealFoodRepository {
           mealType: data.mealType || null,
           keyword: data.keyword || null,
           recommendedData: data.recommendedData ? JSON.parse(JSON.stringify(data.recommendedData)) : null,
-        },
+        } as any,
       });
     } catch (error) {
       return await this.prisma.aiInteraction.create({

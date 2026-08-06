@@ -14,7 +14,7 @@ export class AdminTableService {
 
   async createTable(data: any) {
     const validatedData = createTableSchema.parse(data);
-    return this.adminTableRepository.createTable(validatedData);
+    return this.adminTableRepository.createTable(validatedData as any);
   }
 
   async updateTable(id: number, data: any) {
