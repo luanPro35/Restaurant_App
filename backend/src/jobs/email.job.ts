@@ -5,18 +5,33 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
     process.env.EMAIL_HOST?.includes("gmail") ||
     process.env.EMAIL_USER?.includes("@gmail.com");
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || "smtp.gmail.com",
-    port: Number(process.env.EMAIL_PORT) || 465,
-    secure: process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) === 465 : true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
+  const transporter = nodemailer.createTransport(
+    isGmail
+      ? {
+          host: "smtp.gmail.com",
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
+        }
+      : {
+          host: process.env.EMAIL_HOST || "smtp.gmail.com",
+          port: Number(process.env.EMAIL_PORT) || 465,
+          secure: Number(process.env.EMAIL_PORT) === 465,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
+        },
+  );
 
   const mailOptions = {
     from: `"Restaurant Booking" <${process.env.EMAIL_USER}>`,
