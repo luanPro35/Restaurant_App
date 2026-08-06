@@ -16,55 +16,36 @@ export class OtpService {
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const redisKey = `otp:${email}`;
-    
-    try {
-      await this.redisService.set(redisKey, otp, 300);
-    } catch (err) {
-      console.warn(`[OTP REDIS WARN] Redis cache error:`, err);
-    }
-
+    await this.redisService.set(redisKey, otp, 300);
     try {
       await sendEmail(
         email,
         "Mã xác thực (OTP) của bạn",
         `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
       );
-      console.log(`[OTP EMAIL SUCCESS] OTP sent to: ${email}`);
+      console.log(`OTP email sent successfully to: ${email}`);
     } catch (error: any) {
-      console.warn(
-        `[OTP EMAIL FALLBACK] Could not send email via SMTP on Cloud, OTP generated for ${email}: ${otp}`,
-        error?.message || error
+      console.error("Failed to send OTP email:", error?.message || error);
+      throw new BadRequestException(
+        `Không thể gửi email OTP đến ${email}. Lỗi: ${error?.message || "Unknown error"}`,
       );
     }
 
-    return { email, message: "OTP sent successfully", otp };
+    return { email, message: "OTP sent successfully" };
   }
 
   async verifyOtp(email: string, otp: string) {
     const redisKey = `otp:${email}`;
-    let storedOtp: string | null = null;
-    
-    try {
-      const res = await this.redisService.get(redisKey);
-      if (typeof res === "string") storedOtp = res;
-    } catch (err) {
-      console.warn(`[OTP REDIS WARN] Redis read error:`, err);
-    }
+    const storedOtp = await this.redisService.get(redisKey);
 
-    // Nếu không có Redis hoặc OTP quá hạn, vẫn hỗ trợ trường hợp OTP hợp lệ
     if (!storedOtp) {
-      // Cho phép verify nếu nhập OTP bất kỳ dạng test khi không có Redis
-      return { email, verified: true };
+      throw new BadRequestException("OTP has expired or does not exist");
     }
 
     if (storedOtp !== otp) {
       throw new UnauthorizedException("Invalid OTP");
     }
-    
-    try {
-      await this.redisService.del(redisKey);
-    } catch (err) {}
-
+    await this.redisService.del(redisKey);
     return { email, verified: true };
   }
 }
