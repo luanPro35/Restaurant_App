@@ -13,7 +13,7 @@ export class CommentController {
     @Post()
     @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
     @UseGuards(JwtAuthGuard)
-    async createComment(@Body() data: CreateCommentDto, @UploadedFile() file: Express.Multer.File, @Request() req: any) {
+    async createComment(@Body() data: CreateCommentDto, @UploadedFile() file: Express.Multer.File, @Request() req) {
         if (req.user && req.user.sub) {
             data.userId = req.user.sub;
         }
@@ -65,7 +65,7 @@ export class CommentController {
 
     @Post('send-telegram-notification')
     @UseGuards(JwtAuthGuard)
-    async sendTelegramNotification(@Body() data: CreateCommentDto, @Request() req: any) {
+    async sendTelegramNotification(@Body() data: CreateCommentDto, @Request() req) {
         if (req.user && req.user.sub) {
             data.userId = req.user.sub;
         }

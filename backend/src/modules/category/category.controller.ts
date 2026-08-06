@@ -17,7 +17,7 @@ export class CategoryController {
     const cacheKey = 'categories:all';
     
     const cachedData = await this.redisService.get(cacheKey);
-    if (typeof cachedData === 'string') {
+    if (cachedData) {
       return JSON.parse(cachedData);
     }
 

@@ -31,7 +31,7 @@ export class ProductService {
     const cacheKey = `products:list:${JSON.stringify(validatedQuery)}`;
     
     const cachedData = await this.redisService.get(cacheKey);
-    if (typeof cachedData === 'string') {
+    if (cachedData) {
       return JSON.parse(cachedData);
     }
 

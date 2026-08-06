@@ -5,44 +5,48 @@ import { PrismaService } from "../../../prisma/prisma.service";
 export class MealFoodRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllCategories() {
-    return this.prisma.category.findMany({
+  /**
+   * Truy vấn danh sách món ăn từ Database theo các tiêu chí lọc
+   */
+  async findProducts(filter: { keyword?: string; budget?: number; limit?: number }) {
+    const { keyword, budget, limit = 5 } = filter;
+
+    const whereCondition: any = {
+      isAvailable: true,
+    };
+
+    if (keyword && keyword.trim() !== "") {
+      whereCondition.OR = [
+        { name: { contains: keyword } },
+        { description: { contains: keyword } },
+      ];
+    }
+
+    if (budget && budget > 0) {
+      whereCondition.price = {
+        lte: budget,
+      };
+    }
+
+    return this.prisma.product.findMany({
+      where: whereCondition,
       include: {
-        products: {
-          take: 5,
-        },
-      },
-    });
-  }
-
-  async findProductsByKeywords(keywords: string[]) {
-    if (!keywords || keywords.length === 0) return [];
-
-    return this.prisma.product.findMany({
-      where: {
-        OR: keywords.map((kw) => ({
-          name: {
-            contains: kw,
+        category: {
+          select: {
+            id: true,
+            name: true,
           },
-        })),
-      },
-      take: 20,
-    });
-  }
-
-  async findProductsByMaxPrice(maxPrice: number) {
-    return this.prisma.product.findMany({
-      where: {
-        price: {
-          lte: maxPrice,
         },
       },
-      take: 20,
+      take: limit,
+      orderBy: {
+        price: "asc",
+      },
     });
   }
 
   async saveRecommendation(data: {
-    userId?: string;
+    userId?: string | null;
     height?: number;
     weight?: number;
     bmi?: number;
@@ -66,7 +70,7 @@ export class MealFoodRepository {
           mealType: data.mealType || null,
           keyword: data.keyword || null,
           recommendedData: data.recommendedData ? JSON.parse(JSON.stringify(data.recommendedData)) : null,
-        } as any,
+        },
       });
     } catch (error) {
       return await this.prisma.aiInteraction.create({
@@ -79,13 +83,5 @@ export class MealFoodRepository {
         },
       });
     }
-  }
-
-  async getRecentRecommendations(userId: string, limit: number = 5) {
-    return this.prisma.mealRecommendation.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-    });
   }
 }

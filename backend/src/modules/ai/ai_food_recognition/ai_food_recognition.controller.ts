@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { AiFoodRecognitionService, RecognizeFoodDto } from "./ai_food_recognition.service";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
+import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 
 @ApiTags("ai/food-recognition")
 @Controller("ai/food-recognition")

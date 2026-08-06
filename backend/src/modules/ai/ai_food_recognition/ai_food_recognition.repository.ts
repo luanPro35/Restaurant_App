@@ -7,6 +7,13 @@ export class AiFoodRecognitionRepository {
 
   async getAllProducts() {
     return this.prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        description: true,
+        images: true,
+      },
       take: 50,
     });
   }
