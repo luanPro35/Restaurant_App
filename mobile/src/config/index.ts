@@ -1,11 +1,13 @@
 import { IP } from "./ip";
 
-// Chuyển sang true để App kết nối tới Server Backend trên Render.com
-const USE_RENDER_BACKEND = true;
+// Tự động: __DEV__ = true khi chạy npm start (Local), __DEV__ = false khi build app (Production).
+// Nếu muốn dùng Render ngay trên máy Local, bạn chỉ cần đổi FORCE_RENDER = true.
+const FORCE_RENDER = false;
+const IS_PROD = !__DEV__ || FORCE_RENDER;
 
 export const Config = {
-  ENV: USE_RENDER_BACKEND ? "production" : "development",
-  API_URL: USE_RENDER_BACKEND
+  ENV: IS_PROD ? "production" : "development",
+  API_URL: IS_PROD
     ? "https://res-booking-backend.onrender.com"
     : `http://${IP}:4000`,
 };
