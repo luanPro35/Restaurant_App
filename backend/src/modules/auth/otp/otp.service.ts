@@ -47,7 +47,7 @@ export class OtpService {
           `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
         ),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("SMTP Connection Timeout on Cloud")), 3500),
+          setTimeout(() => reject(new Error("Email Delivery Timeout")), 8000),
         ),
       ]);
       this.logger.log(`OTP email sent successfully to: ${email}`);
