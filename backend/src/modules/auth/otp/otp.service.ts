@@ -38,13 +38,18 @@ export class OtpService {
       // Ignore redis error
     }
 
-    // 3. Gửi Email OTP
+    // 3. Gửi Email OTP (Tự động giới hạn timeout 3.5s để không làm treo App khi Cloud block SMTP)
     try {
-      await sendEmail(
-        email,
-        "Mã xác thực (OTP) của bạn",
-        `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
-      );
+      await Promise.race([
+        sendEmail(
+          email,
+          "Mã xác thực (OTP) của bạn",
+          `Mã OTP của bạn là: ${otp}. Mã có hiệu lực trong 5 phút.`,
+        ),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("SMTP Connection Timeout on Cloud")), 3500),
+        ),
+      ]);
       this.logger.log(`OTP email sent successfully to: ${email}`);
     } catch (error: any) {
       this.logger.warn(
