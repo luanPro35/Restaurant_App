@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import { IP } from "./ip";
 
 export const Config = {
