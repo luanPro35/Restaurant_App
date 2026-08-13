@@ -28,6 +28,7 @@ export default function MenuScreen() {
   const { addToCart, setIsCartVisible } = useCart();
   const [isCartVisibleLocal, setIsCartVisibleLocal] = useState(false); // Just in case, but actually let's use the global one
   const [refreshing, setRefreshing] = useState(false);
+   // const [isGridItem, setIsGridItem] = useState(true);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -216,6 +217,7 @@ export default function MenuScreen() {
                     item={item as any}
                     onAddToCart={handleAddToCart as any}
                     onPress={handleProductPress}
+                    // isGridItem={isGridItem}
                   />
                 ))}
               </View>
@@ -223,8 +225,6 @@ export default function MenuScreen() {
           </>
         )}
       </ScrollView>
-
-      {/* Floating Cart Button and Modal are now handled globally in App.tsx */}
     </View>
   );
 }
