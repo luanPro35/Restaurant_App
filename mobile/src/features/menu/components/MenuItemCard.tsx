@@ -16,12 +16,14 @@ interface MenuItemCardProps {
   item: MenuItem;
   onAddToCart: (item: MenuItem) => void;
   onPress: (item: MenuItem) => void;
+  // isGridItem: boolean;
 }
 
 export default function MenuItemCard({
   item,
   onAddToCart,
   onPress,
+  // isGridItem
 }: MenuItemCardProps) {
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
@@ -61,6 +63,7 @@ export default function MenuItemCard({
   return (
     <Animated.View
       style={{ transform: [{ scale: scaleAnim }] }}
+      // className= {`${isGridItem ? "w-[48%]" : "w-full"} mb-4`}
       className="w-[48%] mb-4"
     >
       <TouchableOpacity
