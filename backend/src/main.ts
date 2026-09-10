@@ -28,7 +28,7 @@ async function bootstrap() {
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: 100,
+      max: 10000,
       message: "Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau 15 phút.",
     }),
   );

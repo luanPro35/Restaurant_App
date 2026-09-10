@@ -19,9 +19,9 @@ export class CreatePackageDto {
     @IsNumber()
     price!: number;
 
-    @IsNotEmpty()
-    @IsEnum(PackageStatus)
-    status!: PackageStatus;
+    @IsOptional()
+    @IsString()
+    status?: string;
 
     @IsNotEmpty()
     @IsString()
@@ -32,7 +32,35 @@ export class CreatePackageDto {
     userId?: string;
 }
 
-export class UpdatePackageDto extends PartialType(CreatePackageDto) {}
+export class UpdatePackageDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+
+    @IsOptional()
+    @IsString()
+    address?: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
+
+    @IsOptional()
+    @IsNumber()
+    price?: number;
+
+    @IsOptional()
+    @IsString()
+    status?: string;
+
+    @IsOptional()
+    @IsString()
+    paymentMethod?: string;
+
+    @IsOptional()
+    @IsString()
+    userId?: string;
+}
 
 export class DeletePackageDto {
     @IsNotEmpty()

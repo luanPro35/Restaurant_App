@@ -1,12 +1,21 @@
 import api from "./axios.instance";
 
+export type PackageStatusType =
+  | "PENDING"
+  | "CONFIRMED"
+  | "COOKING"
+  | "DELIVERING"
+  | "RECEIVED"
+  | "COMPLETED"
+  | "CANCELED";
+
 export interface Package {
   id: string;
   name: string;
   address: string;
   description?: string;
   price: number;
-  status: "PENDING" | "CONFIRMED" | "CANCELED";
+  status: PackageStatusType;
   paymentMethod: string;
   createdAt: string;
   updatedAt: string;
@@ -17,7 +26,7 @@ export interface CreatePackageDto {
   address: string;
   description?: string;
   price: number;
-  status?: "PENDING" | "CONFIRMED" | "CANCELED";
+  status?: PackageStatusType;
   paymentMethod: string;
 }
 

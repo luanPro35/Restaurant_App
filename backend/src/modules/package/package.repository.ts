@@ -22,16 +22,17 @@ export class PackageRepository {
     }
 
     async update(id: string, data: UpdatePackageDto & { userId?: string }) {
+        const updateData: any = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.address !== undefined) updateData.address = data.address;
+        if (data.description !== undefined) updateData.description = data.description;
+        if (data.price !== undefined) updateData.price = data.price;
+        if (data.status !== undefined) updateData.status = data.status;
+        if (data.userId !== undefined) updateData.userId = data.userId;
+
         return (this.prisma as any).package.update({
             where: { id },
-            data: {
-                name: data.name,
-                address: data.address,
-                description: data.description,
-                price: data.price,
-                status: data.status as PackageStatus,
-                userId: data.userId,
-            },
+            data: updateData,
         });
     }
 
@@ -68,7 +69,9 @@ export class PackageRepository {
         return (this.prisma as any).package.count({
             where: {
                 userId,
-                status: "CONFIRMED"
+                status: {
+                    in: ["CONFIRMED", "COOKING", "DELIVERING", "RECEIVED", "COMPLETED"]
+                }
             },
         });
     }

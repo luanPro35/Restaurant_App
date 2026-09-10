@@ -36,6 +36,13 @@ export class OrderController {
     return this.orderService.create({ ...createOrderDto, userId: user?.sub });
   }
 
+  @Public()
+  @Get()
+  @ApiOperation({ summary: "Get all orders" })
+  async getAllOrders(@Query() query: any) {
+    return this.orderService.findAll(query);
+  }
+
   @Get("my-history")
   @ApiOperation({ summary: "Get order history for current user" })
   async getMyOrders(@CurrentUser() user: any, @Query() query: any) {

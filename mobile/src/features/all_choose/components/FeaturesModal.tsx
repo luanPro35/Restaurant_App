@@ -45,22 +45,28 @@ const FEATURE_ITEMS = [
     route: "Promotion",
   },
   {
-    name: "AI Thực đơn",
+    name: "Chat Nhân viên",
+    icon: "headset",
+    color: "#9C27B0",
+    route: "Chat",
+  },
+  {
+    name: "Tư vấn AI",
     icon: "robot-happy",
+    color: "#00BCD4",
+    route: "AI",
+  },
+  {
+    name: "AI Thực đơn",
+    icon: "food",
     color: "#E07B39",
     route: "MealFood",
   },
   {
     name: "AI Quét Ảnh",
     icon: "camera-iris",
-    color: "#00BCD4",
+    color: "#0284C7",
     route: "AIFoodRecognition",
-  },
-  {
-    name: "Tư vấn AI",
-    icon: "chat",
-    color: "#9C27B0",
-    route: "Chat",
   },
   {
     name: "Đơn hàng",
@@ -155,7 +161,7 @@ export default function FeaturesModal({
                   Tất cả tính năng
                 </Text>
                 <AllChooseSearchBar />
-                <QuickUtilities />
+                <QuickUtilities onNavigate={handleNavigation} />
                 <PromoBanner />
                 <Text className="text-sm font-bold text-gray-800 mb-3 px-1">
                   Dịch vụ chính

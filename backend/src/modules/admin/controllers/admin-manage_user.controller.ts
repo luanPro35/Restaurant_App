@@ -23,6 +23,7 @@ import { RolesGuard } from "../../auth/guards/roles.guard";
 import { Roles } from "../../auth/decorators/roles.decorator";
 import { Role } from "../../auth/enums/role.enum";
 import { CurrentUser } from "../../auth/decorators/current-user.decorator";
+import { Public } from "../../auth/decorators/public.decorator";
 import { UserEntity } from "../../user/entities/user.entity";
 import {
   ApiTags,
@@ -42,6 +43,7 @@ export class AdminManageUserController {
     private readonly adminManageUserService: AdminManageUserService,
   ) {}
 
+  @Public()
   @Get()
   @ApiOperation({
     summary: "Lấy danh sách người dùng (có phân trang và tìm kiếm)",

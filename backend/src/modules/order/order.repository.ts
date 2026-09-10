@@ -64,14 +64,15 @@ export class OrderRepository {
   }
 
   async findAll(query: any) {
-    const { status, type, userId, tableId, page = 1, limit = 10 } = query;
-    const skip = (page - 1) * limit;
+    const pageNum = Number(query?.page) || 1;
+    const limitNum = Number(query?.limit) || 50;
+    const skip = (pageNum - 1) * limitNum;
 
     const where: any = {};
-    if (status) where.status = status;
-    if (type) where.type = type;
-    if (userId) where.userId = userId;
-    if (tableId) where.tableId = tableId;
+    if (query?.status) where.status = query.status;
+    if (query?.type) where.type = query.type;
+    if (query?.userId) where.userId = query.userId;
+    if (query?.tableId) where.tableId = Number(query.tableId);
 
     const [data, total] = await Promise.all([
       this.prisma.order.findMany({
@@ -83,7 +84,7 @@ export class OrderRepository {
         },
         orderBy: { createdAt: "desc" },
         skip,
-        take: limit,
+        take: limitNum,
       }),
       this.prisma.order.count({ where }),
     ]);
@@ -92,9 +93,9 @@ export class OrderRepository {
       data,
       pagination: {
         total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
       },
     };
   }

@@ -24,9 +24,6 @@ export class PackageService {
             const inputMethod = pkg.paymentMethod?.toUpperCase();
 
             if (inputMethod === "VIETQR") method = "BANK_TRANSFER";
-            else if (inputMethod === "CREDIT_CARD" || inputMethod === "ATM") method = "CREDIT_CARD";
-            else if (inputMethod === "MOMO" || inputMethod === "ZALOPAY") method = "E_WALLET";
-
             await this.paymentService.create({
                 packageId: pkg.id,
                 amount: pkg.price,
@@ -61,7 +58,7 @@ export class PackageService {
         const validatedData = updatePackageSchema.parse(data);
         const updatedPkg = await this.packageRepository.update(id, validatedData as UpdatePackageDto);
 
-        if (validatedData.status === PackageStatus.CONFIRMED) {
+        if (validatedData.status === PackageStatus.COMPLETED) {
             const payment = await this.prisma.payment.findFirst({
                 where: { packageId: id },
                 include: { user: true }
