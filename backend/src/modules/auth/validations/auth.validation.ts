@@ -138,3 +138,41 @@ export class VerifyOtpDto {
   @ApiProperty({ example: "123456" })
   otp!: string;
 }
+
+export class GoogleAuthDto {
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "4/0AfgeX..." })
+  code?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "https://auth.expo.io/@anonymous/mobile" })
+  redirectUri?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "google-id-or-access-token" })
+  token?: string;
+
+  @IsEmail()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "user@gmail.com" })
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "Nguyen Van A" })
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "https://lh3.googleusercontent.com/..." })
+  photo?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: "google-user-id" })
+  googleId?: string;
+}
+

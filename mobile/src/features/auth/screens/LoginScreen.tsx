@@ -15,6 +15,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../../app/navigation/AuthNavigator";
 import { useAuth } from "../../../app/context/AuthContext";
 import authApi from "../../../services/api/auth.api";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
+
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -121,6 +123,18 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
+          {/* Divider */}
+          <View className="flex-row items-center my-5">
+            <View className="flex-1 h-[1px] bg-[#E5D5C3]" />
+            <Text className="mx-4 text-xs font-bold text-[#6B4423]/60 uppercase">
+              Hoặc
+            </Text>
+            <View className="flex-1 h-[1px] bg-[#E5D5C3]" />
+          </View>
+
+          {/* Google Sign In */}
+          <GoogleSignInButton title="Đăng nhập bằng Google" />
+
           <View className="flex-row justify-center mt-6">
             <Text className="text-sm text-[#6B4423]">
               Don't have an account?{" "}
@@ -129,6 +143,7 @@ export default function LoginScreen() {
               <Text className="text-sm text-[#E07B39] font-bold">Sign Up</Text>
             </TouchableOpacity>
           </View>
+
         </View>
       </View>
     </SafeAreaView>

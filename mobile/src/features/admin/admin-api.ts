@@ -55,9 +55,43 @@ export const adminApi = {
     },
   },
 
-  // Future admin modules can be added here
-  // orders: { ... },
-  // users: { ... },
+  // Admin Category APIs
+  categories: {
+    getAll: async () => {
+      const response = await api.get("/categories");
+      return response.data;
+    },
+
+    getById: async (id: string) => {
+      const response = await api.get(`/categories/${id}`);
+      return response.data;
+    },
+
+    create: async (categoryData: any) => {
+      const response = await api.post("/categories", categoryData);
+      return response.data;
+    },
+
+    update: async (id: string, categoryData: any) => {
+      const response = await api.put(`/categories/${id}`, categoryData);
+      return response.data;
+    },
+
+    delete: async (id: string) => {
+      const response = await api.delete(`/categories/${id}`);
+      return response.data;
+    },
+
+    uploadImage: async (formData: FormData) => {
+      const response = await api.post("/admin/products/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    },
+  },
 };
 
 export default adminApi;
+

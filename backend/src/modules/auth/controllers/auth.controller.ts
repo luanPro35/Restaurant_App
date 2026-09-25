@@ -11,12 +11,14 @@ import { AuthService } from "../services/auth.service";
 import {
   RegisterDto,
   LoginDto,
+  GoogleAuthDto,
   SendOtpDto,
   VerifyOtpDto,
   ForgotPasswordDto,
   ResetPasswordDto,
   UpdateProfileDto,
 } from "../validations/auth.validation";
+
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { RolesGuard } from "../guards/roles.guard";
@@ -71,6 +73,15 @@ export class AuthController {
   async login(@CurrentUser() user: any, @Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
+
+  @ApiTags("Auth")
+  @ApiOperation({ summary: "Login with Google" })
+  @ApiResponse({ status: 200, description: "Return user and tokens" })
+  @Post("google")
+  async googleLogin(@Body() googleAuthDto: GoogleAuthDto) {
+    return this.authService.googleLogin(googleAuthDto);
+  }
+
 
   @ApiTags("Auth")
   @ApiBearerAuth()

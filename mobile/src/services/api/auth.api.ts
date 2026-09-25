@@ -13,6 +13,21 @@ export const authApi = {
     return response.data;
   },
 
+  // POST: http://localhost:4000/api/v1/auth/google
+  googleLogin: async (data: {
+    code?: string;
+    redirectUri?: string;
+    token?: string;
+    email?: string;
+    name?: string;
+    photo?: string;
+    googleId?: string;
+  }) => {
+    const response = await api.post("/auth/google", data);
+    return response.data;
+  },
+
+
   // POST: http://localhost:4000/api/v1/auth/login/admin
   adminLogin: async (credentials: any) => {
     const response = await api.post("/auth/login/admin", credentials);

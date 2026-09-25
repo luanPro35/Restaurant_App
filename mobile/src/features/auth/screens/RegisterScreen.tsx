@@ -14,6 +14,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../../app/navigation/AuthNavigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import authApi from "../../../services/api/auth.api";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
+
 
 export default function RegisterScreen() {
   const navigation =
@@ -167,7 +169,19 @@ export default function RegisterScreen() {
             )}
           </TouchableOpacity>
 
-          <View className="flex-row justify-center mt-6">
+          {/* Divider */}
+          <View className="flex-row items-center my-4">
+            <View className="flex-1 h-[1px] bg-[#E5D5C3]" />
+            <Text className="mx-4 text-xs font-bold text-[#6B4423]/60 uppercase">
+              Hoặc
+            </Text>
+            <View className="flex-1 h-[1px] bg-[#E5D5C3]" />
+          </View>
+
+          {/* Google Sign In */}
+          <GoogleSignInButton title="Đăng ký nhanh bằng Google" />
+
+          <View className="flex-row justify-center mt-5 mb-4">
             <Text className="text-sm text-[#6B4423]">
               Already have an account?{" "}
             </Text>
@@ -180,3 +194,4 @@ export default function RegisterScreen() {
     </SafeAreaView>
   );
 }
+

@@ -5,7 +5,11 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma.service";
-import { RegisterDto, LoginDto } from "../validations/auth.validation";
+import {
+  RegisterDto,
+  LoginDto,
+  GoogleAuthDto,
+} from "../validations/auth.validation";
 import * as bcrypt from "bcrypt";
 import { OtpService } from "../otp/otp.service";
 import { TokenService } from "../tokens/token.service";
@@ -93,6 +97,148 @@ export class AuthService {
       },
     };
   }
+
+  async googleLogin(googleAuthDto: GoogleAuthDto) {
+    let email = googleAuthDto.email;
+    let name = googleAuthDto.name;
+
+    // 1. If authorization code is provided, exchange it for tokens with Google
+    if (googleAuthDto.code) {
+      try {
+        const clientId = process.env.GOOGLE_CLIENT_ID || "";
+        const clientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
+        const redirectUri =
+          googleAuthDto.redirectUri || "https://auth.expo.io/@anonymous/mobile";
+
+        const tokenBody = new URLSearchParams({
+          code: googleAuthDto.code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri,
+          grant_type: "authorization_code",
+        });
+
+        const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: tokenBody.toString(),
+        });
+
+        if (tokenResponse.ok) {
+          const tokenData = await tokenResponse.json();
+          const googleAccessToken = tokenData.access_token;
+          const googleIdToken = tokenData.id_token;
+
+          // Fetch user profile from Google userinfo API
+          if (googleAccessToken) {
+            const userInfoRes = await fetch(
+              "https://www.googleapis.com/oauth2/v3/userinfo",
+              {
+                headers: { Authorization: `Bearer ${googleAccessToken}` },
+              }
+            );
+            if (userInfoRes.ok) {
+              const userData = await userInfoRes.json();
+              if (userData.email) {
+                email = userData.email;
+                name = userData.name || name || userData.email.split("@")[0];
+              }
+            }
+          }
+
+          // Fallback to id_token if email not found from userinfo
+          if (!email && googleIdToken) {
+            const idRes = await fetch(
+              `https://oauth2.googleapis.com/tokeninfo?id_token=${googleIdToken}`
+            );
+            if (idRes.ok) {
+              const idData = await idRes.json();
+              if (idData.email) {
+                email = idData.email;
+                name = idData.name || name || idData.email.split("@")[0];
+              }
+            }
+          }
+        } else {
+          const errText = await tokenResponse.text();
+          console.error("Google token exchange failed:", tokenResponse.status, errText);
+        }
+      } catch (exchangeErr) {
+        console.error("Error exchanging Google authorization code:", exchangeErr);
+      }
+    }
+
+    // 2. Verify token with Google if access_token or id_token provided directly
+    if (googleAuthDto.token) {
+      try {
+        const tokenRes = await fetch(
+          `https://oauth2.googleapis.com/tokeninfo?id_token=${googleAuthDto.token}`
+        );
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          if (tokenData.email) {
+            email = tokenData.email;
+            name = tokenData.name || name || tokenData.email.split("@")[0];
+          }
+        } else {
+          const userInfoRes = await fetch(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            {
+              headers: { Authorization: `Bearer ${googleAuthDto.token}` },
+            }
+          );
+          if (userInfoRes.ok) {
+            const userData = await userInfoRes.json();
+            if (userData.email) {
+              email = userData.email;
+              name = userData.name || name || userData.email.split("@")[0];
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Google token verification warning:", err);
+      }
+    }
+
+    if (!email) {
+      throw new BadRequestException("Email is required for Google login");
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    let user = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user) {
+      const randomPassword =
+        Math.random().toString(36).slice(-8) + Date.now().toString(36) + "Gg1@";
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+      user = await this.prisma.user.create({
+        data: {
+          email: normalizedEmail,
+          name: name || normalizedEmail.split("@")[0],
+          password: hashedPassword,
+          role: "USER" as any,
+        },
+      });
+    }
+
+    const tokens = await this.generateTokens(user);
+    return {
+      message: "Google login successful",
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    };
+  }
+
 
   async forgotPassword(email: string) {
     const user = await this.prisma.user.findUnique({
