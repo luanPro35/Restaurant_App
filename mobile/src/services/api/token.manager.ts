@@ -3,7 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const TOKEN_KEY = "accessToken";
 
 let accessToken: string | null = null;
-
 export const tokenManager = {
   // Called once at app startup to hydrate in-memory token from storage
   loadToken: async () => {
