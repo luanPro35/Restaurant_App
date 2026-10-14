@@ -29,6 +29,8 @@ import AiChatScreen from "../../features/AI/Screens/AiChatScreen";
 import AdminSettingsScreen from "../../features/admin/screens/AdminSettingsScreen";
 import AdminAddTables from "../../features/admin/screens/AdminTablesScreen/AdminAddTables";
 import AdminEditTables from "../../features/admin/screens/AdminTablesScreen/AdminEditTables";
+import AdminStatisticsScreen from "../../features/admin/screens/AdminStatisticsScreen";
+import AdminLogsScreen from "../../features/admin/screens/AdminLogsScreen";
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
@@ -59,6 +61,8 @@ export type AdminStackParamList = {
   AdminSettings: undefined;
   AdminAddTables: undefined;
   AdminEditTables: { table: any };
+  AdminStatisticsScreen: undefined;
+  AdminLogsScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
@@ -97,6 +101,8 @@ export default function AdminNavigator() {
       <Stack.Screen name="AdminSettings" component={AdminSettingsScreen} />
       <Stack.Screen name="AdminAddTables" component={AdminAddTables} />
       <Stack.Screen name="AdminEditTables" component={AdminEditTables} />
+      <Stack.Screen name="AdminStatisticsScreen" component={AdminStatisticsScreen} />
+      <Stack.Screen name="AdminLogsScreen" component={AdminLogsScreen} />
     </Stack.Navigator>
   );
 }

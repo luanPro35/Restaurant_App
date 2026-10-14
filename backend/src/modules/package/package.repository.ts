@@ -65,14 +65,16 @@ export class PackageRepository {
         });
     }
 
-    async count(userId: string) {
-        return (this.prisma as any).package.count({
-            where: {
-                userId,
-                status: {
-                    in: ["CONFIRMED", "COOKING", "DELIVERING", "RECEIVED", "COMPLETED"]
-                }
-            },
-        });
+    async count(userId: string, startDate?: Date) {
+        const where: any = {
+            userId,
+            status: {
+                in: ["CONFIRMED", "COOKING", "DELIVERING", "RECEIVED", "COMPLETED"]
+            }
+        };
+        if (startDate) {
+            where.createdAt = { gte: startDate };
+        }
+        return (this.prisma as any).package.count({ where });
     }
 }

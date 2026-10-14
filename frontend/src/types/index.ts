@@ -51,6 +51,7 @@ export interface PackageItem {
   id: string;
   packageId?: string;
   productId: string;
+  name?: string;
   product?: Product;
   quantity: number;
   price: number;

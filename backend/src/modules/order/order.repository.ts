@@ -99,12 +99,14 @@ export class OrderRepository {
       },
     };
   }
-  async countCompletedByUserId(userId: string) {
-    return this.prisma.order.count({
-      where: {
-        userId,
-        status: OrderStatus.COMPLETED,
-      },
-    });
+  async countCompletedByUserId(userId: string, startDate?: Date) {
+    const where: any = {
+      userId,
+      status: OrderStatus.COMPLETED,
+    };
+    if (startDate) {
+      where.createdAt = { gte: startDate };
+    }
+    return this.prisma.order.count({ where });
   }
 }

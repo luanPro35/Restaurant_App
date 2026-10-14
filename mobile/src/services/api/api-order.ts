@@ -64,4 +64,19 @@ export const orderApi = {
     const response = await api.patch(`/orders/${orderId}/status`, { status });
     return response.data;
   },
+
+  getAll: async (query?: { page?: number; limit?: number; status?: string }): Promise<{ data: Order[]; total: number }> => {
+    const response = await api.get('/orders', { params: query });
+    return response.data;
+  },
+
+  getTotalCount: async (): Promise<number> => {
+    const response = await api.get('/orders', { params: { limit: 1 } });
+    return response.data?.total ?? response.data?.pagination?.total ?? 0;
+  },
+
+  getCompletedToday: async (): Promise<number> => {
+    const response = await api.get('/orders', { params: { status: 'COMPLETED', limit: 1 } });
+    return response.data?.total ?? response.data?.pagination?.total ?? 0;
+  },
 };

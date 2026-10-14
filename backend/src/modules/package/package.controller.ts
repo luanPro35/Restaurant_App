@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from "@nestjs/common";
 import { PackageService } from "./package.service";
 import { CreatePackageDto, UpdatePackageDto } from "./package.dto";
 import { ApiTags, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
@@ -40,8 +40,13 @@ export class PackageController {
 
     @Get("count")
     @ApiOperation({ summary: "Get count packages for current user" })
-    count(@CurrentUser() user: any) {
-        return this.packageService.count(user.sub);
+    count(@CurrentUser() user: any, @Query("monthly") monthly?: string) {
+        let startDate: Date | undefined;
+        if (monthly === "true") {
+            const now = new Date();
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        }
+        return this.packageService.count(user?.sub, startDate);
     }
 
     @Public()

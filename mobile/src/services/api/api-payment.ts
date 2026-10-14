@@ -25,12 +25,16 @@ export const paymentApi = {
         const response = await api.post(`/vietqr/order/${orderId}`);
         return response.data;
     },
-    getAll: async (): Promise<Payment[]> => {
-        const response = await api.get(`/payments`);
-        return response.data.data;
+    getAll: async (query?: any): Promise<Payment[]> => {
+        const response = await api.get(`/payments`, { params: query });
+        return response.data?.data || response.data || [];
     },
     getTotalAmount: async (): Promise<number> => {
         const response = await api.get(`/payments/total-amount`);
+        return response.data?._sum?.amount || 0;
+    },
+    getTotalAmountToday: async (): Promise<number> => {
+        const response = await api.get(`/payments/total-amount-today`);
         return response.data?._sum?.amount || 0;
     },
     uploadReceipt: async (formData: FormData): Promise<any> => {

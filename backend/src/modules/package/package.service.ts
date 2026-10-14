@@ -84,7 +84,7 @@ export class PackageService {
         return this.packageRepository.delete(id);
     }
 
-    async count(userId: string) {
-        return this.packageRepository.count(userId);
+    async count(userId: string, startDate?: Date) {
+        return this.packageRepository.count(userId, startDate);
     }
 }
