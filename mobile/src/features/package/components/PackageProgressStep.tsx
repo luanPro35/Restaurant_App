@@ -15,11 +15,11 @@ interface PackageProgressStepProps {
 }
 
 export default function PackageProgressStep({ status }: PackageProgressStepProps) {
-  const statusKey = (status === "PENDING" ? "CONFIRMED" : status) || "CONFIRMED";
+  const statusKey = status || "PENDING";
   const isCanceled = statusKey === "CANCELED";
 
   const stepOrder = ["CONFIRMED", "COOKING", "DELIVERING", "RECEIVED", "COMPLETED"];
-  const currentStepIndex = isCanceled ? -1 : Math.max(0, stepOrder.indexOf(statusKey));
+  const currentStepIndex = isCanceled || statusKey === "PENDING" ? -1 : Math.max(0, stepOrder.indexOf(statusKey));
 
   // Tỷ lệ % thanh tiến trình từ bước 0 đến bước 4
   const progressPercent = isCanceled
@@ -32,9 +32,24 @@ export default function PackageProgressStep({ status }: PackageProgressStepProps
         <View className="w-14 h-14 rounded-full bg-red-50 items-center justify-center mb-2 border border-red-100">
           <MaterialCommunityIcons name="close-circle-outline" size={32} color="#EF4444" />
         </View>
-        <Text className="text-sm font-black text-red-500 uppercase tracking-wider">
-          Đơn hàng đã bị hủy
+        <Text
+          className="w-full text-center text-sm font-black text-red-500 uppercase"
+          numberOfLines={2}
+          adjustsFontSizeToFit
+          minimumFontScale={0.9}
+        >
+          Đơn hàng đã hủy
         </Text>
+      </View>
+    );
+  }
+
+  if (statusKey === "PENDING") {
+    return (
+      <View className="py-5 px-6 items-center">
+        <MaterialCommunityIcons name="clock-outline" size={28} color="#E07B39" />
+        <Text className="text-sm font-black text-[#E07B39] mt-2">Đang chờ nhà hàng xác nhận</Text>
+        <Text className="text-xs text-gray-500 mt-1 text-center">Bạn có thể hủy đơn trước khi quán bắt đầu chế biến.</Text>
       </View>
     );
   }

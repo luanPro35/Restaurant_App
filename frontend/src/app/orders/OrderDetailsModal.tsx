@@ -19,6 +19,7 @@ interface OrderDetailsModalProps {
 }
 
 const statusWorkflow: PackageStatus[] = [
+  'PENDING',
   'CONFIRMED',
   'COOKING',
   'DELIVERING',
@@ -84,19 +85,19 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
             <Badge status={currentPkg.status} type="package" />
           </div>
 
-          <div className="grid grid-cols-5 gap-2 pt-2">
+          <div className="grid grid-cols-6 gap-2 pt-2">
             {statusWorkflow.map((st, i) => {
               const currentIdx = statusWorkflow.indexOf(currentPkg.status);
               const isPast = i <= currentIdx;
               const isCurrent = i === currentIdx;
 
               const statusLabels: Record<PackageStatus, string> = {
+                PENDING: '0. Chờ xác nhận',
                 CONFIRMED: '1. Tiếp nhận',
                 COOKING: '2. Nấu món',
                 DELIVERING: '3. Phục vụ',
                 RECEIVED: '4. Đã lên bàn',
                 COMPLETED: '5. Hoàn tất',
-                PENDING: 'Chờ',
                 CANCELED: 'Đã hủy',
               };
 

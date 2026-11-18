@@ -13,7 +13,7 @@ interface GlobalCartProps {
 }
 
 export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const [currentRoute, setCurrentRoute] = useState<string | null>(null);
 
   const {
@@ -105,7 +105,7 @@ export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
         discountAmount={discountAmount}
         subtotal={subtotal}
         totalPrice={totalPrice}
-        onCheckout={async (paymentMethod: string) => {
+        onCheckout={async (paymentMethod: string, note: string) => {
           if (!isAuthenticated) {
             Alert.alert(
               "Yêu cầu đăng nhập",
@@ -138,9 +138,11 @@ export const GlobalCart: React.FC<GlobalCartProps> = ({ navigationRef }) => {
               name: selectedAddress.name,
               address: selectedAddress.address,
               description: orderDescription,
+              note,
               price: totalPrice,
               paymentMethod: paymentMethod,
-              status: "PENDING" as const
+              status: "PENDING" as const,
+              userId: user?.id,
             };
 
             const createdPkg = await packageApi.create(newOrder);

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { Package } from "../../../../services/api/package-api";
 
 export const FILTER_TABS = [
   { id: "ALL", label: "Tất cả" },
+  { id: "PENDING", label: "Chờ xác nhận" },
   { id: "CONFIRMED", label: "Tiếp nhận" },
   { id: "COOKING", label: "Đang nấu" },
   { id: "DELIVERING", label: "Đang giao" },
@@ -18,21 +19,37 @@ interface AdminOrderStatusFilterProps {
   packages: Package[];
 }
 
-export default function AdminOrderStatusFilter({
+function AdminOrderStatusFilter({
   activeTab,
   onSelectTab,
   packages,
 }: AdminOrderStatusFilterProps) {
-  // Đếm số lượng đơn theo từng trạng thái
-  const countByStatus = (statusId: string) => {
-    if (statusId === "ALL") return packages.length;
-    if (statusId === "CONFIRMED") {
-      return packages.filter(
-        (p) => p.status === "CONFIRMED" || p.status === "PENDING"
-      ).length;
+  // Đếm số lượng đơn theo từng trạng thái trong một lượt duyệt duy nhất O(N)
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      ALL: packages.length,
+      PENDING: 0,
+      CONFIRMED: 0,
+      COOKING: 0,
+      DELIVERING: 0,
+      RECEIVED: 0,
+      COMPLETED: 0,
+      CANCELED: 0,
+    };
+
+    for (let i = 0; i < packages.length; i++) {
+      const status = packages[i]?.status;
+      if (status === "PENDING") {
+        counts.PENDING++;
+      } else if (status === "CONFIRMED") {
+        counts.CONFIRMED++;
+      } else if (status && counts[status] !== undefined) {
+        counts[status]++;
+      }
     }
-    return packages.filter((p) => p.status === statusId).length;
-  };
+
+    return counts;
+  }, [packages]);
 
   return (
     <View className="py-3 bg-[#FDFCF7]">
@@ -43,7 +60,7 @@ export default function AdminOrderStatusFilter({
       >
         {FILTER_TABS.map((tab) => {
           const isActive = activeTab === tab.id;
-          const count = countByStatus(tab.id);
+          const count = statusCounts[tab.id] || 0;
 
           return (
             <TouchableOpacity
@@ -85,3 +102,5 @@ export default function AdminOrderStatusFilter({
     </View>
   );
 }
+
+export default React.memo(AdminOrderStatusFilter);

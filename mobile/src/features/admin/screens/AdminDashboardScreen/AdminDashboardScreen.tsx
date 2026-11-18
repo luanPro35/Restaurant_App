@@ -43,39 +43,26 @@ export default function AdminDashboardScreen() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const [revTodayRes, packagesRes, tablesRes, usersRes] =
+      const [analyticsRes, packagesRes, tablesRes, usersRes] =
         await Promise.allSettled([
-          paymentApi.getTotalAmountToday(),
+          paymentApi.getAnalytics("TODAY"),
           packageApi.findAllPackage(),
-          tableApi.getAdminTables({ limit: 100 } as any),
+          tableApi.getAdminTables({ limit: 1000 } as any),
           adminUserApi.getUsers({ limit: 1 }),
         ]);
 
       // 1. Revenue today
-      let rev = 0;
-      if (revTodayRes.status === "fulfilled") {
-        rev = Number(revTodayRes.value) || 0;
-      }
+      const analytics = analyticsRes.status === "fulfilled" ? analyticsRes.value : null;
+      setRevenueToday(analytics?.summary.revenueToday || 0);
+      setOrdersTodayCount(analytics?.summary.ordersToday || 0);
+      setActiveOrdersCount(analytics?.summary.activeOrders || 0);
 
       // 2. Packages (Orders)
       let pkgs: Package[] = [];
       if (packagesRes.status === "fulfilled" && Array.isArray(packagesRes.value)) {
         pkgs = packagesRes.value;
-        const active = pkgs.filter(
-          (p) => p.status !== "COMPLETED" && p.status !== "CANCELED"
-        ).length;
-        setActiveOrdersCount(active);
-        setOrdersTodayCount(pkgs.length);
         setRecentPackages(pkgs.slice(0, 3));
-
-        // If revenue API returned 0, compute fallback from completed today
-        if (rev === 0) {
-          rev = pkgs
-            .filter((p) => p.status === "COMPLETED" || p.status === "RECEIVED")
-            .reduce((sum, p) => sum + (Number(p.price) || 0), 0);
-        }
       }
-      setRevenueToday(rev);
 
       // 3. Tables
       if (tablesRes.status === "fulfilled" && tablesRes.value?.data) {
@@ -84,7 +71,7 @@ export default function AdminDashboardScreen() {
           (t: any) => t.status === "OCCUPIED" || t.status === "RESERVED"
         ).length;
         setOccupiedTablesCount(occupied);
-        setTotalTablesCount(tblList.length);
+        setTotalTablesCount(tablesRes.value.pagination?.total ?? tblList.length);
       }
 
       // 4. Users

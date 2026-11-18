@@ -13,10 +13,11 @@ export class PackageRepository {
                 name: data.name,
                 address: data.address,
                 description: data.description,
+                note: data.note?.trim() || null,
                 price: data.price,
                 status: (data.status as PackageStatus) || PackageStatus.PENDING,
                 paymentMethod: data.paymentMethod,
-                userId: data.userId,
+                userId: data.userId || null,
             },
         });
     }
@@ -26,6 +27,7 @@ export class PackageRepository {
         if (data.name !== undefined) updateData.name = data.name;
         if (data.address !== undefined) updateData.address = data.address;
         if (data.description !== undefined) updateData.description = data.description;
+        if (data.note !== undefined) updateData.note = data.note.trim() || null;
         if (data.price !== undefined) updateData.price = data.price;
         if (data.status !== undefined) updateData.status = data.status;
         if (data.userId !== undefined) updateData.userId = data.userId;

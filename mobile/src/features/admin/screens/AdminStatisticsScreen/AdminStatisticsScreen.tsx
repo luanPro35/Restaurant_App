@@ -15,11 +15,9 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
-import { paymentApi, Payment } from "../../../../services/api/api-payment";
-import { orderApi, Order } from "../../../../services/api/api-order";
+import { paymentApi, Payment, PaymentAnalytics } from "../../../../services/api/api-payment";
 import adminUserApi from "../../../../services/api/admin-user.api";
 import { tableApi } from "../../../../services/api/api-table";
-import { productApi } from "../../../../services/api/apiProducts";
 
 const { width } = Dimensions.get("window");
 
@@ -81,50 +79,39 @@ export default function AdminStatisticsScreen() {
 
   // Raw data from API
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<PaymentAnalytics | null>(null);
 
   // 8.1 KPIs
-  const [totalRevenueApi, setTotalRevenueApi] = useState<number>(0);
-  const [revenueTodayApi, setRevenueTodayApi] = useState<number>(0);
-  const [totalOrdersApi, setTotalOrdersApi] = useState<number>(0);
-  const [completedOrdersApi, setCompletedOrdersApi] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [totalTables, setTotalTables] = useState<number>(0);
   const [occupiedTables, setOccupiedTables] = useState<number>(0);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
 
   // Load all data
   const loadData = useCallback(async () => {
     try {
       const [
-        revTotal,
-        revToday,
-        ordTotal,
-        ordCompleted,
+        analyticsRes,
         usersRes,
         tablesRes,
-        paymentsRes,
-        ordersRes,
-        productsRes,
       ] = await Promise.allSettled([
-        paymentApi.getTotalAmount(),
-        paymentApi.getTotalAmountToday(),
-        orderApi.getTotalCount(),
-        orderApi.getCompletedToday(),
+        paymentApi.getAnalytics(timeFilter),
         adminUserApi.getUsers({ limit: 1 }),
-        tableApi.getAdminTables({ limit: 100 } as any),
-        paymentApi.getAll(),
-        orderApi.getAll({ limit: 100 }),
-        productApi.getAll({ limit: 100 } as any),
+        tableApi.getAdminTables({ limit: 1000 } as any),
       ]);
 
-      if (revTotal.status === "fulfilled") setTotalRevenueApi(revTotal.value || 0);
-      if (revToday.status === "fulfilled") setRevenueTodayApi(revToday.value || 0);
-      if (ordTotal.status === "fulfilled") setTotalOrdersApi(ordTotal.value || 0);
-      if (ordCompleted.status === "fulfilled") setCompletedOrdersApi(ordCompleted.value || 0);
+      if (analyticsRes.status === "fulfilled") {
+        setAnalytics(analyticsRes.value);
+        setPayments(analyticsRes.value.recentPayments || []);
+        setAnalyticsError(null);
+      } else {
+        setAnalytics(null);
+        setPayments([]);
+        setAnalyticsError("Không tải được số liệu từ máy chủ. Vui lòng kiểm tra kết nối và làm mới.");
+      }
 
       if (usersRes.status === "fulfilled") {
         setTotalUsers((usersRes.value as any)?.pagination?.total ?? 0);
@@ -139,25 +126,13 @@ export default function AdminStatisticsScreen() {
         );
       }
 
-      if (paymentsRes.status === "fulfilled" && Array.isArray(paymentsRes.value)) {
-        setPayments(paymentsRes.value);
-      }
-
-      if (ordersRes.status === "fulfilled" && ordersRes.value?.data) {
-        setOrders(Array.isArray(ordersRes.value.data) ? ordersRes.value.data : []);
-      }
-
-      if (productsRes.status === "fulfilled" && productsRes.value) {
-        const prodData = productsRes.value.data || productsRes.value;
-        setProducts(Array.isArray(prodData) ? prodData : []);
-      }
     } catch (err) {
       console.error("Error loading statistics:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [timeFilter]);
 
   useFocusEffect(
     useCallback(() => {
@@ -170,98 +145,7 @@ export default function AdminStatisticsScreen() {
     loadData();
   };
 
-  // --- FILTERED PAYMENTS BY TIME ---
-  const filteredPayments = useMemo(() => {
-    if (!payments.length) return [];
-    const now = new Date();
-
-    if (timeFilter === "TODAY") {
-      const todayStr = now.toISOString().split("T")[0];
-      return payments.filter((p) => p.createdAt && p.createdAt.startsWith(todayStr));
-    }
-    if (timeFilter === "7DAYS") {
-      const limit = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      return payments.filter((p) => new Date(p.createdAt) >= limit);
-    }
-    if (timeFilter === "30DAYS") {
-      const limit = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      return payments.filter((p) => new Date(p.createdAt) >= limit);
-    }
-    return payments;
-  }, [payments, timeFilter]);
-
-  // --- FILTERED ORDERS BY TIME ---
-  const filteredOrders = useMemo(() => {
-    if (!orders.length) return [];
-    const now = new Date();
-
-    if (timeFilter === "TODAY") {
-      const todayStr = now.toISOString().split("T")[0];
-      return orders.filter((o) => o.createdAt && o.createdAt.startsWith(todayStr));
-    }
-    if (timeFilter === "7DAYS") {
-      const limit = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      return orders.filter((o) => new Date(o.createdAt) >= limit);
-    }
-    if (timeFilter === "30DAYS") {
-      const limit = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      return orders.filter((o) => new Date(o.createdAt) >= limit);
-    }
-    return orders;
-  }, [orders, timeFilter]);
-
-  // --- 8.2.1.1 BIỂU ĐỒ CỘT DOANH THU THEO THỜI GIAN (7 NGÀY GẦN NHẤT) ---
-  const dailyChartData = useMemo<DailyPoint[]>(() => {
-    const days = 7;
-    const result: DailyPoint[] = [];
-    const now = new Date();
-    const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      const dateKey = `${yyyy}-${mm}-${dd}`;
-      const dayName = i === 0 ? "Hôm nay" : dayNames[d.getDay()];
-      const dateLabel = `${dd}/${mm}`;
-
-      // Sum revenue on this date from payments and orders
-      let dayRev = 0;
-      filteredPayments.forEach((p) => {
-        if (p.createdAt && p.createdAt.startsWith(dateKey) && p.status !== "FAILED") {
-          dayRev += Number(p.amount) || 0;
-        }
-      });
-
-      // Count orders on this date
-      let dayOrders = 0;
-      filteredOrders.forEach((o) => {
-        if (o.createdAt && o.createdAt.startsWith(dateKey)) {
-          dayOrders += 1;
-          if (dayRev === 0) {
-            dayRev += Number(o.totalAmount) || 0;
-          }
-        }
-      });
-
-      // Default sample points if completely 0 for realistic graph preview
-      if (dayRev === 0 && dayOrders === 0 && payments.length > 0) {
-        dayRev = (i + 1) * 280000;
-        dayOrders = (i % 3) + 2;
-      }
-
-      result.push({
-        dateLabel,
-        dayName,
-        revenue: dayRev,
-        ordersCount: dayOrders,
-        rawDate: dateKey,
-      });
-    }
-
-    return result;
-  }, [filteredPayments, filteredOrders, payments.length]);
+  const dailyChartData = useMemo<DailyPoint[]>(() => analytics?.daily || [], [analytics]);
 
   const maxChartValue = useMemo(() => {
     if (chartMetric === "revenue") {
@@ -275,9 +159,10 @@ export default function AdminStatisticsScreen() {
 
   const peakDay = useMemo(() => {
     if (!dailyChartData.length) return null;
-    return [...dailyChartData].sort((a, b) =>
+    const peak = [...dailyChartData].sort((a, b) =>
       chartMetric === "revenue" ? b.revenue - a.revenue : b.ordersCount - a.ordersCount
     )[0];
+    return (chartMetric === "revenue" ? peak.revenue : peak.ordersCount) > 0 ? peak : null;
   }, [dailyChartData, chartMetric]);
 
   const avgDailyRevenue = useMemo(() => {
@@ -287,115 +172,16 @@ export default function AdminStatisticsScreen() {
   }, [dailyChartData]);
 
   // --- 8.2.1.2 BIỂU ĐỒ CƠ CẤU PHƯƠNG THỨC THANH TOÁN (VIETQR VS TIỀN MẶT) ---
-  const paymentBreakdown = useMemo(() => {
-    let vietQrCount = 0;
-    let vietQrTotal = 0;
-    let cashCount = 0;
-    let cashTotal = 0;
-    let bankCount = 0;
-    let bankTotal = 0;
-
-    filteredPayments.forEach((p) => {
-      const amt = Number(p.amount) || 0;
-      if (p.method === "VIET_QR" || p.method === "VIETQR") {
-        vietQrCount++;
-        vietQrTotal += amt;
-      } else if (p.method === "CASH") {
-        cashCount++;
-        cashTotal += amt;
-      } else {
-        bankCount++;
-        bankTotal += amt;
-      }
-    });
-
-    const grandTotal = vietQrTotal + cashTotal + bankTotal || 1;
-    const totalTransactions = vietQrCount + cashCount + bankCount || 1;
-
-    // VietQR ratio
-    const vietQrPercent = Math.round((vietQrTotal / grandTotal) * 100) || 58;
-    const cashPercent = Math.round((cashTotal / grandTotal) * 100) || 32;
-    const bankPercent = 100 - vietQrPercent - cashPercent;
-
-    return {
-      vietQr: {
-        total: vietQrTotal || 1850000,
-        count: vietQrCount || 12,
-        percent: Math.max(10, vietQrPercent),
-      },
-      cash: {
-        total: cashTotal || 980000,
-        count: cashCount || 7,
-        percent: Math.max(10, cashPercent),
-      },
-      bank: {
-        total: bankTotal || 350000,
-        count: bankCount || 2,
-        percent: Math.max(0, bankPercent),
-      },
-      grandTotal: grandTotal > 1 ? grandTotal : 3180000,
-      totalTransactions: totalTransactions > 1 ? totalTransactions : 21,
-    };
-  }, [filteredPayments]);
+  const paymentBreakdown = analytics?.paymentBreakdown || {
+    vietQr: { total: 0, count: 0, percent: 0 },
+    cash: { total: 0, count: 0, percent: 0 },
+    bank: { total: 0, count: 0, percent: 0 },
+    grandTotal: 0,
+    totalTransactions: 0,
+  };
 
   // --- 8.2.2.1 & 8.2.2.2 BẢNG XẾP HẠNG MÓN ĂN BÁN CHẠY VÀ ĐÁNH GIÁ TỐI ƯU ---
-  const topSellingDishes = useMemo<TopDishItem[]>(() => {
-    const dishMap = new Map<string, { count: number; revenue: number; price: number; name: string }>();
-
-    // 1. Extract from orders
-    orders.forEach((ord) => {
-      if (ord.items && Array.isArray(ord.items)) {
-        ord.items.forEach((item) => {
-          const key = item.name || item.productId || "Món ăn";
-          const qty = Number(item.quantity) || 1;
-          const price = Number(item.price) || 45000;
-          const existing = dishMap.get(key) || { count: 0, revenue: 0, price, name: key };
-          dishMap.set(key, {
-            count: existing.count + qty,
-            revenue: existing.revenue + price * qty,
-            price: price || existing.price,
-            name: key,
-          });
-        });
-      }
-    });
-
-    // 2. Also incorporate products catalog
-    if (products.length > 0) {
-      products.forEach((p, idx) => {
-        if (!dishMap.has(p.name)) {
-          const simSales = Math.max(2, 18 - idx * 2);
-          const price = Number(p.price) || 50000;
-          dishMap.set(p.name, {
-            count: simSales,
-            revenue: simSales * price,
-            price,
-            name: p.name,
-          });
-        }
-      });
-    }
-
-    // Convert map to sorted array
-    const list = Array.from(dishMap.values()).map((item, index) => {
-      // 8.2.2.2 Classify into menu engineering matrix
-      let tag: TopDishItem["tag"] = "POPULAR";
-      if (index === 0 || item.count >= 10) tag = "STAR";
-      else if (item.price >= 80000) tag = "POTENTIAL";
-
-      return {
-        id: `dish-${index}`,
-        name: item.name,
-        salesCount: item.count,
-        price: item.price,
-        totalRevenue: item.revenue,
-        tag,
-      };
-    });
-
-    list.sort((a, b) => b.salesCount - a.salesCount);
-    return list.slice(0, 7);
-  }, [orders, products]);
+  const topSellingDishes: TopDishItem[] = analytics?.topDishes || [];
 
   const maxDishSales = useMemo(() => {
     if (!topSellingDishes.length) return 1;
@@ -543,6 +329,11 @@ export default function AdminStatisticsScreen() {
           />
         }
       >
+        {analyticsError && (
+          <View className="bg-red-50 border border-red-200 rounded-2xl p-3 mb-3">
+            <Text className="text-red-700 text-xs font-semibold">{analyticsError}</Text>
+          </View>
+        )}
         {activeMainTab === "CHARTS" ? (
           <>
             {/* ======================================================== */}
@@ -612,10 +403,9 @@ export default function AdminStatisticsScreen() {
                   {dailyChartData.map((item, idx) => {
                     const currentVal =
                       chartMetric === "revenue" ? item.revenue : item.ordersCount;
-                    const heightPercent = Math.max(
-                      10,
-                      Math.min(100, (currentVal / maxChartValue) * 100)
-                    );
+                    const heightPercent = currentVal > 0
+                      ? Math.max(10, Math.min(100, (currentVal / maxChartValue) * 100))
+                      : 0;
                     const isPeak =
                       peakDay &&
                       (chartMetric === "revenue"
@@ -683,19 +473,19 @@ export default function AdminStatisticsScreen() {
               {/* Chart Insights Footer */}
               <View className="mt-3 pt-3 border-t border-gray-100 flex-row items-center justify-between bg-orange-50/60 p-3 rounded-2xl border border-orange-100">
                 <View>
-                  <Text className="text-gray-500 text-[10px] font-bold">Ngày cao điểm nhất</Text>
+                  <Text className="text-gray-500 text-[10px] font-bold">{timeFilter === "ALL" ? "Tháng cao điểm" : chartMetric === "revenue" ? "Ngày doanh thu cao nhất" : "Ngày nhiều đơn nhất"}</Text>
                   <Text className="text-gray-900 font-black text-xs mt-0.5">
                     {peakDay ? `${peakDay.dayName} (${peakDay.dateLabel})` : "N/A"}
                   </Text>
                 </View>
                 <View className="items-center">
-                  <Text className="text-gray-500 text-[10px] font-bold">Doanh số cao nhất</Text>
+                  <Text className="text-gray-500 text-[10px] font-bold">{chartMetric === "revenue" ? "Doanh thu cao nhất" : "Số đơn cao nhất"}</Text>
                   <Text className="text-[#E07B39] font-black text-xs mt-0.5">
-                    {peakDay ? formatCurrency(peakDay.revenue) : "0 đ"}
+                    {peakDay ? (chartMetric === "revenue" ? formatCurrency(peakDay.revenue) : `${peakDay.ordersCount} đơn`) : "Chưa có dữ liệu"}
                   </Text>
                 </View>
                 <View className="items-end">
-                  <Text className="text-gray-500 text-[10px] font-bold">TB ngày</Text>
+                  <Text className="text-gray-500 text-[10px] font-bold">{timeFilter === "ALL" ? "TB tháng" : "TB ngày"}</Text>
                   <Text className="text-gray-900 font-black text-xs mt-0.5">
                     {formatShortCurrency(avgDailyRevenue)} đ
                   </Text>
@@ -841,7 +631,7 @@ export default function AdminStatisticsScreen() {
               <View className="mt-2 bg-gray-50 p-2.5 rounded-xl flex-row items-center">
                 <MaterialCommunityIcons name="shield-check" size={16} color="#10B981" />
                 <Text className="text-gray-500 text-[10px] ml-1.5 font-medium flex-1">
-                  VietQR chiếm {paymentBreakdown.vietQr.percent}%: Giao dịch được xác thực tức thì qua mã động, không rủi ro thất thoát.
+                  Chỉ tính giao dịch đã được xác nhận thanh toán trong khoảng thời gian đã chọn.
                 </Text>
               </View>
             </View>
@@ -865,7 +655,7 @@ export default function AdminStatisticsScreen() {
                       </View>
                     </View>
                     <Text className="text-gray-400 text-[10px] font-medium">
-                      Thống kê theo lượt gọi & doanh thu thực tế
+                      Món trong đơn tại bàn đã hoàn tất
                     </Text>
                   </View>
                 </View>
@@ -878,6 +668,9 @@ export default function AdminStatisticsScreen() {
 
               {/* Dishes list */}
               <View className="space-y-3">
+                {topSellingDishes.length === 0 && (
+                  <Text className="text-gray-500 text-xs py-3">Chưa có món trong đơn hoàn tất ở khoảng thời gian này.</Text>
+                )}
                 {topSellingDishes.map((dish, idx) => {
                   const sharePercent = Math.round((dish.salesCount / maxDishSales) * 100);
 
@@ -981,15 +774,15 @@ export default function AdminStatisticsScreen() {
                       <MaterialCommunityIcons name="star" size={14} color="white" />
                     </View>
                     <Text className="text-amber-900 font-black text-xs">
-                      Món Ngôi Sao (Bán chạy nhất & Doanh số cao)
+                      Món Ngôi Sao (Có số lượng bán cao)
                     </Text>
                   </View>
                   <Text className="text-gray-700 text-[11px] leading-4 mb-2">
                     Các món như{" "}
                     <Text className="font-bold text-amber-900">
-                      {topSellingDishes[0]?.name || "Món ăn chính"}
+                      {topSellingDishes[0]?.name || "Chưa có dữ liệu món bán"}
                     </Text>{" "}
-                    mang lại lượt đặt lớn nhất.
+                    {topSellingDishes.length ? "dẫn đầu về số lượng bán trong kỳ." : "Chưa có đơn tại bàn hoàn tất để phân tích."}
                   </Text>
                   <View className="bg-white/80 p-2.5 rounded-xl border border-amber-100">
                     <Text className="text-amber-800 font-bold text-[10px]">
@@ -1005,11 +798,11 @@ export default function AdminStatisticsScreen() {
                       <MaterialCommunityIcons name="trending-up" size={14} color="white" />
                     </View>
                     <Text className="text-indigo-900 font-black text-xs">
-                      Món Tiềm Năng (Biên lợi nhuận cao)
+                      Món Tiềm Năng (Đơn giá cao)
                     </Text>
                   </View>
                   <Text className="text-gray-700 text-[11px] leading-4 mb-2">
-                    Món ăn có đơn giá cao (trên 80k) nhưng số lượt gọi còn dư địa tăng trưởng.
+                    Món có đơn giá từ 80.000đ trở lên và còn cơ hội tăng số lượt gọi.
                   </Text>
                   <View className="bg-white/80 p-2.5 rounded-xl border border-indigo-100">
                     <Text className="text-indigo-800 font-bold text-[10px]">
@@ -1063,7 +856,7 @@ export default function AdminStatisticsScreen() {
                     Tổng doanh thu
                   </Text>
                   <Text className="font-black text-[18px] text-[#E07B39]">
-                    {formatCurrency(totalRevenueApi || paymentBreakdown.grandTotal)}
+                    {formatCurrency(analytics?.summary.totalRevenue || 0)}
                   </Text>
                   <Text className="text-gray-400 text-[10px] mt-0.5">Toàn thời gian</Text>
                 </View>
@@ -1072,7 +865,7 @@ export default function AdminStatisticsScreen() {
                     Doanh thu hôm nay
                   </Text>
                   <Text className="font-black text-[18px] text-emerald-600">
-                    {formatCurrency(revenueTodayApi)}
+                    {formatCurrency(analytics?.summary.revenueToday || 0)}
                   </Text>
                   <Text className="text-gray-400 text-[10px] mt-0.5">Trong ngày</Text>
                 </View>
@@ -1097,7 +890,7 @@ export default function AdminStatisticsScreen() {
                     Tổng đơn hàng
                   </Text>
                   <Text className="font-black text-[18px] text-blue-600">
-                    {totalOrdersApi || orders.length}
+                    {analytics?.summary.totalOrders || 0}
                   </Text>
                   <Text className="text-gray-400 text-[10px] mt-0.5">Đã phát sinh</Text>
                 </View>
@@ -1106,7 +899,7 @@ export default function AdminStatisticsScreen() {
                     Hoàn tất hôm nay
                   </Text>
                   <Text className="font-black text-[18px] text-emerald-600">
-                    {completedOrdersApi}
+                    {analytics?.summary.completedToday || 0}
                   </Text>
                   <Text className="text-gray-400 text-[10px] mt-0.5">COMPLETED</Text>
                 </View>
@@ -1178,7 +971,7 @@ export default function AdminStatisticsScreen() {
                           {p.method === "CASH" ? "Tiền mặt tại quán" : "VietQR 24/7"}
                         </Text>
                         <Text className="text-gray-400 text-[10px]">
-                          {formatDate(p.createdAt)}
+                          {formatDate(p.updatedAt || p.createdAt)}
                         </Text>
                       </View>
                     </View>

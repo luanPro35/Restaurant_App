@@ -7,7 +7,6 @@ import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { Role } from "../auth/enums/role.enum";
 import { RolesGuard } from "../auth/guards/roles.guard";
-import { Public } from "../auth/decorators/public.decorator";
 
 
 @ApiTags("Packages")
@@ -17,15 +16,14 @@ import { Public } from "../auth/decorators/public.decorator";
 export class PackageController {
     constructor(private readonly packageService: PackageService) { }
 
-    @Public()
     @Post()
     @ApiOperation({ summary: "Create a new package" })
     create(@CurrentUser() user: any, @Body() createPackageDto: CreatePackageDto) {
-        return this.packageService.create({ ...createPackageDto, userId: user?.sub || "admin" });
+        return this.packageService.create({ ...createPackageDto, userId: user.sub, status: "PENDING" });
     }
 
 
-    @Public()
+    @Roles(Role.ADMIN, Role.STAFF)
     @Get("people")
     @ApiOperation({ summary: "Get all packages for admin" })
     findAllPeople() {
@@ -49,21 +47,27 @@ export class PackageController {
         return this.packageService.count(user?.sub, startDate);
     }
 
-    @Public()
+    @Roles(Role.ADMIN, Role.STAFF)
     @Get(":id")
     @ApiOperation({ summary: "Get a package by ID" })
     findOne(@Param("id") id: string) {
         return this.packageService.findOne(id);
     }
 
-    @Public()
+    @Roles(Role.ADMIN, Role.STAFF)
     @Patch(":id")
     @ApiOperation({ summary: "Update a package" })
     update(@Param("id") id: string, @Body() updatePackageDto: UpdatePackageDto) {
         return this.packageService.update(id, updatePackageDto);
     }
 
+    @Patch(":id/cancel")
+    cancel(@Param("id") id: string, @CurrentUser() user: any) {
+        return this.packageService.cancel(id, user.sub);
+    }
+
     @Delete(":id")
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "Delete a package" })
     remove(@Param("id") id: string) {
         return this.packageService.delete(id);

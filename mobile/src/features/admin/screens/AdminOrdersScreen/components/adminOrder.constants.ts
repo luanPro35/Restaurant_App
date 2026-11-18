@@ -10,6 +10,14 @@ export interface StatusConfig {
 }
 
 export const STATUS_MAP: Record<string, StatusConfig> = {
+  PENDING: {
+    label: "CHỜ XÁC NHẬN",
+    bg: "bg-amber-50",
+    text: "text-amber-600",
+    border: "border-amber-200",
+    icon: "clock-outline",
+    badgeColor: "#D97706",
+  },
   CONFIRMED: {
     label: "ĐÃ TIẾP NHẬN",
     bg: "bg-orange-50",
@@ -68,6 +76,12 @@ export interface NextActionConfig {
 }
 
 export const NEXT_ACTION_MAP: Record<string, NextActionConfig> = {
+  PENDING: {
+    nextStatus: "CONFIRMED",
+    nextLabel: "Tiếp nhận đơn",
+    icon: "clipboard-check-outline",
+    colors: ["#E07B39", "#C96A2E"],
+  },
   CONFIRMED: {
     nextStatus: "COOKING",
     nextLabel: "Bắt đầu nấu món",

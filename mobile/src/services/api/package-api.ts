@@ -10,6 +10,8 @@ export type PackageStatusType =
   | "CANCELED";
 
 export interface Package {
+  note?: string | null;
+  refundPending?: boolean;
   id: string;
   name: string;
   address: string;
@@ -22,15 +24,21 @@ export interface Package {
 }
 
 export interface CreatePackageDto {
+  note?: string;
   name: string;
   address: string;
   description?: string;
   price: number;
   status?: PackageStatusType;
   paymentMethod: string;
+  userId?: string;
 }
 
 export const packageApi = {
+  cancel: async (id: string): Promise<Package> => {
+    const response = await api.patch(`/packages/${id}/cancel`);
+    return response.data;
+  },
   // GET: /packages
   findAll: async (): Promise<Package[]> => {
     const response = await api.get("/packages");

@@ -306,7 +306,7 @@ export const apiService = {
           totalPrice: Number(pkg.price || pkg.totalPrice) || 0,
           customerName: pkg.name || pkg.customerName || 'Khách hàng',
           customerPhone: pkg.customerPhone || pkg.phone || '',
-          note: pkg.description || (pkg.address ? `Địa chỉ: ${pkg.address}` : ''),
+          note: [pkg.note, pkg.refundPending ? 'Cần đối soát và hoàn tiền cho khách' : ''].filter(Boolean).join('\n'),
           createdAt: pkg.createdAt || new Date().toISOString(),
           updatedAt: pkg.updatedAt || new Date().toISOString(),
           items: Array.isArray(pkg.items) && pkg.items.length > 0 ? pkg.items : parsedItems,

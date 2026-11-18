@@ -22,6 +22,12 @@ export default function PackageDish({ pack }: PackageDishProps) {
                         <Text className="text-[16px] font-bold text-gray-800">{pack.description}</Text>
                     </View>
 
+                    {!!pack.note && (
+                        <View className="mb-3 bg-orange-50 p-3 rounded-xl">
+                            <Text className="text-sm text-gray-500 mb-1">Ghi chú cho nhà hàng</Text>
+                            <Text className="text-sm text-gray-800">{pack.note}</Text>
+                        </View>
+                    )}
                     <View>
                         <Text className="text-[14px] text-gray-500 mb-1">Giá</Text>
                         <Text className="text-[16px] font-bold text-[#E07B39]">{Number(pack.price).toLocaleString("vi-VN")} VNĐ</Text>

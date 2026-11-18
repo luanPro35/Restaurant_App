@@ -1,8 +1,12 @@
-import { IsNotEmpty, IsString, IsEnum, IsNumber, IsOptional } from "class-validator";
+import { IsNotEmpty, IsString, IsEnum, IsNumber, IsOptional, MaxLength } from "class-validator";
 import { PackageStatus } from "./package.contant";
 import { PartialType } from "@nestjs/swagger";
 
 export class CreatePackageDto {
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    note?: string;
     @IsNotEmpty()
     @IsString()
     name!: string;
@@ -33,6 +37,10 @@ export class CreatePackageDto {
 }
 
 export class UpdatePackageDto {
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    note?: string;
     @IsOptional()
     @IsString()
     name?: string;

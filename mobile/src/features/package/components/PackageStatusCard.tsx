@@ -8,6 +8,13 @@ export const STATUS_CONFIG: Record<
   string,
   { desc: string; icon: string; color: string; badgeText: string; gradientColors: [string, string] }
 > = {
+  PENDING: {
+    desc: "Nhà hàng chưa xác nhận đơn. Bạn có thể hủy khi đơn còn ở bước này.",
+    icon: "clock-outline",
+    color: "#E07B39",
+    badgeText: "Đang chờ nhà hàng xác nhận",
+    gradientColors: ["#F59E0B", "#D97706"],
+  },
   CONFIRMED: {
     desc: "Nhà hàng đã tiếp nhận đơn và đang chuẩn bị nguyên liệu.",
     icon: "clock-check-outline",
@@ -47,7 +54,7 @@ export const STATUS_CONFIG: Record<
     desc: "Đơn hàng này đã bị hủy.",
     icon: "close-circle-outline",
     color: "#EF4444",
-    badgeText: "Đơn hàng đã bị hủy",
+    badgeText: "Đơn hàng đã hủy",
     gradientColors: ["#9CA3AF", "#6B7280"],
   },
 };
@@ -67,10 +74,10 @@ export default function PackageStatusCard({
   onOpenStatusModal,
   onNextStep,
 }: PackageStatusCardProps) {
-  const statusKey = (status === "PENDING" ? "CONFIRMED" : status) || "CONFIRMED";
+  const statusKey = status || "PENDING";
   const isCanceled = statusKey === "CANCELED";
   const stepOrder = ["CONFIRMED", "COOKING", "DELIVERING", "RECEIVED", "COMPLETED"];
-  const currentStepIndex = isCanceled ? -1 : Math.max(0, stepOrder.indexOf(statusKey));
+  const currentStepIndex = isCanceled || statusKey === "PENDING" ? -1 : Math.max(0, stepOrder.indexOf(statusKey));
   const config = STATUS_CONFIG[statusKey] || STATUS_CONFIG.CONFIRMED;
 
   return (
@@ -180,13 +187,17 @@ export default function PackageStatusCard({
             />
             <Text
               style={{
+                flex: 1,
                 color: "white",
                 fontSize: 12.5,
                 fontWeight: "900",
                 textTransform: "uppercase",
-                letterSpacing: 0.5,
+                letterSpacing: 0.25,
+                textAlign: "center",
               }}
-              numberOfLines={1}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              minimumFontScale={0.9}
             >
               {config.badgeText}
             </Text>

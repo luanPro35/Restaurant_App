@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Inject, forwardRef } from "@nestjs/common";
+import { Injectable, NotFoundException, ConflictException, Inject, forwardRef } from "@nestjs/common";
 import { VietQrRepository } from "./vietQr.repository";
 import { PackageService } from "../package/package.service";
 import { OrderService } from "../order/order.service";
@@ -60,6 +60,7 @@ export class VietQrService {
     async createQrForPackage(packageId: string) {
         const pkg = await this.packageService.findOne(packageId);
         if (!pkg) throw new NotFoundException('Không tìm thấy đơn hàng');
+        if (pkg.status === "CANCELED") throw new ConflictException("Đơn đã hủy, không thể tạo mã thanh toán.");
 
         return this.createVietQr({
             accountName: 'LE QUANG LUAN',
@@ -80,7 +81,7 @@ export class VietQrService {
             bin: '970422',
             accountNumber: '0905622341',
             amount: order.totalAmount,
-            orderInfo: `Thanh toan don ban ${order.table?.name || ''}`,
+            orderInfo: `Thanh toan don ban ${order.table?.name || ''} ${order.id.substring(0, 8)}`.trim(),
             orderId: order.id,
         } as any);
     }

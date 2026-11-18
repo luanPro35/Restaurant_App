@@ -40,7 +40,7 @@ interface CartModalProps {
   onClose: () => void;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
-  onCheckout: (paymentMethod: string) => void;
+  onCheckout: (paymentMethod: string, note: string) => void;
   selectedVoucher: Voucher | null;
   onApplyVoucher: (voucher: Voucher) => void;
   onRemoveVoucher: () => void;
@@ -68,6 +68,8 @@ export default function CartModal({
   const [quantityInput, setQuantityInput] = React.useState("");
   const [isVoucherModalVisible, setIsVoucherModalVisible] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState("Cash");
+  const [note, setNote] = React.useState("");
+  React.useEffect(() => { if (items.length === 0) setNote(""); }, [items.length]);
 
   const { promotions } = usePromotion();
   const { claimedIds } = useMilestones();
@@ -191,6 +193,7 @@ export default function CartModal({
           </View>
 
           <ScrollView
+            keyboardShouldPersistTaps="handled"
             className="flex-1"
             contentContainerStyle={{
               paddingHorizontal: 20,
@@ -217,6 +220,20 @@ export default function CartModal({
               </View>
             ) : (
               <View className="flex-1">
+                <View className="mb-6 bg-white rounded-2xl p-4 border border-orange-100">
+                  <Text className="font-bold text-gray-800 mb-2">Ghi chú cho nhà hàng</Text>
+                  <TextInput
+                    value={note}
+                    onChangeText={setNote}
+                    placeholder="Ví dụ: ít cay, không hành, để riêng nước sốt..."
+                    multiline
+                    maxLength={500}
+                    textAlignVertical="top"
+                    style={{ minHeight: 80, color: "#1f2937" }}
+                    accessibilityLabel="Ghi chú cho nhà hàng"
+                  />
+                  <Text className="text-xs text-gray-400 text-right">{note.length}/500</Text>
+                </View>
                 <View className="mb-6">
                   {items.map((item, index) => (
                     <View
@@ -509,7 +526,7 @@ export default function CartModal({
               }}
             >
               <TouchableOpacity
-                onPress={() => onCheckout(paymentMethod)}
+                onPress={() => onCheckout(paymentMethod, note.trim())}
                 activeOpacity={0.8}
                 style={{ borderRadius: 20, overflow: 'hidden' }}
               >

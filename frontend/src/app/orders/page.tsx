@@ -67,6 +67,7 @@ export default function OrdersPage() {
 
   const filterTabs = [
     { label: 'Tất cả', value: 'ALL', count: packages.length },
+    { label: 'Chờ xác nhận', value: 'PENDING', count: packages.filter((p) => p.status === 'PENDING').length },
     { label: 'Tiếp nhận', value: 'CONFIRMED', count: packages.filter((p) => p.status === 'CONFIRMED').length },
     { label: 'Đang nấu', value: 'COOKING', count: packages.filter((p) => p.status === 'COOKING').length },
     { label: 'Đang phục vụ', value: 'DELIVERING', count: packages.filter((p) => p.status === 'DELIVERING').length },

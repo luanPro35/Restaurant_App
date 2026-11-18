@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
+  FlatList,
   ActivityIndicator,
   RefreshControl,
   Alert,
+  Platform,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AdminStackParamList } from "../../../../app/navigation/AdminNavigator";
@@ -19,7 +21,16 @@ import { orderApi, Order } from "../../../../services/api/api-order";
 import { LinearGradient } from "expo-linear-gradient";
 import AdminOrderStatusFilter from "./AdminOrderStatusFilter";
 import AdminOrderCard from "./AdminOrderCard";
+import DineInOrderCard from "./components/DineInOrderCard";
 import PackageStatusModal from "../../../package/components/PackageStatusModal";
+
+const DINE_IN_TABS = [
+  { id: "ALL", label: "Tất cả" },
+  { id: "PENDING", label: "Chờ xác nhận" },
+  { id: "CONFIRMED", label: "Đang phục vụ" },
+  { id: "COMPLETED", label: "Hoàn tất" },
+  { id: "CANCELLED", label: "Đã hủy" },
+];
 
 export default function AdminOrdersScreen() {
   const navigation =
@@ -59,58 +70,71 @@ export default function AdminOrdersScreen() {
     fetchDineInOrders();
   }, [refreshPackages, fetchDineInOrders]);
 
+  // Tải dữ liệu khi màn hình được Focus, ngăn chặn vòng lặp vô hạn
   useFocusEffect(
     useCallback(() => {
-      refreshAll();
-    }, [refreshAll])
+      refreshPackages();
+      fetchDineInOrders();
+    }, [refreshPackages, fetchDineInOrders])
   );
 
-  // Filter Delivery Packages
-  const filteredPackages = packages.filter((pkg) => {
-    if (activeTab === "ALL") return true;
-    if (activeTab === "CONFIRMED") {
-      return pkg.status === "CONFIRMED" || pkg.status === "PENDING";
-    }
-    return pkg.status === activeTab;
-  });
+  // Filter Delivery Packages (Memoized)
+  const filteredPackages = useMemo(() => {
+    return packages.filter((pkg) => {
+      if (activeTab === "ALL") return true;
+      return pkg.status === activeTab;
+    });
+  }, [packages, activeTab]);
 
-  // Filter Dine-in Orders
-  const filteredDineInOrders = dineInOrders.filter((ord) => {
-    if (dineInTab === "ALL") return true;
-    return ord.status === dineInTab;
-  });
+  // Filter Dine-in Orders (Memoized)
+  const filteredDineInOrders = useMemo(() => {
+    return dineInOrders.filter((ord) => {
+      if (dineInTab === "ALL") return true;
+      return ord.status === dineInTab;
+    });
+  }, [dineInOrders, dineInTab]);
 
   // Update Package Status
-  const handleUpdatePackageStatus = async (pkgId: string, newStatus: PackageStatusType) => {
-    setUpdatingId(pkgId);
-    try {
-      await packageApi.update(pkgId, { status: newStatus });
-      refreshPackages();
-    } catch (error: any) {
-      console.error("Lỗi khi cập nhật trạng thái đơn hàng:", error?.response?.data || error?.message || error);
-      const serverMsg = Array.isArray(error?.response?.data?.message)
-        ? error.response.data.message.join("\n")
-        : error?.response?.data?.message;
-      Alert.alert("Lỗi", serverMsg || "Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại.");
-    } finally {
-      setUpdatingId(null);
-      setSelectedPkgForModal(null);
-    }
-  };
+  const handleUpdatePackageStatus = useCallback(
+    async (pkgId: string, newStatus: PackageStatusType) => {
+      setUpdatingId(pkgId);
+      try {
+        await packageApi.update(pkgId, { status: newStatus });
+        refreshPackages();
+      } catch (error: any) {
+        console.error("Lỗi khi cập nhật trạng thái đơn hàng:", error?.response?.data || error?.message || error);
+        const serverMsg = Array.isArray(error?.response?.data?.message)
+          ? error.response.data.message.join("\n")
+          : error?.response?.data?.message;
+        Alert.alert("Lỗi", serverMsg || "Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại.");
+      } finally {
+        setUpdatingId(null);
+        setSelectedPkgForModal(null);
+      }
+    },
+    [refreshPackages]
+  );
 
   // Update Dine-in Order Status
-  const handleUpdateDineInStatus = async (orderId: string, newStatus: string) => {
-    setUpdatingId(orderId);
-    try {
-      await orderApi.updateOrderStatus(orderId, newStatus);
-      fetchDineInOrders();
-    } catch (error: any) {
-      console.error("Lỗi cập nhật đơn tại bàn:", error);
-      Alert.alert("Lỗi", "Không thể cập nhật trạng thái đơn tại bàn.");
-    } finally {
-      setUpdatingId(null);
-    }
-  };
+  const handleUpdateDineInStatus = useCallback(
+    async (orderId: string, newStatus: string) => {
+      setUpdatingId(orderId);
+      try {
+        await orderApi.updateOrderStatus(orderId, newStatus);
+        fetchDineInOrders();
+      } catch (error: any) {
+        console.error("Lỗi cập nhật đơn tại bàn:", error);
+        Alert.alert("Lỗi", "Không thể cập nhật trạng thái đơn tại bàn.");
+      } finally {
+        setUpdatingId(null);
+      }
+    },
+    [fetchDineInOrders]
+  );
+
+  const handleOpenPackageModal = useCallback((targetPkg: Package) => {
+    setSelectedPkgForModal(targetPkg);
+  }, []);
 
   const renderHeader = () => (
     <View className="bg-[#FDFCF7]">
@@ -203,7 +227,7 @@ export default function AdminOrdersScreen() {
     </View>
   );
 
-  const renderEmpty = (title: string, subtitle: string) => (
+  const renderEmpty = useCallback((title: string, subtitle: string) => (
     <View className="flex-1 items-center justify-center pt-20">
       <View className="w-20 h-20 bg-orange-50 rounded-full items-center justify-center mb-4">
         <MaterialCommunityIcons
@@ -215,7 +239,33 @@ export default function AdminOrdersScreen() {
       <Text className="text-gray-700 font-bold text-base mb-1">{title}</Text>
       <Text className="text-gray-400 text-xs text-center px-8">{subtitle}</Text>
     </View>
+  ), []);
+
+  const renderPackageItem = useCallback(
+    ({ item }: { item: Package }) => (
+      <AdminOrderCard
+        pkg={item}
+        isUpdating={updatingId === item.id}
+        onUpdateStatus={handleUpdatePackageStatus}
+        onOpenStatusModal={handleOpenPackageModal}
+      />
+    ),
+    [updatingId, handleUpdatePackageStatus, handleOpenPackageModal]
   );
+
+  const renderDineInItem = useCallback(
+    ({ item }: { item: Order }) => (
+      <DineInOrderCard
+        ord={item}
+        isUpdating={updatingId === item.id}
+        onUpdateStatus={handleUpdateDineInStatus}
+      />
+    ),
+    [updatingId, handleUpdateDineInStatus]
+  );
+
+  const packageKeyExtractor = useCallback((item: Package) => item.id, []);
+  const dineInKeyExtractor = useCallback((item: Order) => item.id, []);
 
   return (
     <View className="flex-1 bg-[#FDFCF7]">
@@ -230,36 +280,42 @@ export default function AdminOrdersScreen() {
             packages={packages}
           />
 
-          {pkgLoading && packages.length === 0 ? (
-            <View className="flex-1 items-center justify-center">
-              <ActivityIndicator size="large" color="#E07B39" />
-            </View>
-          ) : (
-            <ScrollView
-              className="flex-1"
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 14, paddingBottom: 60 }}
-              refreshControl={
-                <RefreshControl
-                  refreshing={pkgLoading}
-                  onRefresh={refreshPackages}
-                  colors={["#E07B39"]}
-                />
-              }
-            >
-              {filteredPackages.length === 0
-                ? renderEmpty("Không có gói giao hàng nào", "Không tìm thấy gói đơn nào trong bộ lọc này.")
-                : filteredPackages.map((pkg) => (
-                    <AdminOrderCard
-                      key={pkg.id}
-                      pkg={pkg}
-                      updatingId={updatingId}
-                      onUpdateStatus={handleUpdatePackageStatus}
-                      onOpenStatusModal={(targetPkg) => setSelectedPkgForModal(targetPkg)}
-                    />
-                  ))}
-            </ScrollView>
-          )}
+          <FlatList
+            key="admin-packages-list"
+            data={filteredPackages}
+            keyExtractor={packageKeyExtractor}
+            renderItem={renderPackageItem}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              paddingTop: 14,
+              paddingBottom: 60,
+              flexGrow: 1,
+            }}
+            initialNumToRender={5}
+            maxToRenderPerBatch={6}
+            windowSize={5}
+            removeClippedSubviews={Platform.OS === "android"}
+            refreshControl={
+              <RefreshControl
+                refreshing={pkgLoading}
+                onRefresh={refreshPackages}
+                colors={["#E07B39"]}
+              />
+            }
+            ListEmptyComponent={
+              pkgLoading && packages.length === 0 ? (
+                <View className="flex-1 items-center justify-center pt-24">
+                  <ActivityIndicator size="large" color="#E07B39" />
+                </View>
+              ) : (
+                renderEmpty(
+                  "Không có gói giao hàng nào",
+                  "Không tìm thấy gói đơn nào trong bộ lọc này."
+                )
+              )
+            }
+          />
 
           {/* Modal chọn trạng thái bất kỳ cho Delivery Package */}
           {selectedPkgForModal && (
@@ -280,14 +336,13 @@ export default function AdminOrdersScreen() {
           {/* Tabs Filter for Dine-in */}
           <View className="py-2.5 px-4 bg-white border-b border-gray-100">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-              {[
-                { id: "ALL", label: `Tất cả (${dineInOrders.length})` },
-                { id: "PENDING", label: "Chờ xác nhận" },
-                { id: "CONFIRMED", label: "Đang phục vụ" },
-                { id: "COMPLETED", label: "Hoàn tất" },
-                { id: "CANCELLED", label: "Đã hủy" },
-              ].map((tab) => {
+              {DINE_IN_TABS.map((tab) => {
                 const isSelected = dineInTab === tab.id;
+                const tabCount =
+                  tab.id === "ALL"
+                    ? dineInOrders.length
+                    : dineInOrders.filter((o) => o.status === tab.id).length;
+
                 return (
                   <TouchableOpacity
                     key={tab.id}
@@ -303,7 +358,7 @@ export default function AdminOrdersScreen() {
                         isSelected ? "text-white" : "text-gray-600"
                       }`}
                     >
-                      {tab.label}
+                      {tab.label} {tabCount > 0 ? `(${tabCount})` : ""}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -311,184 +366,42 @@ export default function AdminOrdersScreen() {
             </ScrollView>
           </View>
 
-          {dineInLoading && dineInOrders.length === 0 ? (
-            <View className="flex-1 items-center justify-center">
-              <ActivityIndicator size="large" color="#E07B39" />
-            </View>
-          ) : (
-            <ScrollView
-              className="flex-1 px-5"
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingTop: 14, paddingBottom: 60 }}
-              refreshControl={
-                <RefreshControl
-                  refreshing={dineInLoading}
-                  onRefresh={fetchDineInOrders}
-                  colors={["#E07B39"]}
-                />
-              }
-            >
-              {filteredDineInOrders.length === 0
-                ? renderEmpty("Không có đơn tại bàn nào", "Chưa có lượt gọi món tại bàn nào trong mục này.")
-                : filteredDineInOrders.map((ord) => {
-                    const tableName =
-                      ord.tableName || (ord.tableId ? `Bàn #${ord.tableId}` : "Khách tại quầy");
-                    const isUpdating = updatingId === ord.id;
-
-                    return (
-                      <View
-                        key={ord.id}
-                        className="bg-white rounded-3xl p-4 mb-3.5 border border-gray-100 shadow-sm"
-                      >
-                        {/* Header: Table & Status */}
-                        <View className="flex-row items-center justify-between pb-3 border-b border-gray-50 mb-3">
-                          <View className="flex-row items-center">
-                            <View className="w-10 h-10 rounded-2xl bg-teal-50 items-center justify-center mr-3 border border-teal-100">
-                              <MaterialCommunityIcons name="table-chair" size={20} color="#0D9488" />
-                            </View>
-                            <View>
-                              <Text className="text-gray-900 font-black text-sm tracking-tight">
-                                {tableName}
-                              </Text>
-                              <Text className="text-gray-400 text-[10px] font-semibold">
-                                #{ord.id.slice(-6).toUpperCase()} • {ord.items?.length || 0} món
-                              </Text>
-                            </View>
-                          </View>
-
-                          <View
-                            className={`px-2.5 py-1 rounded-full border ${
-                              ord.status === "COMPLETED"
-                                ? "bg-emerald-50 border-emerald-200"
-                                : ord.status === "CANCELLED"
-                                ? "bg-rose-50 border-rose-200"
-                                : ord.status === "CONFIRMED"
-                                ? "bg-blue-50 border-blue-200"
-                                : "bg-amber-50 border-amber-200"
-                            }`}
-                          >
-                            <Text
-                              className={`text-[10px] font-black ${
-                                ord.status === "COMPLETED"
-                                  ? "text-emerald-700"
-                                  : ord.status === "CANCELLED"
-                                  ? "text-rose-700"
-                                  : ord.status === "CONFIRMED"
-                                  ? "text-blue-700"
-                                  : "text-amber-700"
-                              }`}
-                            >
-                              {ord.status}
-                            </Text>
-                          </View>
-                        </View>
-
-                        {/* Items preview */}
-                        {ord.items && ord.items.length > 0 && (
-                          <View className="bg-gray-50/70 rounded-2xl p-3 mb-3">
-                            {ord.items.slice(0, 3).map((item, idx) => (
-                              <View
-                                key={idx}
-                                className="flex-row items-center justify-between py-1"
-                              >
-                                <Text
-                                  className="text-gray-800 text-xs font-semibold flex-1 mr-2"
-                                  numberOfLines={1}
-                                >
-                                  {item.quantity}x {item.name || `Món ăn #${idx + 1}`}
-                                </Text>
-                                <Text className="text-gray-500 text-xs font-medium">
-                                  {((item.price || 0) * item.quantity).toLocaleString("vi-VN")} đ
-                                </Text>
-                              </View>
-                            ))}
-                            {ord.items.length > 3 && (
-                              <Text className="text-gray-400 text-[10px] mt-1 font-medium italic">
-                                +{ord.items.length - 3} món khác...
-                              </Text>
-                            )}
-                          </View>
-                        )}
-
-                        {/* Total Amount & Actions */}
-                        <View className="flex-row items-center justify-between pt-1">
-                          <View>
-                            <Text className="text-gray-400 text-[10px] font-bold uppercase">
-                              Tổng cộng
-                            </Text>
-                            <Text className="text-[#E07B39] font-black text-base">
-                              {(ord.totalAmount || 0).toLocaleString("vi-VN")} đ
-                            </Text>
-                          </View>
-
-                          <View className="flex-row items-center space-x-2">
-                            {ord.status === "PENDING" && (
-                              <TouchableOpacity
-                                onPress={() => handleUpdateDineInStatus(ord.id, "CONFIRMED")}
-                                disabled={isUpdating}
-                                className="bg-[#E07B39] px-3.5 py-2 rounded-xl flex-row items-center"
-                              >
-                                {isUpdating ? (
-                                  <ActivityIndicator size="small" color="white" />
-                                ) : (
-                                  <>
-                                    <MaterialCommunityIcons name="check" size={16} color="white" />
-                                    <Text className="text-white font-bold text-xs ml-1">
-                                      Nhận đơn
-                                    </Text>
-                                  </>
-                                )}
-                              </TouchableOpacity>
-                            )}
-
-                            {ord.status === "CONFIRMED" && (
-                              <TouchableOpacity
-                                onPress={() => handleUpdateDineInStatus(ord.id, "COMPLETED")}
-                                disabled={isUpdating}
-                                className="bg-emerald-600 px-3.5 py-2 rounded-xl flex-row items-center"
-                              >
-                                {isUpdating ? (
-                                  <ActivityIndicator size="small" color="white" />
-                                ) : (
-                                  <>
-                                    <MaterialCommunityIcons name="cash-check" size={16} color="white" />
-                                    <Text className="text-white font-bold text-xs ml-1">
-                                      Hoàn tất
-                                    </Text>
-                                  </>
-                                )}
-                              </TouchableOpacity>
-                            )}
-
-                            {ord.status !== "COMPLETED" && ord.status !== "CANCELLED" && (
-                              <TouchableOpacity
-                                onPress={() => {
-                                  Alert.alert(
-                                    "Hủy đơn hàng",
-                                    "Bạn có chắc muốn hủy đơn gọi món này không?",
-                                    [
-                                      { text: "Đóng", style: "cancel" },
-                                      {
-                                        text: "Hủy đơn",
-                                        style: "destructive",
-                                        onPress: () => handleUpdateDineInStatus(ord.id, "CANCELLED"),
-                                      },
-                                    ]
-                                  );
-                                }}
-                                disabled={isUpdating}
-                                className="bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl ml-2"
-                              >
-                                <MaterialCommunityIcons name="close" size={16} color="#E11D48" />
-                              </TouchableOpacity>
-                            )}
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  })}
-            </ScrollView>
-          )}
+          <FlatList
+            key="admin-dine-in-list"
+            data={filteredDineInOrders}
+            keyExtractor={dineInKeyExtractor}
+            renderItem={renderDineInItem}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              paddingTop: 14,
+              paddingBottom: 60,
+              flexGrow: 1,
+            }}
+            initialNumToRender={5}
+            maxToRenderPerBatch={6}
+            windowSize={5}
+            removeClippedSubviews={Platform.OS === "android"}
+            refreshControl={
+              <RefreshControl
+                refreshing={dineInLoading}
+                onRefresh={fetchDineInOrders}
+                colors={["#E07B39"]}
+              />
+            }
+            ListEmptyComponent={
+              dineInLoading && dineInOrders.length === 0 ? (
+                <View className="flex-1 items-center justify-center pt-24">
+                  <ActivityIndicator size="large" color="#E07B39" />
+                </View>
+              ) : (
+                renderEmpty(
+                  "Không có đơn tại bàn nào",
+                  "Chưa có lượt gọi món tại bàn nào trong mục này."
+                )
+              )
+            }
+          />
         </>
       )}
     </View>

@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { PackageStatusType } from "../../../services/api/package-api";
 
 export const ALL_STATUSES: { id: PackageStatusType; label: string; icon: string; color: string }[] = [
+  { id: "PENDING", label: "CHỜ XÁC NHẬN", icon: "clock-outline", color: "#D97706" },
   { id: "CONFIRMED", label: "ĐÃ TIẾP NHẬN", icon: "clipboard-check-outline", color: "#E07B39" },
   { id: "COOKING", label: "ĐANG NẤU", icon: "pot-steam-outline", color: "#F59E0B" },
   { id: "DELIVERING", label: "ĐANG GIAO HÀNG", icon: "truck-delivery-outline", color: "#3B82F6" },
