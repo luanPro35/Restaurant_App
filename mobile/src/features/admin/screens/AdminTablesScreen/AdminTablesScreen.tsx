@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from "react-native";
 import { AdminTableCard } from "../../components/AdminTableCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
@@ -13,7 +13,7 @@ export default function AdminTablesScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<AdminStackParamList>>();
 
-  const { tables, getTables, deleteTable } = useAdminTable();
+  const { tables, loading, getTables, deleteTable } = useAdminTable();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(async () => {
@@ -68,10 +68,27 @@ export default function AdminTablesScreen() {
         </View>
       </View>
 
-      <ScrollView
+      <FlatList
         className="flex-1 px-6"
+        data={tables}
+        numColumns={2}
+        keyExtractor={(item) => item.id.toString()}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
+        initialNumToRender={8}
+        maxToRenderPerBatch={6}
+        windowSize={7}
+        removeClippedSubviews
+        renderItem={({ item }) => (
+          <AdminTableCard
+            table={item}
+            onEdit={(table: AdminTable) =>
+              navigation.navigate("AdminEditTables", { table })
+            }
+            onDelete={handleDelete}
+          />
+        )}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -80,20 +97,8 @@ export default function AdminTablesScreen() {
             tintColor="#E07B39"
           />
         }
-      >
-        <View className="flex-row flex-wrap justify-between">
-          {tables.map((table) => (
-            <AdminTableCard
-              key={table.id}
-              table={table}
-              onEdit={(t: AdminTable) =>
-                navigation.navigate("AdminEditTables", { table: t })
-              }
-              onDelete={(t: AdminTable) => handleDelete(t)}
-            />
-          ))}
-        </View>
-      </ScrollView>
+        ListEmptyComponent={loading ? <ActivityIndicator className="mt-12" color="#E07B39" /> : null}
+      />
     </View>
   );
 }

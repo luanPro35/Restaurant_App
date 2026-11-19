@@ -54,6 +54,10 @@ export class AdminTableService {
     };
   }
 
+  async getSummary() {
+    return this.adminTableRepository.getSummary();
+  }
+
   async getTableById(id: number) {
     getTableByIdSchema.parse({ id });
     return this.adminTableRepository.getTableById(id);

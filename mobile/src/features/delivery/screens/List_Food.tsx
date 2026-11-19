@@ -31,7 +31,7 @@ const List_Food = forwardRef(
     }: { onScroll?: any; ListHeaderComponent?: any },
     ref,
   ) => {
-    const { menu, loading, fetchMenu } = useDelivery();
+    const { menu, loading, loadingMore, hasMore, fetchMenu, fetchMoreMenu } = useDelivery();
     const navigation = useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
     const { addToCart } = useCart();
     const sectionListRef = useRef<SectionList>(null);
@@ -119,13 +119,25 @@ const List_Food = forwardRef(
           ref={sectionListRef}
           sections={MENU_SECTIONS}
           keyExtractor={(item) =>
-            item.id ? item.id.toString() : Math.random().toString()
+            item.id ? item.id.toString() : `${item.name}-${item.price}`
           }
           stickySectionHeadersEnabled={true}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingTop: 280, paddingBottom: 100 }}
           ListHeaderComponent={ListHeaderComponent}
           getItemLayout={getItemLayout}
+          initialNumToRender={8}
+          maxToRenderPerBatch={6}
+          updateCellsBatchingPeriod={50}
+          windowSize={7}
+          removeClippedSubviews
+          onEndReached={() => {
+            if (hasMore && !loadingMore) fetchMoreMenu();
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={loadingMore ? (
+            <ActivityIndicator className="my-4" color="#E07B39" />
+          ) : null}
           onScroll={onScroll}
           scrollEventThrottle={16}
           renderSectionHeader={({ section: { title } }) => (

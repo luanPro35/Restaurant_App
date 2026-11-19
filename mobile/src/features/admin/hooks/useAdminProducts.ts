@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import adminApi from "../admin-api";
 import { Alert } from "react-native";
 import {
@@ -113,10 +113,6 @@ export const useAdminProducts = () => {
       Alert.alert("Lỗi", "Không thể tạo sản phẩm");
     }
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
 
   return {
     products,

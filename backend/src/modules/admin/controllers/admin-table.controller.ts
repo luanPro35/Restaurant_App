@@ -80,6 +80,12 @@ export class AdminTableController {
     return this.adminTableService.getTables(query);
   }
 
+  @Get("summary")
+  @ApiOperation({ summary: "Get total and occupied table counts" })
+  async getSummary() {
+    return this.adminTableService.getSummary();
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Lấy thông tin chi tiết một bàn" })
   @ApiParam({ name: "id", description: "ID của bàn" })

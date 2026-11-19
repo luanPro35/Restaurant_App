@@ -15,7 +15,7 @@ interface AdminOrderActionsProps {
   onCancel: () => void;
 }
 
-export default function AdminOrderActions({
+function AdminOrderActions({
   nextAction,
   isUpdating,
   isCompleted,
@@ -112,3 +112,5 @@ export default function AdminOrderActions({
     </View>
   );
 }
+
+export default React.memo(AdminOrderActions);

@@ -100,7 +100,7 @@ export default function AdminStatisticsScreen() {
       ] = await Promise.allSettled([
         paymentApi.getAnalytics(timeFilter),
         adminUserApi.getUsers({ limit: 1 }),
-        tableApi.getAdminTables({ limit: 1000 } as any),
+        tableApi.getAdminTableSummary(),
       ]);
 
       if (analyticsRes.status === "fulfilled") {
@@ -118,12 +118,8 @@ export default function AdminStatisticsScreen() {
       }
 
       if (tablesRes.status === "fulfilled") {
-        const res = tablesRes.value as any;
-        const tblList = res?.data || [];
-        setTotalTables(res?.pagination?.total ?? tblList.length ?? 0);
-        setOccupiedTables(
-          tblList.filter((t: any) => t.status === "OCCUPIED" || t.status === "RESERVED").length
-        );
+        setTotalTables(tablesRes.value.total || 0);
+        setOccupiedTables(tablesRes.value.occupied || 0);
       }
 
     } catch (err) {

@@ -11,6 +11,7 @@ interface AddFoodToTableModalProps {
   onClose: () => void;
   table: Table | null;
   products: Product[];
+  productsLoading?: boolean;
   onSuccess: () => void;
 }
 
@@ -19,6 +20,7 @@ export const AddFoodToTableModal: React.FC<AddFoodToTableModalProps> = ({
   onClose,
   table,
   products,
+  productsLoading = false,
   onSuccess,
 }) => {
   const [selectedQuantities, setSelectedQuantities] = useState<Record<string, number>>({});
@@ -99,7 +101,9 @@ export const AddFoodToTableModal: React.FC<AddFoodToTableModalProps> = ({
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pr-1">
-          {filteredProducts.map((product) => {
+          {productsLoading ? (
+            <p className="col-span-full py-8 text-center text-sm text-slate-400">Đang tải thực đơn...</p>
+          ) : filteredProducts.map((product) => {
             const qty = selectedQuantities[product.id] || 0;
             const imgUrl = getProductImage(product);
 
@@ -116,6 +120,8 @@ export const AddFoodToTableModal: React.FC<AddFoodToTableModalProps> = ({
                   <img
                     src={imgUrl}
                     alt={product.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-12 h-12 rounded-xl object-cover bg-slate-100 shrink-0"
                   />
                   <div className="min-w-0">

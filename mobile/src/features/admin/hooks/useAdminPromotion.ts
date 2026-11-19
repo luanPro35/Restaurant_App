@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import promotionApi from "../../../services/api/api-promotion";
 import { Alert } from "react-native";
 import { AdminPagination } from "../types/admin.types";
@@ -129,10 +129,6 @@ export const useAdminPromotion = () => {
       Alert.alert("Lỗi", "Không thể cập nhật khuyến mãi");
     }
   };
-
-  useEffect(() => {
-    fetchPromotions();
-  }, [fetchPromotions]);
 
   return {
     promotions,

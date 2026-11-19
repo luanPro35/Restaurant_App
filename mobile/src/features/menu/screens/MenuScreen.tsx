@@ -3,6 +3,7 @@ import {
   View,
   Text,
   ScrollView,
+  FlatList,
   StatusBar,
   TouchableOpacity,
   ActivityIndicator,
@@ -10,7 +11,7 @@ import {
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useCallback } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import MenuItemCard from "../components/MenuItemCard";
 import Search_Dish from "../../delivery/Header/Search_Dish";
@@ -24,9 +25,13 @@ import { resolveImageUrl } from "../../../shared/utils";
 export default function MenuScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<CustomerStackParamList>>();
-  const { menu, loading, fetchMenu, filter, setFilter } = useMenu();
+  const { menu, loading, loadingMore, hasMore, fetchMenu, fetchMoreMenu, filter, setFilter } = useMenu();
   const { addToCart, setIsCartVisible } = useCart();
-  const [isCartVisibleLocal, setIsCartVisibleLocal] = useState(false); // Just in case, but actually let's use the global one
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentFilter = useRef(filter);
+  currentFilter.current = filter;
+  const fetchMenuRef = useRef(fetchMenu);
+  fetchMenuRef.current = fetchMenu;
   const [refreshing, setRefreshing] = useState(false);
    // const [isGridItem, setIsGridItem] = useState(true);
 
@@ -36,14 +41,21 @@ export default function MenuScreen() {
     setRefreshing(false);
   }, [fetchMenu]);
 
+  useEffect(() => () => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      fetchMenu();
+      fetchMenuRef.current();
     }, [])
   );
   const handleSearch = (query: string) => {
     setFilter((prev: any) => ({ ...prev, search: query }));
-    fetchMenu({ ...filter, search: query });
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      fetchMenu({ ...currentFilter.current, search: query });
+    }, 250);
   };
 
   const handlePriceFilter = (value: string) => {
@@ -69,7 +81,7 @@ export default function MenuScreen() {
     fetchMenu(newFilter);
   };
 
-  const menuItems: MenuItem[] = menu
+  const menuItems: MenuItem[] = useMemo(() => menu
     .filter((item: any) => item.isAvailable !== false)
     .map((item: any) => {
     return {
@@ -80,7 +92,7 @@ export default function MenuScreen() {
       description: item.description || "",
       category: item.category?.name || "Khác",
     };
-  });
+  }), [menu]);
 
   const handleAddToCart = (item: MenuItem) => {
     addToCart(item);
@@ -178,53 +190,53 @@ export default function MenuScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView
+      <FlatList
         className="flex-1 px-4 pt-4"
+        data={menuItems}
+        numColumns={2}
+        keyExtractor={(item) => item.id.toString()}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#E07B39"]} tintColor="#E07B39" />}
-      >
-        {loading && !refreshing && menuItems.length === 0 ? (
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
+        windowSize={7}
+        removeClippedSubviews
+        onEndReached={() => {
+          if (hasMore && !loadingMore) fetchMoreMenu();
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={loadingMore ? (
+          <ActivityIndicator className="my-4" color="#E07B39" />
+        ) : null}
+        ListHeaderComponent={filter.search ? (
+          <View className="bg-orange-100 px-4 py-2 rounded-full mb-4 self-start">
+            <Text className="text-orange-600 font-semibold text-sm">
+              Tìm thấy {menuItems.length} món
+            </Text>
+          </View>
+        ) : null}
+        renderItem={({ item }) => (
+          <MenuItemCard
+            item={item as any}
+            onAddToCart={handleAddToCart as any}
+            onPress={handleProductPress}
+          />
+        )}
+        ListEmptyComponent={loading && !refreshing ? (
           <View className="py-20">
             <ActivityIndicator size="large" color="#E07B39" />
           </View>
         ) : (
-          <>
-            {filter.search && (
-              <View className="bg-orange-100 px-4 py-2 rounded-full mb-4 self-start">
-                <Text className="text-orange-600 font-semibold text-sm">
-                  Tìm thấy {menuItems.length} món
-                </Text>
-              </View>
-            )}
-
-            {menuItems.length === 0 ? (
-              <View className="items-center justify-center py-20">
-                <MaterialCommunityIcons
-                  name="food-off"
-                  size={80}
-                  color="#ddd"
-                />
-                <Text className="text-gray-400 text-base mt-4">
-                  Không tìm thấy món ăn
-                </Text>
-              </View>
-            ) : (
-              <View className="flex-row flex-wrap justify-between">
-                {menuItems.map((item) => (
-                  <MenuItemCard
-                    key={item.id}
-                    item={item as any}
-                    onAddToCart={handleAddToCart as any}
-                    onPress={handleProductPress}
-                    // isGridItem={isGridItem}
-                  />
-                ))}
-              </View>
-            )}
-          </>
+          <View className="items-center justify-center py-20">
+            <MaterialCommunityIcons name="food-off" size={80} color="#ddd" />
+            <Text className="text-gray-400 text-base mt-4">
+              Không tìm thấy món ăn
+            </Text>
+          </View>
         )}
-      </ScrollView>
+      />
     </View>
   );
 }

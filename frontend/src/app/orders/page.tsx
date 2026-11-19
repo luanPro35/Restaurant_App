@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Package, PackageStatus, Product } from '../../types';
+import { Package, PackageStatus } from '../../types';
 import apiService from '../../services/api';
 import { Badge } from '../../components/common/Badge';
 import { OrderDetailsModal } from './OrderDetailsModal';
@@ -9,7 +9,6 @@ import { Search, ShoppingBag, Eye, RefreshCw } from 'lucide-react';
 
 export default function OrdersPage() {
   const [packages, setPackages] = useState<Package[]>([]);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,12 +17,8 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const [pkgs, prods] = await Promise.all([
-        apiService.getPackages(),
-        apiService.getProducts(),
-      ]);
+      const pkgs = await apiService.getPackages();
       setPackages(pkgs);
-      setAllProducts(prods);
     } catch (e) {
       console.error(e);
     } finally {
@@ -259,7 +254,6 @@ export default function OrdersPage() {
       {/* Modal chi tiết đơn */}
       <OrderDetailsModal
         activePackage={activePackage}
-        allProducts={allProducts}
         onClose={() => setActivePackage(null)}
         onStatusChange={handleStatusChange}
         onRefresh={fetchOrders}

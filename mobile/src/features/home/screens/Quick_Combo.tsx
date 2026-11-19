@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator } from
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { productApi } from "../../../services/api/apiProducts";
+import { getHomeProducts } from "../services/homeProducts";
 import { seededShuffle, getDailySeed } from "../../../utils/random";
 import { formatCurrency } from "../../../shared/utils";
 import { useCart } from "../../../app/context/CartContext";
@@ -93,8 +93,7 @@ export default function Quick_Combo({ navigation }: { navigation: any }) {
   useEffect(() => {
     const fetchCombos = async () => {
       try {
-        const response = await productApi.getAll({ limit: 1000 });
-        const allProducts = Array.isArray(response) ? response : response.data || [];
+        const allProducts = await getHomeProducts();
         
         if (allProducts.length > 0) {
           const shuffled = seededShuffle(allProducts, getDailySeed() + "_combo");
@@ -129,6 +128,10 @@ export default function Quick_Combo({ navigation }: { navigation: any }) {
         <FlatList
           data={combos}
           horizontal
+          initialNumToRender={3}
+          maxToRenderPerBatch={3}
+          windowSize={3}
+          removeClippedSubviews
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => <SimpleProductCard item={item} navigation={navigation} />}

@@ -7,7 +7,7 @@ interface AdminOrderItemsListProps {
   orderItems: OrderItem[];
 }
 
-export default function AdminOrderItemsList({ orderItems }: AdminOrderItemsListProps) {
+function AdminOrderItemsList({ orderItems }: AdminOrderItemsListProps) {
   if (orderItems.length === 0) return null;
 
   return (
@@ -18,7 +18,7 @@ export default function AdminOrderItemsList({ orderItems }: AdminOrderItemsListP
           Món ăn đã đặt ({orderItems.length})
         </Text>
       </View>
-      <View className="space-y-1.5">
+      <View className="gap-y-1.5">
         {orderItems.map((item, index) => (
           <View key={index} className="flex-row items-center justify-between py-0.5">
             <View className="flex-row items-center flex-1 mr-2">
@@ -41,3 +41,5 @@ export default function AdminOrderItemsList({ orderItems }: AdminOrderItemsListP
     </View>
   );
 }
+
+export default React.memo(AdminOrderItemsList);

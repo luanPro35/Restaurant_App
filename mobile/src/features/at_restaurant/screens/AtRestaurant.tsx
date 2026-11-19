@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  FlatList,
   TouchableOpacity,
   Text,
   Animated,
@@ -69,7 +70,7 @@ export default function AtRestaurant({ route }: any) {
 
   useEffect(() => {
     const loadTableOrder = async () => {
-      if (currentTableId) {
+      if (currentTableId && activeTab === "order") {
         try {
           const order = await getOrdersByTableId(currentTableId);
           if (order) {
@@ -225,58 +226,52 @@ export default function AtRestaurant({ route }: any) {
     switch (activeTab) {
       case "tables":
         return (
-          <ScrollView className="flex-1 px-4 pt-4">
-            <TouchableOpacity
-              className="bg-orange-100 rounded-2xl p-4 mb-4 flex-row items-center"
-              onPress={() => navigation.navigate("QRScanner")}
-            >
-              <MaterialCommunityIcons
-                name="qrcode-scan"
-                size={40}
-                color="#E07B39"
-              />
-              <View className="flex-1 ml-3">
-                <Text className="text-gray-800 font-bold text-base">
-                  Quét mã QR
-                </Text>
-                <Text className="text-gray-600 text-sm">
-                  Quét mã QR trên bàn để check-in
-                </Text>
+          <FlatList
+            className="flex-1 px-4 pt-4"
+            data={tables}
+            numColumns={2}
+            keyExtractor={(table) => table.id.toString()}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            initialNumToRender={8}
+            maxToRenderPerBatch={6}
+            windowSize={7}
+            removeClippedSubviews
+            ListHeaderComponent={
+              <View>
+                <TouchableOpacity
+                  className="bg-orange-100 rounded-2xl p-4 mb-4 flex-row items-center"
+                  onPress={() => navigation.navigate("QRScanner")}
+                >
+                  <MaterialCommunityIcons name="qrcode-scan" size={40} color="#E07B39" />
+                  <View className="flex-1 ml-3">
+                    <Text className="text-gray-800 font-bold text-base">Quét mã QR</Text>
+                    <Text className="text-gray-600 text-sm">Quét mã QR trên bàn để check-in</Text>
+                  </View>
+                  <MaterialCommunityIcons name="chevron-right" size={24} color="#E07B39" />
+                </TouchableOpacity>
+                <Text className="text-xl font-bold text-gray-800 mb-4">Chọn bàn</Text>
               </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={24}
-                color="#E07B39"
+            }
+            renderItem={({ item: table }) => (
+              <TableCard
+                tableNumber={table.name}
+                capacity={table.capacity}
+                status={mapStatus(table.status)}
+                onPress={() => {
+                  setCurrentTableId(table.id);
+                  setCurrentTable(table.name);
+                  if ((table.status || "").toUpperCase() === "OCCUPIED") {
+                    setActiveTab("order");
+                  } else {
+                    setServerOrders([]);
+                    setActiveTab("menu");
+                  }
+                }}
               />
-            </TouchableOpacity>
-
-            <Text className="text-xl font-bold text-gray-800 mb-4">
-              Chọn bàn
-            </Text>
-            <View className="flex-row flex-wrap justify-between">
-              {Array.isArray(tables) && tables.map((table) => (
-                <TableCard
-                  key={table.id}
-                  tableNumber={table.name}
-                  capacity={table.capacity}
-                  status={mapStatus(table.status)}
-                  onPress={async () => {
-                    setCurrentTableId(table.id);
-                    setCurrentTable(table.name);
-                    const status = (table.status || "").toUpperCase();
-                    if (status === "OCCUPIED") {
-                      setActiveTab("order");
-                    } else {
-                      setServerOrders([]);
-                      setActiveTab("menu");
-                    }
-                  }}
-                />
-              ))}
-            </View>
-          </ScrollView>
+            )}
+          />
         );
-
       case "order":
         const allItems = [...(Array.isArray(serverOrders) ? serverOrders : []), ...(Array.isArray(orderItems) ? orderItems : [])];
         return (

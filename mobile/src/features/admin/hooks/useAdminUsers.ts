@@ -19,6 +19,7 @@ export const useAdminUsers = () => {
     async (pageNum = 1, isRefresh = false) => {
       try {
         if (pageNum === 1 && !isRefresh) setLoading(true);
+        if (pageNum > 1) setLoading(true);
 
         const response = await adminUserApi.getUsers({
           name: search,

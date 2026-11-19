@@ -61,6 +61,27 @@ export class PackageRepository {
         });
     }
 
+    async getAdminSummary() {
+        const activeStatuses: PackageStatus[] = [
+            PackageStatus.PENDING,
+            PackageStatus.CONFIRMED,
+            PackageStatus.COOKING,
+            PackageStatus.DELIVERING,
+            PackageStatus.RECEIVED,
+        ];
+        const [activeOrdersCount, recentPackages] = await Promise.all([
+            (this.prisma as any).package.count({
+                where: { status: { in: activeStatuses } },
+            }),
+            (this.prisma as any).package.findMany({
+                orderBy: { createdAt: "desc" },
+                take: 3,
+            }),
+        ]);
+
+        return { activeOrdersCount, recentPackages };
+    }
+
     async findById(id: string) {
         return this.prisma.package.findUnique({
             where: { id },

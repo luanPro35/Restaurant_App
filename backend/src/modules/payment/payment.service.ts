@@ -146,7 +146,7 @@ export class PaymentService {
 
     async totalAmountToday() {
         const { start, end } = this.getBangkokDayRange(this.dateKeyInBangkok(new Date()));
-        const payments = await this.getRecognizedPayments();
+        const payments = await this.getRecognizedPayments({ gte: start, lt: end });
         const amount = payments.reduce((sum, payment) =>
             payment.updatedAt >= start && payment.updatedAt < end ? sum + payment.amount : sum, 0);
         return { _sum: { amount } };
@@ -174,9 +174,12 @@ export class PaymentService {
         return { start, end: new Date(start.getTime() + 24 * 60 * 60 * 1000) };
     }
 
-    private async getRecognizedPayments() {
+    private async getRecognizedPayments(updatedAt?: { gte: Date; lt: Date }) {
         const records = await this.prisma.payment.findMany({
-            where: { status: TransactionStatus.COMPLETED },
+            where: {
+                status: TransactionStatus.COMPLETED,
+                ...(updatedAt ? { updatedAt } : {}),
+            },
             include: {
                 order: { select: { status: true } },
                 package: { select: { status: true } },
@@ -334,7 +337,7 @@ export class PaymentService {
 
     async totalPackageToday() {
         const { start, end } = this.getBangkokDayRange(this.dateKeyInBangkok(new Date()));
-        const payments = await this.getRecognizedPayments();
+        const payments = await this.getRecognizedPayments({ gte: start, lt: end });
         const amount = payments.reduce((sum, payment) => payment.packageId && payment.updatedAt >= start && payment.updatedAt < end
             ? sum + Number(payment.amount || 0) : sum, 0);
         return { _sum: { amount } };
@@ -342,7 +345,7 @@ export class PaymentService {
 
     async totalOrderToday() {
         const { start, end } = this.getBangkokDayRange(this.dateKeyInBangkok(new Date()));
-        const payments = await this.getRecognizedPayments();
+        const payments = await this.getRecognizedPayments({ gte: start, lt: end });
         const amount = payments.reduce((sum, payment) => payment.orderId && payment.updatedAt >= start && payment.updatedAt < end
             ? sum + Number(payment.amount || 0) : sum, 0);
         return { _sum: { amount } };

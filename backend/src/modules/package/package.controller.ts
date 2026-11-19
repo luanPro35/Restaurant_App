@@ -30,6 +30,13 @@ export class PackageController {
         return this.packageService.findAllPackage();
     }
 
+    @Roles(Role.ADMIN, Role.STAFF)
+    @Get("summary")
+    @ApiOperation({ summary: "Get active package count and recent packages" })
+    getAdminSummary() {
+        return this.packageService.getAdminSummary();
+    }
+
     @Get()
     @ApiOperation({ summary: "Get all packages for current user" })
     findAll(@CurrentUser() user: any) {

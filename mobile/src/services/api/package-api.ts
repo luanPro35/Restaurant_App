@@ -77,6 +77,14 @@ export const packageApi = {
     const response = await api.get("/packages/people");
     return response.data;
   },
+
+  getAdminSummary: async (): Promise<{
+    activeOrdersCount: number;
+    recentPackages: Package[];
+  }> => {
+    const response = await api.get("/packages/summary");
+    return response.data;
+  },
 };
 
 export default packageApi;

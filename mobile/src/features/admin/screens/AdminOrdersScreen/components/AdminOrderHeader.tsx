@@ -11,7 +11,7 @@ interface AdminOrderHeaderProps {
   statusInfo: StatusConfig;
 }
 
-export default function AdminOrderHeader({
+function AdminOrderHeader({
   name,
   orderId,
   totalItemCount,
@@ -69,3 +69,5 @@ export default function AdminOrderHeader({
     </View>
   );
 }
+
+export default React.memo(AdminOrderHeader);

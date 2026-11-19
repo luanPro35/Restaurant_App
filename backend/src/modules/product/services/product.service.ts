@@ -35,10 +35,10 @@ export class ProductService {
       return JSON.parse(cachedData);
     }
 
-    const products = await this.productRepository.findAll(
-      validatedQuery as any,
-    );
-    const total = await this.productRepository.count(validatedQuery as any);
+    const [products, total] = await Promise.all([
+      this.productRepository.findAll(validatedQuery as any),
+      this.productRepository.count(validatedQuery as any),
+    ]);
 
     const result = {
       data: products,

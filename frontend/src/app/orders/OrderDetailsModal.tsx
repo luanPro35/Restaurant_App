@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from '../../components/common/Modal';
 import { Badge } from '../../components/common/Badge';
 import { Package, PackageStatus, Product } from '../../types';
@@ -15,7 +15,6 @@ interface OrderDetailsModalProps {
   onStatusChange: (packageId: string, nextStatus: PackageStatus) => void;
   onPackageUpdated?: () => void;
   onRefresh?: () => void;
-  allProducts: Product[];
 }
 
 const statusWorkflow: PackageStatus[] = [
@@ -35,13 +34,27 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
   onStatusChange,
   onPackageUpdated,
   onRefresh,
-  allProducts,
 }) => {
   const currentPkg = pkg || activePackage;
   const [showAddFood, setShowAddFood] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [productsLoaded, setProductsLoaded] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!showAddFood || productsLoaded || productsLoading) return;
+    setProductsLoading(true);
+    apiService.getProducts()
+      .then(setAllProducts)
+      .catch((error) => console.error('Error loading menu items:', error))
+      .finally(() => {
+        setProductsLoaded(true);
+        setProductsLoading(false);
+      });
+  }, [showAddFood, productsLoaded, productsLoading]);
 
   if (!currentPkg) return null;
 
@@ -188,7 +201,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                   />
                   <button
                     onClick={handleAddFood}
-                    disabled={!selectedProductId}
+                    disabled={!selectedProductId || productsLoading}
                     className="px-4 py-2 bg-[#E07B39] text-white rounded-xl text-xs font-bold hover:bg-orange-600 disabled:opacity-50 transition-colors"
                   >
                     Xác nhận thêm

@@ -61,6 +61,10 @@ export class PackageService {
         return this.packageRepository.findAllPackage();
     }
 
+    async getAdminSummary() {
+        return this.packageRepository.getAdminSummary();
+    }
+
     async findOne(id: string) {
         const pkg = await this.packageRepository.findById(id);
         if (!pkg) {

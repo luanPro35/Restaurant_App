@@ -40,23 +40,23 @@ export const apiService = {
   // --- 1. DASHBOARD & STATS (Real Backend) ---
   async getDashboardStats() {
     try {
-      const [productsRes, tablesRes, packagesRes, revenueTodayRes, totalPackageTodayRes] =
+      const [productsRes, tablesRes, packagesRes, revenueTodayRes] =
         await Promise.allSettled([
-          this.getProducts(),
+          this.getProducts({ limit: 4 }),
           this.getTables(),
           this.getPackages(),
           apiClient.get('/payments/total-amount-today'),
-          apiClient.get('/payments/total-package-today'),
         ]);
 
       const prods = productsRes.status === 'fulfilled' ? productsRes.value : [];
       const tbls = tablesRes.status === 'fulfilled' ? tablesRes.value : [];
       const pkgs = packagesRes.status === 'fulfilled' ? packagesRes.value : [];
 
-      const revenueFromApi =
-        revenueTodayRes.status === 'fulfilled' && revenueTodayRes.value?.data
-          ? Number(revenueTodayRes.value.data.total || revenueTodayRes.value.data) || 0
-          : 0;
+      const revenueResponse =
+        revenueTodayRes.status === 'fulfilled' ? revenueTodayRes.value?.data : null;
+      const revenueFromApi = Number(
+        revenueResponse?._sum?.amount ?? revenueResponse?.total ?? revenueResponse ?? 0,
+      ) || 0;
 
       const calculatedRevenue = pkgs
         .filter((p) => p.status === 'COMPLETED' || p.status === 'RECEIVED')
@@ -78,6 +78,7 @@ export const apiService = {
         totalTables: tbls.length,
         topProducts: prods.slice(0, 4),
         recentPackages: pkgs.slice(0, 5),
+        tables: tbls,
       };
     } catch (e) {
       console.error('Error fetching dashboard stats:', e);
@@ -89,14 +90,15 @@ export const apiService = {
         totalTables: 0,
         topProducts: [],
         recentPackages: [],
+        tables: [],
       };
     }
   },
 
   // --- 2. PRODUCTS (Real Backend: /products) ---
-  async getProducts(): Promise<Product[]> {
+  async getProducts(params?: { page?: number; limit?: number }): Promise<Product[]> {
     try {
-      const res = await apiClient.get('/products');
+      const res = await apiClient.get('/products', { params });
       let rawList: any[] = [];
       if (res.data?.data && Array.isArray(res.data.data)) {
         rawList = res.data.data;

@@ -49,6 +49,14 @@ export class AdminTableRepository {
     return this.prisma.table.count({ where: { status, location } });
   }
 
+  async getSummary() {
+    const [total, occupied] = await Promise.all([
+      this.prisma.table.count(),
+      this.prisma.table.count({ where: { status: TableStatus.OCCUPIED } }),
+    ]);
+    return { total, occupied };
+  }
+
   async getTableById(id: number) {
     return this.prisma.table.findUnique({ where: { id } });
   }

@@ -13,6 +13,11 @@ export interface AdminTableQuery {
 }
 
 export const tableApi = {
+  getAdminTableSummary: async (): Promise<{ total: number; occupied: number }> => {
+    const response = await api.get("/admin/tables/summary");
+    return response.data;
+  },
+
   getAdminTables: async (
     query?: AdminTableQuery,
   ): Promise<AdminTableResponse> => {

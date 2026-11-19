@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Alert } from "react-native";
 import { tableApi, AdminTableQuery } from "../../../services/api/api-table";
 import {
@@ -80,10 +80,6 @@ export const useTable = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchTables();
-  }, [fetchTables]);
 
   return {
     tables,

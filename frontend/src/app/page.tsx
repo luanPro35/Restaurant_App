@@ -14,25 +14,16 @@ export default function DashboardPage() {
   const [recentPackages, setRecentPackages] = useState<Package[]>([]);
   const [topProducts, setTopProducts] = useState<Product[]>([]);
   const [tables, setTables] = useState<Table[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchDashboard = async () => {
     try {
-      setLoading(true);
-      const [dashData, pkgs, prods, tbls] = await Promise.all([
-        apiService.getDashboardStats(),
-        apiService.getPackages(),
-        apiService.getProducts(),
-        apiService.getTables(),
-      ]);
+      const dashData = await apiService.getDashboardStats();
       setStats(dashData);
-      setRecentPackages(pkgs.slice(0, 5));
-      setTopProducts(prods.slice(0, 4));
-      setTables(tbls);
+      setRecentPackages(dashData.recentPackages ?? []);
+      setTopProducts(dashData.topProducts ?? []);
+      setTables(dashData.tables ?? []);
     } catch (e) {
       console.error('Error fetching dashboard:', e);
-    } finally {
-      setLoading(false);
     }
   };
 

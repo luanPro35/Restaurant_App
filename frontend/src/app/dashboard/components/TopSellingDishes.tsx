@@ -31,6 +31,8 @@ export const TopSellingDishes: React.FC<TopSellingDishesProps> = ({ products }) 
               <img
                 src={getProductImage(prod)}
                 alt={prod.name}
+                loading="lazy"
+                decoding="async"
                 className="w-11 h-11 rounded-lg object-cover bg-slate-100 shrink-0 border border-slate-100 shadow-2xs"
               />
               <div className="flex-1 min-w-0">

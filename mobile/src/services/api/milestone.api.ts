@@ -2,7 +2,13 @@ import api from "./axios.instance";
 
 export interface MilestoneProgress {
   currentOrders: number;
+  packageCount?: number;
+  totalOrders?: number;
   claimedIds: number[];
+  cycleMonth?: string;
+  daysRemaining?: number;
+  resetDate?: string;
+  isMaxReached?: boolean;
 }
 
 export const milestoneApi = {

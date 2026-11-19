@@ -46,8 +46,8 @@ export default function AdminDashboardScreen() {
       const [analyticsRes, packagesRes, tablesRes, usersRes] =
         await Promise.allSettled([
           paymentApi.getAnalytics("TODAY"),
-          packageApi.findAllPackage(),
-          tableApi.getAdminTables({ limit: 1000 } as any),
+          packageApi.getAdminSummary(),
+          tableApi.getAdminTableSummary(),
           adminUserApi.getUsers({ limit: 1 }),
         ]);
 
@@ -58,20 +58,14 @@ export default function AdminDashboardScreen() {
       setActiveOrdersCount(analytics?.summary.activeOrders || 0);
 
       // 2. Packages (Orders)
-      let pkgs: Package[] = [];
-      if (packagesRes.status === "fulfilled" && Array.isArray(packagesRes.value)) {
-        pkgs = packagesRes.value;
-        setRecentPackages(pkgs.slice(0, 3));
+      if (packagesRes.status === "fulfilled") {
+        setRecentPackages(packagesRes.value.recentPackages || []);
       }
 
       // 3. Tables
-      if (tablesRes.status === "fulfilled" && tablesRes.value?.data) {
-        const tblList = tablesRes.value.data;
-        const occupied = tblList.filter(
-          (t: any) => t.status === "OCCUPIED" || t.status === "RESERVED"
-        ).length;
-        setOccupiedTablesCount(occupied);
-        setTotalTablesCount(tablesRes.value.pagination?.total ?? tblList.length);
+      if (tablesRes.status === "fulfilled") {
+        setOccupiedTablesCount(tablesRes.value.occupied || 0);
+        setTotalTablesCount(tablesRes.value.total || 0);
       }
 
       // 4. Users

@@ -9,7 +9,7 @@ interface AdminOrderInfoProps {
   price: number;
 }
 
-export default function AdminOrderInfo({
+function AdminOrderInfo({
   formattedDate,
   address,
   paymentMethod,
@@ -22,7 +22,7 @@ export default function AdminOrderInfo({
   return (
     <>
       {/* Khối thông tin chi tiết: Thời gian, Địa chỉ, Thanh toán */}
-      <View className="bg-gray-50/80 rounded-2xl p-3 mb-3 border border-gray-100/80 space-y-1.5">
+      <View className="bg-gray-50/80 rounded-2xl p-3 mb-3 border border-gray-100/80 gap-y-1.5">
         {/* Thời gian */}
         <View className="flex-row items-center">
           <MaterialCommunityIcons name="clock-time-four-outline" size={13} color="#9CA3AF" />
@@ -75,3 +75,5 @@ export default function AdminOrderInfo({
     </>
   );
 }
+
+export default React.memo(AdminOrderInfo);

@@ -11,6 +11,8 @@ import { Grid2X2, Plus, Users, UtensilsCrossed, RefreshCw, Clock, Layers } from 
 export default function TablesPage() {
   const [tables, setTables] = useState<Table[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoaded, setProductsLoaded] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedFloor, setSelectedFloor] = useState<string>('ALL');
 
@@ -24,12 +26,8 @@ export default function TablesPage() {
   const fetchTablesData = async () => {
     try {
       setLoading(true);
-      const [tbls, prods] = await Promise.all([
-        apiService.getTables(),
-        apiService.getProducts(),
-      ]);
+      const tbls = await apiService.getTables();
       setTables(tbls);
-      setProducts(prods);
     } catch (e) {
       console.error(e);
     } finally {
@@ -40,6 +38,22 @@ export default function TablesPage() {
   useEffect(() => {
     fetchTablesData();
   }, []);
+
+  const openAddFoodModal = async (table: Table) => {
+    setActiveTableForFood(table);
+    if (productsLoaded || productsLoading) return;
+
+    setProductsLoading(true);
+    try {
+      const data = await apiService.getProducts();
+      setProducts(data);
+      setProductsLoaded(true);
+    } catch (e) {
+      console.error('Error fetching menu for table:', e);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
 
   const handleUpdateStatus = async (tableId: string | number, status: TableStatus) => {
     await apiService.updateTableStatus(tableId, status);
@@ -203,7 +217,7 @@ export default function TablesPage() {
               {/* Action Buttons */}
               <div className="mt-5 pt-3 border-t border-slate-100 space-y-2">
                 <button
-                  onClick={() => setActiveTableForFood(table)}
+                  onClick={() => openAddFoodModal(table)}
                   className="w-full py-2 px-3 rounded-xl bg-[#E07B39] hover:bg-orange-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                 >
                   <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -246,6 +260,7 @@ export default function TablesPage() {
         onClose={() => setActiveTableForFood(null)}
         table={activeTableForFood}
         products={products}
+        productsLoading={productsLoading}
         onSuccess={fetchTablesData}
       />
 

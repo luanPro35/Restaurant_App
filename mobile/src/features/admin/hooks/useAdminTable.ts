@@ -1,5 +1,5 @@
 import { tableApi, AdminTableQuery } from "../../../services/api/api-table";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Alert } from "react-native";
 import {
   AdminTable,
@@ -138,10 +138,6 @@ export const useAdminTable = () => {
       Alert.alert("Lỗi", "Không thể cập nhật bàn");
     }
   };
-
-  useEffect(() => {
-    fetchTables();
-  }, [fetchTables]);
 
   return {
     tables,

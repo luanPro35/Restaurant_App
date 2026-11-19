@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { productApi } from "../../../services/api/apiProducts";
+import { getHomeProducts } from "../services/homeProducts";
 import { seededShuffle, getDailySeed } from "../../../utils/random";
 import { formatCurrency, resolveImageUrl } from "../../../shared/utils";
 import { useCart } from "../../../app/context/CartContext";
@@ -88,10 +88,7 @@ export default function MealOption({ navigation }: { navigation: any }) {
     const fetchAndRandomize = async () => {
       try {
         setLoading(true);
-        const response = await productApi.getAll({ limit: 50 });
-        const allProducts = Array.isArray(response)
-          ? response
-          : response.data || [];
+        const allProducts = await getHomeProducts();
 
         if (isMounted && allProducts.length > 0) {
           const shuffled = seededShuffle(
@@ -144,8 +141,8 @@ export default function MealOption({ navigation }: { navigation: any }) {
           contentContainerStyle={{ paddingHorizontal: 16 }}
           snapToInterval={200}
           decelerationRate="fast"
-          initialNumToRender={5}
-          maxToRenderPerBatch={5}
+          initialNumToRender={3}
+          maxToRenderPerBatch={3}
           windowSize={3}
         />
       )}

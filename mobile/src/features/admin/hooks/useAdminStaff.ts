@@ -19,6 +19,7 @@ export const useAdminStaff = () => {
     async (pageNum = 1, isRefresh = false) => {
       try {
         if (pageNum === 1 && !isRefresh) setLoading(true);
+        if (pageNum > 1) setLoading(true);
 
         const response = await adminStaffApi.getStaff({
           name: search,
